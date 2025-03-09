@@ -1,6 +1,9 @@
 # Playground
 
-Playground is a web application built with TypeScript, React, Tailwind CSS, and Vite. This project serves as a template for creating modern web applications with a focus on simplicity and performance.
+This app is naive implementation for [codepen.io](http://codepen.io)
+just to demonstrate effective development with AI support
+
+## [Live Demo](https://mikhail-angelov.github.io/playground)
 
 ## Features
 
@@ -30,7 +33,7 @@ To get started with Playground, follow these steps:
    ```
 
 4. **Open your browser**:
-   Navigate to `http://localhost:3000` to see your application in action.
+   Navigate to `http://localhost:5173` to see your application in action.
 
 ## Building for Production
 
@@ -41,6 +44,19 @@ npm run build
 ```
 
 This will create an optimized build of your application in the `dist` directory.
+
+## Deploying to GitHub Pages
+
+To deploy the application to GitHub Pages, follow these steps:
+
+1. **Push to the master branch**:
+   Ensure your changes are committed and push to the `master` branch:
+   ```bash
+   git push origin master
+   ```
+
+2. **GitHub Actions**:
+   The GitHub Actions workflow will automatically build and deploy your application to GitHub Pages.
 
 ## Contributing
 
