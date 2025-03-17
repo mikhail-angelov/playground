@@ -20,7 +20,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="flex items-center justify-between p-4 bg-gray-800 text-white">
+    <header className="flex items-center justify-between p-4 bg-gray-900 text-white">
       <div className="flex items-center space-x-4">
         <h2 className="ml-2 text-4xl">🃟</h2>
         {isEditing ? (

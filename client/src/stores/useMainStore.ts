@@ -12,33 +12,35 @@ interface AppState {
   triggerPreview: () => void;
 }
 
+const initFileContents = {
+  "index.html": `<canvas id="canvas" style:"width:100%; height:100%; border:1px solid;"></canvas>`,
+  "style.css": "html{ width:100%; height:100%; background-color: #333; color:  #f0f0f0; margin:0px; padding:0px; display:flex; flex-direction:column;} canvas { flex:1; margin:5px; }",
+  "script.js": 'console.log("Hello, World!");',
+}
+
 export const useMainStore = create<AppState>((set) => ({
   projectName: "New Project",
   setProjectName: (name) => set({ projectName: name }),
   files: ["index.html", "style.css", "script.js"],
   selectedFile: "index.html",
   setSelectedFile: (file: string) => set({ selectedFile: file }),
-  fileContents: {
-    "index.html": `<div id="test">Hello, World!</div>`,
-    "style.css": "body { background-color: #333; color:  #f0f0f0;}",
-    "script.js": 'console.log("Hello, World!");',
-  },
+  fileContents: initFileContents,
   setFileContent: (file: string, content: string) =>
     set((state) => ({
       fileContents: { ...state.fileContents, [file]: content },
     })),
-    preview: "",
+    preview: '',
     triggerPreview: () =>
         set((state) =>{
-            const preview = composePreview(state);
+            const preview = composePreview(state.fileContents);
             return{ preview};
         }),
 }));
 
-const composePreview = (state: AppState) => {
-     const htmlContent = state.fileContents['index.html'] || '';
-      const cssContent = state.fileContents['style.css'] || '';
-      const jsContent = state.fileContents['script.js'] || '';
+const composePreview = (fileContents: Record<string, string>) => {
+     const htmlContent = fileContents['index.html'] || '';
+      const cssContent = fileContents['style.css'] || '';
+      const jsContent = fileContents['script.js'] || '';
     
       return `
         <!DOCTYPE html>
@@ -53,11 +55,19 @@ const composePreview = (state: AppState) => {
             ${htmlContent}
             <script>
               (function() {
+                // Override console.log to post messages to the parent window
                 const originalLog = console.log;
                 console.log = function(...args) {
                     window.parent.postMessage({ type: 'console', message: args.join(' ') }, '*');
                     originalLog.apply(console, args);
                 };
+                //wrap mouse events and propagate to parent window
+                document.addEventListener('mousemove', (event) => {
+                  window.parent.postMessage({ type: 'mousemove', event: { clientX: event.clientX, clientY: event.clientY } }, '*');
+                });
+                document.addEventListener('mouseup', (event) => {
+                  window.parent.postMessage({ type: 'mouseup', event: { clientX: event.clientX, clientY: event.clientY } }, '*');
+                });
                 ${jsContent}
               })();
             </script>
