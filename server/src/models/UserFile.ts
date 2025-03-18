@@ -1,9 +1,5 @@
-import { Sequelize, DataTypes, Model } from 'sequelize';
-
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: './database.sqlite',
-});
+import { DataTypes, Model } from 'sequelize';
+import sequelize from '../db';
 
 class UserFile extends Model {
   public id!: number;
@@ -29,8 +25,8 @@ UserFile.init(
   },
   {
     sequelize,
-    modelName: 'UserFile',
+    modelName: 'user_files',
   }
 );
 
-export { sequelize, UserFile };
+export { UserFile };

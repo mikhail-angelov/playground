@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import { v4 } from "uuid";
 import { UserFile } from "../models/UserFile";
 import { uploadFileToS3, getFileFromS3 } from "../services/s3Service";
 
@@ -10,7 +11,7 @@ interface AuthenticatedRequest extends Request {
 }
 
 router.post("/upload", async (req: AuthenticatedRequest, res: Response) => {
-  const { fileName, content } = req.body;
+  const { fileName = "", projectId, content } = req.body;
   const userId = req.userId;
 
   if (!userId) {
@@ -18,12 +19,35 @@ router.post("/upload", async (req: AuthenticatedRequest, res: Response) => {
   }
 
   try {
-    const s3Key = `${userId}/${fileName}`;
-    await uploadFileToS3(s3Key, content);
+    const s3Key = projectId || v4();
 
-    const userFile = await UserFile.create({ userId, fileName, s3Key });
+    // Check if a file with the same s3Key already exists
+    const existingFile = await UserFile.findOne({ where: { s3Key } });
+
+    if (existingFile && existingFile.userId != userId) {
+      console.log(
+        `File ${projectId} with the same key already exists for another user: ${existingFile.userId}, but current user is ${userId}`
+      );
+      return res
+        .status(400)
+        .json({
+          error: "File with the same key already exists for another user",
+        });
+    }
+
+    // Upload the file to S3
+    await uploadFileToS3(s3Key, JSON.stringify(content));
+
+    // Create or update the UserFile record
+    const userFile = await UserFile.upsert({
+      userId,
+      fileName,
+      s3Key,
+    });
+
     res.json(userFile);
   } catch (err) {
+    console.error("Error uploading file:", err);
     res.status(500).json({ error: "Failed to upload file" });
   }
 });

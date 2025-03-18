@@ -1,23 +1,14 @@
-import { Sequelize, DataTypes, Model } from 'sequelize';
-
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: './database.sqlite',
-});
+import { DataTypes, Model } from 'sequelize';
+import sequelize from '../db';
 
 class User extends Model {
   public id!: string;
-  public userId!: string;
   public email!: string;
   public token?: string;
 }
 
 User.init(
   {
-    userId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -29,7 +20,7 @@ User.init(
   },
   {
     sequelize,
-    modelName: 'User',
+    modelName: 'users',
   }
 );
 

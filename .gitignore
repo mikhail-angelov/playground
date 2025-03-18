@@ -20,6 +20,8 @@ temp/
 # OS files
 .DS_Store
 Thumbs.db
+*.pem
+*.sqlite
 
 # Environment variables
 .env
