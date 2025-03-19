@@ -2,8 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-import App from "./components/App";
-import ViewApp from "./components/ViewApp";
+import HomeApp from "./pages/home/HomeApp";
+import EditApp from "./pages/edit/EditApp";
+import ViewApp from "./pages/view/ViewApp";
 import "./styles/index.css";
 
 const root = ReactDOM.createRoot(
@@ -13,10 +14,9 @@ root.render(
   <React.StrictMode>
     <Router>
       <Routes>
-        {/* Route for /view/{id} */}
         <Route path="/view/:id" element={<ViewApp />} />
-        {/* Default route */}
-        <Route path="/*" element={<App />} />
+        <Route path="/edit/:id" element={<EditApp />} />
+        <Route path="/" element={<HomeApp />} />
       </Routes>
     </Router>
   </React.StrictMode>

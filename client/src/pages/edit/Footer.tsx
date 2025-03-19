@@ -1,5 +1,5 @@
 import React from "react";
-import { useMainStore } from "../stores/useMainStore";
+import { useMainStore } from "../../stores/useMainStore";
 
 const Footer: React.FC = () => {
   const selectedFile = useMainStore((state) => state.selectedFile);

@@ -5,6 +5,7 @@ import { nanoid } from "nanoid";
 interface AppState {
   projectId: string;
   projectName: string;
+  newProject: () => string;
   setProjectName: (name: string) => void;
   lastPublish: string;
   error: string;
@@ -16,8 +17,9 @@ interface AppState {
   setFileContent: (file: string, content: string) => void;
   preview: string;
   triggerPreview: () => void;
-  uploadFiles: () => Promise<{ success: boolean; url?: string }>;
-  loadFileContents: (id?: string) => Promise<void>;
+  uploadFiles: (image: string) => Promise<{ success: boolean; url?: string }>;
+  loadFileContents: (id: string) => Promise<void>;
+  cloneProject: () => void;
 }
 
 const initFileContents = {
@@ -30,6 +32,11 @@ const initFileContents = {
 export const useMainStore = create<AppState>((set, get) => ({
   projectId: "",
   projectName: "New Project",
+  newProject: () => {
+    const projectId = nanoid(20)
+    set({ projectId, projectName: "New Project" })
+    return projectId
+  },
   setProjectName: (name) => set({ projectName: name }),
   lastPublish: "",
   error: "",
@@ -48,10 +55,10 @@ export const useMainStore = create<AppState>((set, get) => ({
       const preview = composePreview(state.fileContents);
       return { preview };
     }),
-  uploadFiles: async () => {
-    const { projectId, fileContents, projectName } = get();
+  uploadFiles: async (image: string) => {
+    const { projectId, fileContents, projectName: name } = get();
     try {
-      const response = await fetch(`${HOST}/api/files/upload`, {
+      const response = await fetch(`${HOST}/api/project/upload`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,8 +66,9 @@ export const useMainStore = create<AppState>((set, get) => ({
         credentials: "include",
         body: JSON.stringify({
           projectId,
-          projectName,
+          name,
           content: fileContents,
+          image,
         }),
       });
 
@@ -80,19 +88,7 @@ export const useMainStore = create<AppState>((set, get) => ({
       return { success: false, error: "An unexpected error occurred" };
     }
   },
-  loadFileContents: async (id?: string) => {
-    const urlParams = new URLSearchParams(window.location.search);
-
-    if (!id) {
-      // Generate a random 20-character string if `id` is not defined
-      console.log("Generating new project ID");
-      id = nanoid(20);
-      urlParams.set("id", id);
-      const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
-      window.history.replaceState(null, "", newUrl); // Update the URL without reloading
-    }
-    set({ projectId: id });
-
+  loadFileContents: async (id: string) => {
     try {
       const response = await fetch(
         `https://storage.yandexcloud.net/playground-yat/${id}`
@@ -100,13 +96,16 @@ export const useMainStore = create<AppState>((set, get) => ({
 
       if (response.ok) {
         const content = await response.json();
-        set({ fileContents: content });
+        set({ fileContents: content, projectId: id });
       } else {
         console.error("Failed to load file contents:", response.statusText);
       }
     } catch (err) {
       console.error("Error loading file contents:", err);
     }
+  },
+  cloneProject: () => {
+    set({ projectId: nanoid(20), projectName: "New Project", lastPublish: "" });
   },
 }));
 

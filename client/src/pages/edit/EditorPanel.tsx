@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
-import { useMainStore } from "../stores/useMainStore";
+import { useMainStore } from "../../stores/useMainStore";
 
 const getLanguageFromExtension = (fileName: string) => {
   const extension = fileName.split(".").pop();

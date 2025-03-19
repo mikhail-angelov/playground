@@ -3,12 +3,12 @@ import {
   useParams,
 } from "react-router-dom";
 
-import ViewHeader from "./ViewHeader";
-import ViewProject from "./ViewProject";
-import ViewFooter from "./ViewFooter";
-import { useMainStore } from "../stores/useMainStore";
+import Header from "./Header";
+import ProjectList from "./ProjectList";
+import Footer from "./Footer";
+import { useMainStore } from "../../stores/useMainStore";
 
-const ViewApp: React.FC = () => {
+const HomeApp: React.FC = () => {
   const loadFileContents = useMainStore((state) => state.loadFileContents);
   const triggerPreview = useMainStore((state) => state.triggerPreview);
 
@@ -23,11 +23,11 @@ const ViewApp: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <ViewHeader />
-      <ViewProject projectId={id || ""} />
-      <ViewFooter />
+      <Header />
+      <ProjectList />
+      <Footer />
     </div>
   );
 };
 
-export default ViewApp;
+export default HomeApp;

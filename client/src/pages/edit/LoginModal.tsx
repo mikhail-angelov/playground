@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import { useAuthStore } from "../stores/useAuthStore";
+import { useAuthStore } from "../../stores/useAuthStore";
 
 interface LoginModalProps {
   isOpen: boolean;

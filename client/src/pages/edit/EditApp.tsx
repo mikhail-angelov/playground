@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
-import { useMainStore } from "../stores/useMainStore";
+import { useMainStore } from "../../stores/useMainStore";
 
-const App: React.FC = () => {
+const EditApp: React.FC = () => {
   const loadFileContents = useMainStore((state) => state.loadFileContents);
-
+  const { id } = useParams<{ id: string }>();
+  
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("id") ?? "";
     loadFileContents(id);
   }, [loadFileContents]);
 
@@ -22,4 +22,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default EditApp;

@@ -1,5 +1,5 @@
 import React from "react";
-import { useMainStore } from "../stores/useMainStore";
+import { useMainStore } from "../../stores/useMainStore";
 
 interface LeftPanelProps {
   isCollapsed: boolean;

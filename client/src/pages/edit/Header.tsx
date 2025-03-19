@@ -1,22 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { useMainStore } from "../stores/useMainStore";
-import { useAuthStore } from "../stores/useAuthStore";
+import html2canvas from "html2canvas";
+import { useMainStore } from "../../stores/useMainStore";
+import { useAuthStore } from "../../stores/useAuthStore";
 import LoginModal from "./LoginModal";
 import PublishedUrlModal from "./PublishedUrlModal";
+import NewProjectButton from "../../components/NewProjectButton";
+import { useNavigate } from "react-router-dom";
 
 const Header: React.FC = () => {
+  const navigate = useNavigate();
   const projectName = useMainStore((state) => state.projectName);
   const setProjectName = useMainStore((state) => state.setProjectName);
   const uploadFiles = useMainStore((state) => state.uploadFiles);
-  const error = useMainStore((state) => state.error); 
-  const setError = useMainStore((state) => state.setError); 
+  const error = useMainStore((state) => state.error);
+  const setError = useMainStore((state) => state.setError);
   const [isEditing, setIsEditing] = useState(false);
   const [newProjectName, setNewProjectName] = useState(projectName);
   const triggerPreview = useMainStore((state) => state.triggerPreview);
+  const cloneProject = useMainStore((state) => state.cloneProject);
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isPublishedModalOpen, setIsPublishedModalOpen] = useState(false); 
-  const [publishedUrl, setPublishedUrl] = useState(""); 
+  const [isPublishedModalOpen, setIsPublishedModalOpen] = useState(false);
+  const [publishedUrl, setPublishedUrl] = useState("");
 
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
@@ -34,10 +39,39 @@ const Header: React.FC = () => {
   };
 
   const handlePublish = async () => {
-    const { success, url = "" } = await uploadFiles();
-    if (success) {
-      setPublishedUrl(url); // Set the published URL
-      setIsPublishedModalOpen(true); // Open the PublishedUrlModal
+    try {
+      // Select the iframe element
+      const iframe = document.querySelector("iframe");
+      let image = "";
+  
+      if (iframe && iframe.contentDocument) {
+        // Use html2canvas to capture the iframe content
+        const iframeBody = iframe.contentDocument.body;
+  
+        const canvas = await html2canvas(iframeBody, {
+          useCORS: true, // Enable cross-origin resource sharing if needed
+          logging: true, // Enable logging for debugging
+          scale: 1, // Adjust the scale for better resolution
+        });
+  
+        // Convert the canvas content to a Base64 string
+        image = canvas.toDataURL("image/png");
+  
+        // Call the uploadFiles API with the captured image
+        const { success, url = "" } = await uploadFiles(image);
+  
+        if (success) {
+          setPublishedUrl(url); // Set the published URL
+          setIsPublishedModalOpen(true); // Open the PublishedUrlModal
+        } else {
+          setError("Failed to publish the project. Please try again.");
+        }
+      } else {
+        console.warn("Iframe element not found. Proceeding without an image.");
+      }
+    } catch (err) {
+      console.error("Error during publish:", err);
+      setError("An unexpected error occurred while publishing the project.");
     }
   };
 
@@ -86,6 +120,19 @@ const Header: React.FC = () => {
           )}
         </div>
         <div className="flex space-x-4">
+          <NewProjectButton />
+          <button
+            className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
+            onClick={() => navigate("/")}
+          >
+            Home
+          </button>
+          <button
+            className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
+            onClick={cloneProject}
+          >
+            Clone Project
+          </button>
           <button
             className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
             onClick={triggerPreview}

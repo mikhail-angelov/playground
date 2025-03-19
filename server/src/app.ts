@@ -3,10 +3,9 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import cookieParser from "cookie-parser";
 import cors from 'cors';
-import fileRoutes from './routes/fileRoutes';
 import authRoutes from './routes/authRoutes';
-import { authMiddleware } from './routes/authMiddleware';
 import sequelize from './db';
+import projectsRoutes from './routes/projectsRoutes';
 
 dotenv.config();
 
@@ -30,7 +29,7 @@ app.use('/api/auth', authRoutes);
 
 
 // Protected routes
-app.use('/api/files', authMiddleware, fileRoutes);
+app.use('/api/project', projectsRoutes);
 
 sequelize.sync().then(() => {
   console.log('Database synced');
