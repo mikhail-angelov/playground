@@ -21,17 +21,8 @@ WORKDIR /app
 # Copy server build
 COPY --from=server-builder /app/server/dist ./server/dist
 COPY --from=server-builder /app/server/package.json ./server/package.json
-COPY --from=server-builder /app/server/node_modules ./server/node_modules
+COPY --from=server-builder /app/server/package-lock.json ./server/package-lock.json
+RUN cd server; npm ci --omit=dev
 
 # Copy client build
-COPY --from=client-builder /app/client/build ./client/build
-
-# Set environment variables
-ENV NODE_ENV=production
-ENV PORT=5000
-
-# Expose the server port
-EXPOSE 5000
-
-# Start the server
-CMD ["node", "server/dist/server.js"]
+COPY --from=client-builder /app/client/dist ./client/dist

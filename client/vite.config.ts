@@ -4,7 +4,7 @@ import { resolve } from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: './',
+  base: '/',
   plugins: [react()],
   resolve: {
     alias: {
@@ -18,5 +18,10 @@ export default defineConfig({
   server: {
     port: 5173,
     open: true,
+    proxy: {
+      "/api": {
+          target: "http://localhost:5000",
+      },
+  }
   },
 });

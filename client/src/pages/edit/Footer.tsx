@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
   return (
     <footer className="flex items-center justify-between p-4 bg-gray-800 text-white">
       <span>File: {selectedFile}</span>
-      <p>© 2025 Playground</p>
+      <p>© 2025 ѣ</p>
       <span>
         Last published: {lastPublish ? lastPublish : "Not published yet"}
       </span>

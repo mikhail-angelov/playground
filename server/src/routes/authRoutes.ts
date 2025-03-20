@@ -89,7 +89,7 @@ router.get('/validate', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json({ message: 'Authentication is valid', user: { id: user.id, email: user.email } });
+    res.json({ message: 'Authentication is valid', user: { email: user.email } });
   } catch (err) {
     console.error('Error validating token:', err);
     res.status(401).json({ error: 'Unauthorized: Invalid token' });

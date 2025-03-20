@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import { HOST } from "./utils";
 
 interface AuthState {
   isAuthenticated: boolean;
+  email?: string;
   login: (email: string) => Promise<"success" | "error">;
   checkAuthStatus: () => Promise<void>;
   logout: () => Promise<void>;
@@ -10,16 +10,16 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
+  email: '',
   login: async (email: string) => {
     try {
-      const response = await fetch(`${HOST}/api/auth`, {
+      const response = await fetch('/api/auth', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
 
       if (response.ok) {
-        set({ isAuthenticated: true });
         return "success";
       } else {
         return "error";
@@ -31,13 +31,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   checkAuthStatus: async () => {
     try {
-      const response = await fetch(`${HOST}/api/auth/validate`, {
+      const response = await fetch('/api/auth/validate', {
         method: "GET",
         credentials: "include", // Include cookies in the request
       });
 
       if (response.ok) {
-        set({ isAuthenticated: true });
+        const { user } = await response.json();
+        set({ isAuthenticated: true, email: user.email });
       } else {
         set({ isAuthenticated: false });
       }
@@ -48,7 +49,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   logout: async () => {
     try {
-      const response = await fetch(`${HOST}/api/auth/logout`, {
+      const response = await fetch('/api/auth/logout', {
         method: "POST",
         credentials: "include", // Include cookies in the request
       });

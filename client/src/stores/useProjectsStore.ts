@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { HOST } from "./utils";
 
 interface Project {
   projectId: string;
@@ -16,7 +15,7 @@ export const useProjectsStore = create<ProjectsState>((set) => ({
   bestProjects: [],
   loadBestProjects: async () => {
     try {
-      const response = await fetch(`${HOST}/api/project/best`);
+      const response = await fetch('/api/project/best');
       if (response.ok) {
         const projects = await response.json();
         set({ bestProjects: projects });

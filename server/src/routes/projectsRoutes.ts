@@ -9,6 +9,7 @@ const router = express.Router();
 // Define a custom request type to include `userId`
 interface AuthenticatedRequest extends Request {
   userId?: string;
+  email?: string;
 }
 
 router.post(
@@ -17,6 +18,7 @@ router.post(
   async (req: AuthenticatedRequest, res: Response) => {
     const { name = "", projectId = v4(), content, image } = req.body;
     const userId = req.userId;
+    const email = req.email;
 
     if (!userId) {
       return res
@@ -40,7 +42,7 @@ router.post(
       }
 
       // Upload the file to S3
-      await uploadFileToS3(s3Key, JSON.stringify(content));
+      await uploadFileToS3(s3Key, JSON.stringify({projectId, name, content, email}));
 
       if (existingProject) {
         await Project.update(

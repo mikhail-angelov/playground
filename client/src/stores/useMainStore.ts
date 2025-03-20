@@ -1,10 +1,10 @@
 import { create } from "zustand";
-import { HOST, ORIGIN_HOST } from "./utils";
 import { nanoid } from "nanoid";
 
 interface AppState {
   projectId: string;
   projectName: string;
+  email: string;
   newProject: () => string;
   setProjectName: (name: string) => void;
   lastPublish: string;
@@ -31,6 +31,7 @@ const initFileContents = {
 
 export const useMainStore = create<AppState>((set, get) => ({
   projectId: "",
+  email: "",
   projectName: "New Project",
   newProject: () => {
     const projectId = nanoid(20)
@@ -58,7 +59,7 @@ export const useMainStore = create<AppState>((set, get) => ({
   uploadFiles: async (image: string) => {
     const { projectId, fileContents, projectName: name } = get();
     try {
-      const response = await fetch(`${HOST}/api/project/upload`, {
+      const response = await fetch('/api/project/upload', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +82,7 @@ export const useMainStore = create<AppState>((set, get) => ({
 
       console.log("Files uploaded successfully");
       set({ error: "", lastPublish: new Date().toLocaleString() });
-      return { success: true, url: `${ORIGIN_HOST}/view/${projectId}` };
+      return { success: true, url: `${location.origin}/view/${projectId}` };
     } catch (err) {
       set({ error: "Failed to upload files" });
       console.error("Error uploading files:", err);
@@ -95,8 +96,8 @@ export const useMainStore = create<AppState>((set, get) => ({
       );
 
       if (response.ok) {
-        const content = await response.json();
-        set({ fileContents: content, projectId: id });
+        const {content, email} = await response.json();
+        set({ fileContents: content, projectId: id, email });
       } else {
         console.error("Failed to load file contents:", response.statusText);
       }

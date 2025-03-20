@@ -46,7 +46,6 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
       iframeRef.current &&
       dragging.current
     ) {
-      //correct clientX and clientY values to be relative to the iframe
       const rect = iframeRef.current.getBoundingClientRect();
       handleMouseMove({
         clientX: event.data.event.clientX + rect.left,
@@ -84,11 +83,17 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
 
   return (
     <div className="bg-gray-900 border-l border-gray-700 flex flex-col">
-      <div className="flex justify-between bg-gray-800">
-        <button onClick={toggleCollapse} className="p-2 text-white">
+      <div className="flex justify-between items-center bg-gray-800 p-2">
+        <button onClick={toggleCollapse} className="text-white">
           {">"}
         </button>
-        <span className="p-2 text-white">Preview</span>
+        <span className="text-white font-bold">Preview</span>
+        <button
+          onClick={triggerPreview}
+          className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700"
+        >
+          Run ▶
+        </button>
       </div>
       <iframe
         id="iframe"
