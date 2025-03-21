@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useMainStore } from "../stores/useMainStore";
+import { Button } from "./ui/button";
 
 const NewProjectButton: React.FC = () => {
   const navigate = useNavigate();
@@ -12,12 +13,11 @@ const NewProjectButton: React.FC = () => {
   };
 
   return (
-    <button
+    <Button variant="outline" 
       onClick={handleNewProject}
-      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
     >
       New
-    </button>
+    </Button>
   );
 };
 

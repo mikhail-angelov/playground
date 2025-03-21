@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useMainStore } from "../../stores/useMainStore";
+import { Button } from "@/components/ui/button";
+import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 
 interface PreviewPanelProps {
   isCollapsed: boolean;
@@ -13,47 +16,12 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
   const preview = useMainStore((state) => state.preview);
   const triggerPreview = useMainStore((state) => state.triggerPreview);
   const [consoleOutput, setConsoleOutput] = useState<string[]>([]);
-  const [consoleHeight, setConsoleHeight] = useState(300);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const dragging = useRef<{ yOffset: number; height: number } | undefined>(
-    undefined
-  );
 
-  const handleMouseMove = (event: MouseEvent) => {
-    if (dragging.current) {
-      const { yOffset, height } = dragging.current;
-      const newHeight = height - (event.clientY - yOffset);
-      setConsoleHeight(
-        Math.min(Math.max(newHeight, 200), window.innerHeight - 200)
-      ); // Ensure height is between 200px and window height - 200px
-    }
-  };
-
-  const handleMouseUp = () => {
-    dragging.current = undefined;
-  };
-
-  const handleMouseDown = (event: React.MouseEvent) => {
-    dragging.current = { yOffset: event.clientY, height: consoleHeight };
-  };
 
   const handleConsoleMessage = (event: MessageEvent) => {
     if (event.data.type === "console") {
       setConsoleOutput((prevOutput) => [...prevOutput, event.data.message]);
-    }
-    if (
-      event.data.type === "mousemove" &&
-      iframeRef.current &&
-      dragging.current
-    ) {
-      const rect = iframeRef.current.getBoundingClientRect();
-      handleMouseMove({
-        clientX: event.data.event.clientX + rect.left,
-        clientY: event.data.event.clientY + rect.top,
-      } as MouseEvent);
-    }
-    if (event.data.type === "mouseup" && dragging.current) {
-      handleMouseUp();
     }
   };
 
@@ -61,39 +29,36 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
     triggerPreview();
 
     window.addEventListener("message", handleConsoleMessage);
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
 
     return () => {
       window.removeEventListener("message", handleConsoleMessage);
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
     };
   }, []);
 
   if (isCollapsed) {
     return (
       <div className="bg-gray-900 border-l border-gray-700 flex flex-col">
-        <button onClick={toggleCollapse} className="p-2 text-white">
-          {"<"}
-        </button>
+        <Button variant="ghost" onClick={toggleCollapse}>
+          <ChevronLeft className="w-6 h-6 text-white" />
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-900 border-l border-gray-700 flex flex-col">
-      <div className="flex justify-between items-center bg-gray-800 p-2">
-        <button onClick={toggleCollapse} className="text-white">
-          {">"}
-        </button>
+    <ResizablePanelGroup direction="vertical">
+    <ResizablePanel    >
+<div className="flex justify-between items-center bg-gray-800 px-2 py-1">
+        <Button onClick={toggleCollapse} variant="ghost">
+          <ChevronRight className="w-6 h-6 text-white" />
+        </Button>
         <span className="text-white font-bold">Preview</span>
-        <button
+        <Button
           onClick={triggerPreview}
-          className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700"
+          variant="outline"
         >
           Run ▶
-        </button>
+        </Button>
       </div>
       <iframe
         id="iframe"
@@ -102,21 +67,14 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
         title="Preview"
         className="w-full h-full flex-1"
       />
-      <div
-        className="w-full bg-gray-800 text-white overflow-y-auto"
-        style={{
-          height: `${consoleHeight}px`,
-          minHeight: `${consoleHeight}px`,
-        }}
+    </ResizablePanel>
+    <ResizableHandle />
+    <ResizablePanel>
+    <div
+        className="w-full h-full overflow-y-auto"
       >
-        <div
-          className="w-full h-2 bg-gray-700 cursor-row-resize relative"
-          onMouseDown={handleMouseDown}
-        >
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-0.5 bg-white"></div>
-        </div>
-        <h3 className="text-lg font-bold mx-2">Console Output</h3>
-        <div className="mx-2">
+        <h3 className="mx-2">Console Output</h3>
+        <div className="mx-2 ">
           {consoleOutput.map((message, index) => (
             <div key={index} className="text-sm">
               {message}
@@ -124,7 +82,8 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
           ))}
         </div>
       </div>
-    </div>
+    </ResizablePanel>
+    </ResizablePanelGroup>
   );
 };
 

@@ -1,5 +1,15 @@
-import React, { useState } from "react";
-import ReactDOM from "react-dom";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
 import { useAuthStore } from "../stores/useAuthStore";
 
 interface LoginModalProps {
@@ -7,7 +17,7 @@ interface LoginModalProps {
   onClose: () => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
+export function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [email, setEmail] = useState("");
   const [loginStatus, setLoginStatus] = useState<"idle" | "success" | "error">(
     "idle"
@@ -16,60 +26,49 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
   const login = useAuthStore((state) => state.login);
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
     const result = await login(email);
     if (result === "success") {
-      setLoginStatus("success");
+      onClose();
     } else {
       setErrorMessage("Failed to send login email.");
       setLoginStatus("error");
     }
   };
-
-  if (!isOpen) return null;
-
-  return ReactDOM.createPortal(
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-lg w-96">
-        <h2 className="text-xl font-bold mb-4">Login</h2>
-        {loginStatus === "idle" && (
-          <>
-            <input
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Sign in</DialogTitle>
+          <DialogDescription>
+            To authorize, please enter your email address, then you'll receive a
+            magic link in your inbox.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="email" className="text-right">
+              Email
+            </Label>
+            <Input
+              id="email"
               type="email"
-              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 mb-4 border rounded"
+              className="col-span-3"
             />
-            <button
-              onClick={handleLogin}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Send
-            </button>
-          </>
-        )}
-        {loginStatus === "success" && (
-          <p className="text-green-600">Check your email for the login link!</p>
-        )}
-        {loginStatus === "error" && (
-          <p className="text-red-600">{errorMessage}</p>
-        )}
-        <button
-          onClick={() => {
-            onClose();
-            setLoginStatus("idle");
-            setEmail("");
-            setErrorMessage("");
-          }}
-          className="mt-4 w-full px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-        >
-          Close
-        </button>
-      </div>
-    </div>,
-    document.getElementById("modal-root") as HTMLElement
+          </div>
+          {loginStatus === "error" && (
+            <p className="text-red-600">{errorMessage}</p>
+          )}
+        </div>
+        <DialogFooter>
+          <Button type="submit" onClick={handleLogin}>
+            Send
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
-};
-
-export default LoginModal;
+}

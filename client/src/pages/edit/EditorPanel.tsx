@@ -37,7 +37,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ width }) => {
   }, [width]);
 
   return (
-    <div className="flex-grow p-1" style={{ width: `${width}px` }}>
+    <div className="flex-grow p-1 h-full" style={{ width: `${width}px` }}>
       <Editor
         height="100%"
         defaultLanguage={language}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuthStore } from "../stores/useAuthStore";
-import LoginModal from "./LoginModal";
+import {LoginModal} from "./LoginModal";
+import { Button } from "./ui/button";
 
 const AuthButtons: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -10,19 +11,11 @@ const AuthButtons: React.FC = () => {
   return (
     <>
       {!isAuthenticated ? (
-        <button
-          className="px-4 py-2 bg-yellow-600 rounded hover:bg-yellow-700"
-          onClick={() => setIsLoginModalOpen(true)}
-        >
-          Login
-        </button>
+        <Button onClick={() => setIsLoginModalOpen(true)}>Login</Button>
       ) : (
-        <button
-          className="px-4 py-2 bg-red-600 rounded hover:bg-red-700"
-          onClick={onLogout}
-        >
+        <Button variant="outline" onClick={onLogout}>
           Logout
-        </button>
+        </Button>
       )}
       <LoginModal
         isOpen={isLoginModalOpen}

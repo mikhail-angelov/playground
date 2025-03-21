@@ -2,6 +2,7 @@ import React from "react";
 import { useMainStore } from "../../stores/useMainStore";
 import { useNavigate } from "react-router-dom";
 import HomeButton from "../../components/HomeButton";
+import { Button } from "../../components/ui/button";
 
 const Header: React.FC = () => {
   const projectName = useMainStore((state) => state.projectName); // Get projectName from useMainStore
@@ -13,15 +14,12 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="flex items-center justify-between p-4 bg-gray-900 text-white">
+    <header className="flex items-center justify-between p-4">
       <HomeButton />
       <h1 className="text-2xl font-bold">View: {projectName}</h1>
-      <button
-        onClick={handleEdit}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
+      <Button variant="outline" onClick={handleEdit}>
         Edit
-      </button>
+      </Button>
     </header>
   );
 };

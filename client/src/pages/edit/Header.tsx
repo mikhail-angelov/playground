@@ -6,6 +6,10 @@ import PublishedUrlModal from "./PublishedUrlModal";
 import NewProjectButton from "../../components/NewProjectButton";
 import HomeButton from "../../components/HomeButton";
 import AuthButtons from "../../components/AuthButtons";
+import { Button } from "../../components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 const Header: React.FC = () => {
   const projectName = useMainStore((state) => state.projectName);
@@ -21,6 +25,8 @@ const Header: React.FC = () => {
   const [publishedUrl, setPublishedUrl] = useState("");
 
   const userEmail = useAuthStore((state) => state.email);
+  const showForkButton = userEmail !== projectEmail && projectEmail;
+  const showPublishButton = userEmail === projectEmail || !projectEmail;
 
   const handleSave = () => {
     setProjectName(newProjectName);
@@ -34,6 +40,10 @@ const Header: React.FC = () => {
   };
 
   const handlePublish = async () => {
+    if (!userEmail) {
+      toast.error("Please login to publish the project.");
+      return;
+    }
     try {
       // Select the iframe element
       const iframe = document.querySelector("iframe");
@@ -72,52 +82,37 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="flex items-center justify-between p-4 bg-gray-900 text-white">
+      <header className="flex items-center justify-between p-4 border-b border-gray-700">
         <div className="flex items-center space-x-4">
           <HomeButton />
           {isEditing ? (
             <div className="flex items-center space-x-2">
-              <input
+              <Input
                 type="text"
                 value={newProjectName}
                 onChange={(e) => setNewProjectName(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="px-2 py-1 text-black rounded"
               />
-              <button
-                onClick={handleSave}
-                className="px-2 py-1 bg-green-600 rounded hover:bg-green-700"
-              >
+              <Button variant="default" onClick={handleSave}>
                 ✔
-              </button>
+              </Button>
             </div>
           ) : (
-            <span
-              className="text-xl font-bold cursor-pointer"
-              onClick={() => setIsEditing(true)}
-            >
-              {projectName}
-            </span>
+            <Label onClick={() => setIsEditing(true)}>{projectName}</Label>
           )}
         </div>
         <div className="flex space-x-4">
           <NewProjectButton />
 
-          {userEmail !== projectEmail && (
-            <button
-              className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
-              onClick={cloneProject}
-            >
+          {showForkButton && (
+            <Button variant="outline" onClick={cloneProject}>
               Fork
-            </button>
+            </Button>
           )}
-          {userEmail === projectEmail && (
-            <button
-              className="px-4 py-2 bg-green-600 rounded hover:bg-green-700"
-              onClick={handlePublish}
-            >
+          {showPublishButton && (
+            <Button variant="outline" onClick={handlePublish}>
               Publish
-            </button>
+            </Button>
           )}
           <AuthButtons />
         </div>
@@ -126,12 +121,12 @@ const Header: React.FC = () => {
       {error && (
         <div className="p-4 bg-red-600 text-white text-center">
           {error}
-          <button
-            className="ml-4 px-2 py-1 bg-gray-800 rounded hover:bg-gray-700"
+          <Button
+            variant="destructive"
             onClick={() => setError("")} // Clear the error in the store
           >
             Dismiss
-          </button>
+          </Button>
         </div>
       )}
 

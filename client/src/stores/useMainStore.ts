@@ -34,9 +34,17 @@ export const useMainStore = create<AppState>((set, get) => ({
   email: "",
   projectName: "New Project",
   newProject: () => {
-    const projectId = nanoid(20)
-    set({ projectId, projectName: "New Project" })
-    return projectId
+    const projectId = nanoid(20);
+    set({
+      projectId,
+      projectName: "New Project",
+      lastPublish: "",
+      fileContents: initFileContents,
+      email: "",
+      preview: composePreview(initFileContents),
+      error: "",
+    });
+    return projectId;
   },
   setProjectName: (name) => set({ projectName: name }),
   lastPublish: "",
@@ -59,7 +67,7 @@ export const useMainStore = create<AppState>((set, get) => ({
   uploadFiles: async (image: string) => {
     const { projectId, fileContents, projectName: name } = get();
     try {
-      const response = await fetch('/api/project/upload', {
+      const response = await fetch("/api/project/upload", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,8 +104,16 @@ export const useMainStore = create<AppState>((set, get) => ({
       );
 
       if (response.ok) {
-        const {content, email} = await response.json();
-        set({ fileContents: content, projectId: id, email });
+        const { content, email, name = "" } = await response.json();
+        set({
+          fileContents: content,
+          projectId: id,
+          email,
+          projectName: name,
+          error: "",
+          lastPublish: "",
+          preview: composePreview(content),
+        });
       } else {
         console.error("Failed to load file contents:", response.statusText);
       }

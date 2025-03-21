@@ -1,11 +1,7 @@
 import React from "react";
 import { useMainStore } from "../../stores/useMainStore";
 
-interface ViewProjectProps {
-  projectId: string;
-}
-
-const ViewProject: React.FC<ViewProjectProps> = ({ projectId }) => {
+const ViewProject: React.FC = () => {
   const preview = useMainStore((state) => state.preview);
 
   return (

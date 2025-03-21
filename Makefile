@@ -20,5 +20,5 @@ install:
 deploy:
 	@echo "Deploying server..."
 	ssh root@js2go.ru "docker pull docker.pkg.github.com/mikhail-angelov/playground/playground:latest"
-	ssh root@js2go.ru "cd /opt/playground && docker-compose down"
-	ssh root@js2go.ru "cd /opt/playground && docker-compose up -d"
+	ssh root@js2go.ru "cd /opt/playground && docker compose down"
+	ssh root@js2go.ru "cd /opt/playground && docker compose up -d"

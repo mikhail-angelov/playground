@@ -1,5 +1,7 @@
 import React from "react";
 import { useMainStore } from "../../stores/useMainStore";
+import { Button } from "@/components/ui/button";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 
 interface LeftPanelProps {
   isCollapsed: boolean;
@@ -16,27 +18,27 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
 
   if (isCollapsed) {
     return (
-      <div className="flex flex-col bg-gray-900 border-r border-gray-700">
-        <button onClick={toggleCollapse} className="p-2 text-white">
-          {">"}
-        </button>
+      <div className="flex flex-col">
+        <Button onClick={toggleCollapse} variant="ghost">
+        <ChevronRight className="w-6 h-6 text-white" />
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col bg-gray-900 border-r border-gray-700">
+    <div className="flex flex-col h-full">
       <div className="flex justify-between bg-gray-800">
         <span className="p-2 text-white">Files</span>
-        <button onClick={toggleCollapse} className="p-2 text-white">
-          {"<"}
-        </button>
+        <Button onClick={toggleCollapse} variant="ghost">
+        <ChevronLeft className="w-6 h-6 text-white" />
+        </Button>
       </div>
       <ul className="text-white">
         {files.map((file) => (
           <li
             key={file}
-            className={`cursor-pointer p-2 ${
+            className={`cursor-pointer text-sm p-2 ${
               file === selectedFile ? "bg-gray-700" : ""
             }`}
             onClick={() => setSelectedFile(file)}

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { toast } from "sonner"
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -20,8 +21,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
 
       if (response.ok) {
+        toast.success("Check your email for the login link!");
         return "success";
       } else {
+        toast.error("Failed to send login email.");
         return "error";
       }
     } catch (error) {

@@ -5,9 +5,9 @@ import AuthButtons from "../../components/AuthButtons";
 
 const Header: React.FC = () => {
   return (
-    <header className="flex items-center justify-between p-4 bg-gray-900 text-white">
+    <header className="flex items-center justify-between p-4">
       <HomeButton />
-      <h1 className="text-2xl font-bold">Playground</h1>
+      <h1 className="text-2xl font-bold">CotPen</h1>
       <div className="flex items-center space-x-4">
         <NewProjectButton />
         <AuthButtons />
