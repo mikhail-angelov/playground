@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useMainStore } from "../stores/useMainStore";
 import { Button } from "./ui/button";
+import { Trans } from "@lingui/react/macro";
 
 const NewProjectButton: React.FC = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const NewProjectButton: React.FC = () => {
     <Button variant="outline" 
       onClick={handleNewProject}
     >
-      New
+      <Trans>New</Trans>
     </Button>
   );
 };

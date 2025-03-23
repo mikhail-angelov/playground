@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
     user.token = authToken;
     await user.save();
 
-    sendMail({
+    await sendMail({
       to: email,
       subject: 'Your Authentication Link',
       text: `Click the following link to log in to PLAYGROUND: ${process.env.SERVER_URL}/api/auth/login?token=${authToken}`,

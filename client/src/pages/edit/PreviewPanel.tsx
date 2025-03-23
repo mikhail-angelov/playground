@@ -2,7 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { useMainStore } from "../../stores/useMainStore";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { Trans } from "@lingui/react/macro";
 
 interface PreviewPanelProps {
   isCollapsed: boolean;
@@ -17,7 +22,6 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
   const triggerPreview = useMainStore((state) => state.triggerPreview);
   const [consoleOutput, setConsoleOutput] = useState<string[]>([]);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-
 
   const handleConsoleMessage = (event: MessageEvent) => {
     if (event.data.type === "console") {
@@ -47,42 +51,41 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
 
   return (
     <ResizablePanelGroup direction="vertical">
-    <ResizablePanel    >
-<div className="flex justify-between items-center bg-gray-800 px-2 py-1">
-        <Button onClick={toggleCollapse} variant="ghost">
-          <ChevronRight className="w-6 h-6 text-white" />
-        </Button>
-        <span className="text-white font-bold">Preview</span>
-        <Button
-          onClick={triggerPreview}
-          variant="outline"
-        >
-          Run ▶
-        </Button>
-      </div>
-      <iframe
-        id="iframe"
-        ref={iframeRef}
-        srcDoc={preview}
-        title="Preview"
-        className="w-full h-full flex-1"
-      />
-    </ResizablePanel>
-    <ResizableHandle />
-    <ResizablePanel>
-    <div
-        className="w-full h-full overflow-y-auto"
-      >
-        <h3 className="mx-2">Console Output</h3>
-        <div className="mx-2 ">
-          {consoleOutput.map((message, index) => (
-            <div key={index} className="text-sm">
-              {message}
-            </div>
-          ))}
+      <ResizablePanel>
+        <div className="flex justify-between items-center bg-gray-800 px-2 py-1">
+          <Button onClick={toggleCollapse} variant="ghost">
+            <ChevronRight className="w-6 h-6 text-white" />
+          </Button>
+          <span className="text-white font-bold">
+            <Trans>Preview</Trans>
+          </span>
+          <Button onClick={triggerPreview} variant="outline">
+            <Trans>Run ▶</Trans>
+          </Button>
         </div>
-      </div>
-    </ResizablePanel>
+        <iframe
+          id="iframe"
+          ref={iframeRef}
+          srcDoc={preview}
+          title="Preview"
+          className="w-full h-full flex-1"
+        />
+      </ResizablePanel>
+      <ResizableHandle />
+      <ResizablePanel>
+        <div className="w-full h-full overflow-y-auto">
+          <h3 className="mx-2">
+            <Trans>Console Output</Trans>
+          </h3>
+          <div className="mx-2 ">
+            {consoleOutput.map((message, index) => (
+              <div key={index} className="text-sm">
+                {message}
+              </div>
+            ))}
+          </div>
+        </div>
+      </ResizablePanel>
     </ResizablePanelGroup>
   );
 };

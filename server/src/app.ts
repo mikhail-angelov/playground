@@ -3,6 +3,9 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import { setupSocketIO } from "./services/socketService"; // Import the socket service
 import authRoutes from "./routes/authRoutes";
 import sequelize from "./db";
 import projectsRoutes from "./routes/projectsRoutes";
@@ -11,6 +14,15 @@ import { join } from "node:path";
 dotenv.config();
 
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: ["http://localhost:5174", "http://localhost:5000"],
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+setupSocketIO(io);
 
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -25,24 +37,19 @@ if (process.env.NODE_ENV === "development") {
           callback(new Error("Not allowed by CORS: " + origin));
         }
       },
-      credentials: true, // Allow cookies to be sent));
+      credentials: true,
     })
   );
 }
 
 // Serve static files from the client app
 const clientDistPath = join(__dirname, "../../client/dist");
-app.use(express.static(clientDistPath,{immutable:true})); // Ensure this is defined before the catch-all route
+app.use(express.static(clientDistPath, { immutable: true }));
 
-// Public routes (no authentication required)
 app.use("/api/auth", authRoutes);
-
-// Protected routes
 app.use("/api/project", projectsRoutes);
 
-// Catch-all route to serve index.html for non-static routes
 app.get("*", (req, res) => {
-  // Serve index.html only for non-API and non-static routes
   if (!req.path.startsWith("/api") && !/\.[^/]+$/.test(req.path)) {
     res.sendFile(join(clientDistPath, "index.html"));
   } else {
@@ -54,4 +61,4 @@ sequelize.sync().then(() => {
   console.log("Database synced");
 });
 
-export default app;
+export { app, httpServer };

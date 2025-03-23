@@ -41,7 +41,7 @@ export const useMainStore = create<AppState>((set, get) => ({
       lastPublish: "",
       fileContents: initFileContents,
       email: "",
-      preview: composePreview(initFileContents),
+      preview: composePreview(initFileContents, projectId),
       error: "",
     });
     return projectId;
@@ -61,7 +61,7 @@ export const useMainStore = create<AppState>((set, get) => ({
   preview: "",
   triggerPreview: () =>
     set((state) => {
-      const preview = composePreview(state.fileContents);
+      const preview = composePreview(state.fileContents, state.projectId);
       return { preview };
     }),
   uploadFiles: async (image: string) => {
@@ -112,7 +112,7 @@ export const useMainStore = create<AppState>((set, get) => ({
           projectName: name,
           error: "",
           lastPublish: "",
-          preview: composePreview(content),
+          preview: composePreview(content, id),
         });
       } else {
         console.error("Failed to load file contents:", response.statusText);
@@ -126,7 +126,7 @@ export const useMainStore = create<AppState>((set, get) => ({
   },
 }));
 
-const composePreview = (fileContents: Record<string, string>) => {
+const composePreview = (fileContents: Record<string, string>, projectId: string) => {
   const htmlContent = fileContents["index.html"] || "";
   const cssContent = fileContents["style.css"] || "";
   const jsContent = fileContents["script.js"] || "";
@@ -144,6 +144,7 @@ const composePreview = (fileContents: Record<string, string>) => {
             ${htmlContent}
             <script>
               (function() {
+                const projectId = '${projectId || ''}';
                 // Override console.log to post messages to the parent window
                 const originalLog = console.log;
                 console.log = function(...args) {

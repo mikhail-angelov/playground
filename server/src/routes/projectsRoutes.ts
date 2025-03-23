@@ -56,8 +56,9 @@ router.post(
         );
       } else {
         // Create or update the UserFile record
-        const project = await Project.upsert({
+        await Project.upsert({
           userId,
+          email,
           name,
           projectId,
           image,

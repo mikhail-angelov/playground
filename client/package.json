@@ -6,9 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "l": "lingui extract --clean --overwrite",
+    "lingui": "lingui compile --typescript"
   },
   "dependencies": {
+    "@lingui/detect-locale": "^5.3.0",
+    "@lingui/react": "^5.3.0",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-hover-card": "^1.1.6",
@@ -21,6 +25,7 @@
     "next-themes": "^0.4.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-easy-crop": "^5.4.1",
     "react-resizable-panels": "^2.1.7",
     "react-router-dom": "^7.3.0",
     "sonner": "^2.0.1",
@@ -30,11 +35,14 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@lingui/cli": "^5.3.0",
+    "@lingui/swc-plugin": "^5.5.1",
+    "@lingui/vite-plugin": "^5.3.0",
     "@tailwindcss/vite": "^4.0.15",
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react-swc": "^3.8.1",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.0.15",

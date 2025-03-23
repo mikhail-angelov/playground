@@ -5,11 +5,11 @@ const ViewProject: React.FC = () => {
   const preview = useMainStore((state) => state.preview);
 
   return (
-    <div className="flex-1 bg-gray-100 p-4">
+    <div className="flex-1 p-2">
       <iframe
         title="Project Preview"
         srcDoc={preview}
-        className="w-full h-full border"
+        className="w-full h-full"
       />
     </div>
   );

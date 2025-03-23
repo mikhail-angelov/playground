@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuthStore } from "../stores/useAuthStore";
 import {LoginModal} from "./LoginModal";
 import { Button } from "./ui/button";
+import { Trans } from "@lingui/react/macro";
 
 const AuthButtons: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -11,10 +12,10 @@ const AuthButtons: React.FC = () => {
   return (
     <>
       {!isAuthenticated ? (
-        <Button onClick={() => setIsLoginModalOpen(true)}>Login</Button>
+        <Button onClick={() => setIsLoginModalOpen(true)}><Trans>Login</Trans></Button>
       ) : (
         <Button variant="outline" onClick={onLogout}>
-          Logout
+          <Trans>Logout</Trans>
         </Button>
       )}
       <LoginModal

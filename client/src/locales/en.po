@@ -1,0 +1,79 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2025-03-23 09:03+0300\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/components/PublishedUrlModal.tsx:52
+msgid "Close"
+msgstr "Close"
+
+#: src/pages/edit/PreviewPanel.tsx:78
+msgid "Console Output"
+msgstr "Console Output"
+
+#: src/pages/home/HomeApp.tsx:28
+msgid "Cot Pen"
+msgstr "Cot Pen"
+
+#: src/pages/edit/EditApp.tsx:94
+msgid "Dismiss"
+msgstr "Dismiss"
+
+#: src/pages/edit/EditApp.tsx:100
+msgid "File: {selectedFile}"
+msgstr "File: {selectedFile}"
+
+#: src/pages/edit/EditApp.tsx:79
+msgid "Fork"
+msgstr "Fork"
+
+#. placeholder {0}: lastPublish ? lastPublish : t`Not published yet`
+#: src/pages/edit/EditApp.tsx:103
+msgid "Last published: {0}"
+msgstr "Last published: {0}"
+
+#: src/components/AuthButtons.tsx:15
+msgid "Login"
+msgstr "Login"
+
+#: src/components/AuthButtons.tsx:18
+msgid "Logout"
+msgstr "Logout"
+
+#: src/components/NewProjectButton.tsx:20
+msgid "New"
+msgstr "New"
+
+#: src/pages/edit/EditApp.tsx:103
+msgid "Not published yet"
+msgstr "Not published yet"
+
+#: src/pages/edit/PreviewPanel.tsx:60
+msgid "Preview"
+msgstr "Preview"
+
+#: src/components/PublishButton.tsx:62
+msgid "Publish"
+msgstr "Publish"
+
+#: src/components/PublishedUrlModal.tsx:38
+msgid "Published URL"
+msgstr "Published URL"
+
+#: src/pages/edit/PreviewPanel.tsx:63
+msgid "Run ▶"
+msgstr "Run ▶"
+
+#: src/components/PublishedUrlModal.tsx:49
+msgid "View"
+msgstr "View"

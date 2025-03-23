@@ -21,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.10.0",
     "sequelize": "^6.37.6",
+    "socket.io": "^4.8.1",
     "sqlite3": "^5.1.7",
     "uuid": "^8.0.0"
   },
