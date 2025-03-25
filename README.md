@@ -1,9 +1,8 @@
 # Playground
 
-This app is naive implementation for [codepen.io](http://codepen.io)
-just to demonstrate effective development with AI support
+This app is a naive implementation of [codepen.io](https://codepen.io), designed to demonstrate effective development with AI support.
 
-## [Live Demo](https://mikhail-angelov.github.io/playground)
+## [Live](https://js2go.ru/)
 
 ## Features
 
@@ -11,6 +10,8 @@ just to demonstrate effective development with AI support
 - **React**: A JavaScript library for building user interfaces.
 - **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
 - **Vite**: A fast build tool and development server for modern web projects.
+- **Socket.IO**: Real-time bidirectional communication for collaborative features.
+- **IndexedDB**: Persistent client-side storage for offline capabilities.
 
 ## Getting Started
 
@@ -49,10 +50,10 @@ This will create an optimized build of your application in the `dist` directory.
 
 To deploy the application to GitHub Pages, follow these steps:
 
-1. **Push to the master branch**:
-   Ensure your changes are committed and push to the `master` branch:
+1. **Push to the main branch**:
+   Ensure your changes are committed and push to the `main` branch:
    ```bash
-   git push origin master
+   git push origin main
    ```
 
 2. **GitHub Actions**:
