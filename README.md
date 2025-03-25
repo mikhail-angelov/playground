@@ -4,6 +4,12 @@ This app is a naive implementation of [codepen.io](https://codepen.io), designed
 
 ## [Live](https://js2go.ru/)
 
+## Screens
+![image](https://github.com/user-attachments/assets/ca538b38-000d-4226-bf89-98bff0ad3556)
+
+![image](https://github.com/user-attachments/assets/d09f8ef6-7b52-488d-bfba-8e1addc1c1b3)
+
+
 ## Features
 
 - **TypeScript**: Strongly typed programming language that helps catch errors early.
