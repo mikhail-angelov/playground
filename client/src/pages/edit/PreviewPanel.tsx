@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useActiveStore } from "../../stores/useActiveStore";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronRight, ChevronLeft, ViewIcon } from "lucide-react";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -19,6 +19,7 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
   toggleCollapse,
 }) => {
   const preview = useActiveStore((state) => state.preview);
+  const projectId = useActiveStore((state) => state.projectId);
   const triggerPreview = useActiveStore((state) => state.triggerPreview);
   const [consoleOutput, setConsoleOutput] = useState<string[]>([]);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -38,6 +39,17 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
       window.removeEventListener("message", handleConsoleMessage);
     };
   }, []);
+
+  const onPreview = () => {
+    const url = `${location.origin}/view/${projectId}`;
+    const newWindow = window.open();
+    if (newWindow) {
+      newWindow.document.write(preview); // Write the preview content to the new tab
+      newWindow.document.close(); // Close the document to render the content
+    } else {
+      console.error("Failed to open a new tab for the preview.");
+    }
+  };
 
   if (isCollapsed) {
     return (
@@ -59,6 +71,11 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
           <span className="text-white font-bold">
             <Trans>Preview</Trans>
           </span>
+          <Button asChild variant="outline">
+            <a href={`${location.origin}/view/${projectId}`} target="_blank">
+              <ViewIcon className="w-6 h-6" />
+            </a>
+          </Button>
           <Button onClick={triggerPreview} variant="outline">
             <Trans>Run ▶</Trans>
           </Button>
