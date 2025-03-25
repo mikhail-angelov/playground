@@ -1,24 +1,24 @@
 import React, { useState } from "react";
 import html2canvas from "html2canvas";
-import { useMainStore } from "../stores/useMainStore";
+import { useActiveStore } from "../stores/useActiveStore";
 import { useAuthStore } from "../stores/useAuthStore";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { Trans } from "@lingui/react/macro";
 import PublishedUrlModal from "@/components/PublishedUrlModal";
-import Cropper from "react-easy-crop";
-import getCroppedImg from "@/lib/cropImage"; // Utility function for cropping
+import Cropper, { Area } from "react-easy-crop";
+import getCroppedImg from "@/lib/cropImage";
 
 const PublishButton: React.FC = () => {
-  const uploadFiles = useMainStore((state) => state.uploadFiles);
-  const setError = useMainStore((state) => state.setError);
+  const uploadFiles = useActiveStore((state) => state.uploadFiles);
+  const setError = useActiveStore((state) => state.setError);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [isPublishedModalOpen, setIsPublishedModalOpen] = useState(false);
   const [publishedUrl, setPublishedUrl] = useState("");
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 }); // State for crop position
   const [zoom, setZoom] = useState(1); // State for zoom level
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   const userEmail = useAuthStore((state) => state.email);
 
@@ -90,6 +90,7 @@ const PublishButton: React.FC = () => {
               crop={crop}
               zoom={zoom}
               aspect={1 / 1}
+              minZoom={0.5} // Allow zoom levels below 1
               onCropChange={setCrop} // Update crop position dynamically
               onCropComplete={(_, croppedAreaPixels) =>
                 setCroppedAreaPixels(croppedAreaPixels)
@@ -97,12 +98,13 @@ const PublishButton: React.FC = () => {
               onZoomChange={setZoom} // Update zoom level dynamically
             />
             <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-4">
-              <Button variant="outline" onClick={() => setIsCropModalOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsCropModalOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleCropComplete}>
-                Crop & Publish
-              </Button>
+              <Button onClick={handleCropComplete}>Crop & Publish</Button>
             </div>
           </div>
         </div>

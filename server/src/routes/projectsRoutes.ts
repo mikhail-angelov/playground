@@ -3,6 +3,7 @@ import { v4 } from "uuid";
 import { uploadFileToS3 } from "../services/s3Service";
 import { Project } from "../models/Project";
 import { authMiddleware } from "./authMiddleware";
+import { projectsService } from "../services/projectsService";
 
 const router = express.Router();
 
@@ -27,60 +28,26 @@ router.post(
     }
 
     try {
-      const s3Key = projectId || v4();
-
-      // Check if a file with the same s3Key already exists
-      const existingProject = await Project.findOne({ where: { projectId } });
-
-      if (existingProject && existingProject.userId != userId) {
-        console.log(
-          `File ${projectId} with the same key already exists for another user: ${existingProject.userId}, but current user is ${userId}`
-        );
-        return res.status(400).json({
-          error: "File with the same key already exists for another user",
-        });
-      }
-
-      // Upload the file to S3
-      await uploadFileToS3(s3Key, JSON.stringify({projectId, name, content, email}));
-
-      if (existingProject) {
-        await Project.update(
-          {
-            name,
-            image,
-          },
-          {
-            where: { projectId },
-          }
-        );
-      } else {
-        // Create or update the UserFile record
-        await Project.upsert({
-          userId,
-          email,
-          name,
-          projectId,
-          image,
-          rating: 0,
-        });
-      }
-
-      res.json({ status: "success" });
+      const result = await projectsService.upload({
+        name,
+        projectId,
+        content,
+        image,
+        userId,
+        email,
+      });
+      
+      res.json(result);
     } catch (err) {
       console.error("Error uploading file:", err);
       res.status(500).json({ error: "Failed to upload file" });
     }
   }
 );
-
+// Get the best projects
 router.get("/best", async (req: Request, res: Response) => {
   try {
-    // Fetch the top 9 projects sorted by rating or likes in descending order
-    const projects = await Project.findAll({
-      order: [["rating", "DESC"]], // Replace "rating" with the appropriate field (e.g., "likes")
-      limit: 9, // Limit to 9 projects
-    });
+    const projects = await projectsService.getBestProjects();
 
     res.json(projects);
   } catch (err) {
@@ -88,5 +55,50 @@ router.get("/best", async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to fetch best projects" });
   }
 });
+
+// Get projects for the authenticated user
+router.get(
+  "/my",
+  authMiddleware,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const projects = await projectsService.getMyProjects(
+        req.userId as string
+      );
+      res.json(projects);
+    } catch (err) {
+      console.error("Error fetching user projects:", err);
+      res.status(500).json({ error: "Failed to fetch user projects" });
+    }
+  }
+);
+
+// Delete a project
+router.delete(
+  "/:projectId",
+  authMiddleware,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { projectId } = req.params;
+    const userId = req.userId;
+    const { my } = req.body;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized: No user ID provided" });
+    }
+
+    try {
+      await projectsService.deleteProject(projectId, userId);
+      const projects = await (my
+        ? projectsService.getMyProjects(userId)
+        : projectsService.getBestProjects());
+      res.json(projects);
+    } catch (err) {
+      console.error("Error deleting project:", err);
+      res.status(500).json({ error: "Failed to delete project" });
+    }
+  }
+);
 
 export default router;

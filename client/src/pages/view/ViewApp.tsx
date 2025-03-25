@@ -3,13 +3,14 @@ import React from "react";
 import ViewProject from "./ViewProject";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { useMainStore } from "@/stores/useMainStore";
+import { useActiveStore } from "@/stores/useActiveStore";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Trans } from "@lingui/react/macro";
 
 const ViewApp: React.FC = () => {
-  const projectName = useMainStore((state) => state.projectName);
-  const projectId = useMainStore((state) => state.projectId); // Get projectId from useMainStore
+  const projectName = useActiveStore((state) => state.projectName);
+  const projectId = useActiveStore((state) => state.projectId); // Get projectId from useActiveStore
   const navigate = useNavigate();
 
   const handleEdit = () => {
@@ -22,7 +23,7 @@ const ViewApp: React.FC = () => {
         center={<h1 className="text-lg">{projectName}</h1>}
         right={
           <Button variant="outline" onClick={handleEdit}>
-            Edit
+            <Trans>Edit</Trans>
           </Button>
         }
       />

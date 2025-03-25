@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useMainStore } from "../../stores/useMainStore";
+import { useActiveStore } from "../../stores/useActiveStore";
 import { useAuthStore } from "../../stores/useAuthStore";
 import NewProjectButton from "../../components/NewProjectButton";
 import HomeButton from "../../components/HomeButton";
@@ -16,16 +16,16 @@ import { CheckIcon } from "lucide-react";
 
 const EditApp: React.FC = () => {
   const {t} = useLingui();
-  const projectName = useMainStore((state) => state.projectName);
-  const setProjectName = useMainStore((state) => state.setProjectName);
-  const projectEmail = useMainStore((state) => state.email);
-  const error = useMainStore((state) => state.error);
-  const setError = useMainStore((state) => state.setError);
+  const projectName = useActiveStore((state) => state.projectName);
+  const setProjectName = useActiveStore((state) => state.setProjectName);
+  const projectEmail = useActiveStore((state) => state.email);
+  const error = useActiveStore((state) => state.error);
+  const setError = useActiveStore((state) => state.setError);
   const [isEditing, setIsEditing] = useState(false);
   const [newProjectName, setNewProjectName] = useState(projectName);
-  const cloneProject = useMainStore((state) => state.cloneProject);
-  const selectedFile = useMainStore((state) => state.selectedFile);
-  const lastPublish = useMainStore((state) => state.lastPublish);
+  const cloneProject = useActiveStore((state) => state.cloneProject);
+  const selectedFile = useActiveStore((state) => state.selectedFile);
+  const lastPublish = useActiveStore((state) => state.lastPublish);
 
   const userEmail = useAuthStore((state) => state.email);
   const showForkButton = userEmail !== projectEmail && projectEmail;
@@ -100,7 +100,7 @@ const EditApp: React.FC = () => {
         left={<Label>{t`File: ${selectedFile}`}</Label>}
         right={
           <Label>
-            {t`Last published: ${lastPublish ? lastPublish : t`Not published yet`}`}
+            {`${t`Last published`}: ${lastPublish ? lastPublish : t`Not published yet`}`}
           </Label>
         }
       />

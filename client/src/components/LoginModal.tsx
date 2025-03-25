@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useAuthStore } from "../stores/useAuthStore";
+import { Trans } from "@lingui/react/macro";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -40,16 +41,17 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Sign in</DialogTitle>
+          <DialogTitle><Trans>Sign in</Trans></DialogTitle>
           <DialogDescription>
+          <Trans>
             To authorize, please enter your email address, then you'll receive a
-            magic link in your inbox.
+            magic link in your inbox.</Trans>
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="email" className="text-right">
-              Email
+            <Trans>Email</Trans>
             </Label>
             <Input
               id="email"
@@ -65,7 +67,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
         </div>
         <DialogFooter>
           <Button type="submit" onClick={handleLogin}>
-            Send
+          <Trans>Send</Trans>
           </Button>
         </DialogFooter>
       </DialogContent>

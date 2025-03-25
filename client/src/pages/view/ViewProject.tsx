@@ -1,8 +1,8 @@
 import React from "react";
-import { useMainStore } from "../../stores/useMainStore";
+import { useActiveStore } from "../../stores/useActiveStore";
 
 const ViewProject: React.FC = () => {
-  const preview = useMainStore((state) => state.preview);
+  const preview = useActiveStore((state) => state.preview);
 
   return (
     <div className="flex-1 p-2">

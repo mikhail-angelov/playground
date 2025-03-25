@@ -21,13 +21,21 @@ msgstr "Close"
 msgid "Console Output"
 msgstr "Console Output"
 
-#: src/pages/home/HomeApp.tsx:28
-msgid "Cot Pen"
-msgstr "Cot Pen"
+#: src/components/HomeButton.tsx:26
+msgid "CotPen"
+msgstr "CotPen"
 
 #: src/pages/edit/EditApp.tsx:94
 msgid "Dismiss"
 msgstr "Dismiss"
+
+#: src/pages/view/ViewApp.tsx:26
+msgid "Edit"
+msgstr "Edit"
+
+#: src/components/LoginModal.tsx:54
+msgid "Email"
+msgstr "Email"
 
 #: src/pages/edit/EditApp.tsx:100
 msgid "File: {selectedFile}"
@@ -37,10 +45,9 @@ msgstr "File: {selectedFile}"
 msgid "Fork"
 msgstr "Fork"
 
-#. placeholder {0}: lastPublish ? lastPublish : t`Not published yet`
 #: src/pages/edit/EditApp.tsx:103
-msgid "Last published: {0}"
-msgstr "Last published: {0}"
+msgid "Last published"
+msgstr "Last published"
 
 #: src/components/AuthButtons.tsx:15
 msgid "Login"
@@ -49,6 +56,10 @@ msgstr "Login"
 #: src/components/AuthButtons.tsx:18
 msgid "Logout"
 msgstr "Logout"
+
+#: src/pages/home/ProjectList.tsx:62
+msgid "My Projects"
+msgstr "My Projects"
 
 #: src/components/NewProjectButton.tsx:20
 msgid "New"
@@ -62,7 +73,7 @@ msgstr "Not published yet"
 msgid "Preview"
 msgstr "Preview"
 
-#: src/components/PublishButton.tsx:62
+#: src/components/PublishButton.tsx:81
 msgid "Publish"
 msgstr "Publish"
 
@@ -73,6 +84,26 @@ msgstr "Published URL"
 #: src/pages/edit/PreviewPanel.tsx:63
 msgid "Run ▶"
 msgstr "Run ▶"
+
+#: src/components/LoginModal.tsx:70
+msgid "Send"
+msgstr "Send"
+
+#: src/components/LoginModal.tsx:44
+msgid "Sign in"
+msgstr "Sign in"
+
+#: src/components/HomeButton.tsx:28
+msgid "This is online project editor made by impression of https://codepen.io"
+msgstr "This is online project editor made by impression of https://codepen.io"
+
+#: src/components/LoginModal.tsx:46
+msgid "To authorize, please enter your email address, then you'll receive a magic link in your inbox."
+msgstr "To authorize, please enter your email address, then you'll receive a magic link in your inbox."
+
+#: src/pages/home/ProjectList.tsx:56
+msgid "Trends"
+msgstr "Trends"
 
 #: src/components/PublishedUrlModal.tsx:49
 msgid "View"

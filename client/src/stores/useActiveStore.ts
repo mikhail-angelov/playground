@@ -1,7 +1,10 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
+import IndexedDB from "@/lib/indexedDB"; // Import the IndexedDB service
 
-interface AppState {
+const indexedDBService = new IndexedDB("playground", "active");
+
+interface ActiveState {
   projectId: string;
   projectName: string;
   email: string;
@@ -23,19 +26,19 @@ interface AppState {
 }
 
 const initFileContents = {
-  "index.html": `<canvas id="canvas" style:"width:100%; height:100%; border:1px solid;"></canvas>`,
+  "index.html": `<canvas id="canvas" tabindex="0" style:"width:100%; height:100%; border:1px solid;"></canvas>`,
   "style.css":
     "html{ width:100%; height:100%; background-color: #333; color:  #f0f0f0; margin:0px; padding:0px; display:flex; flex-direction:column;} canvas { flex:1; margin:5px; }",
   "script.js": 'console.log("Hello, World!");',
 };
 
-export const useMainStore = create<AppState>((set, get) => ({
+export const useActiveStore = create<ActiveState>((set, get) => ({
   projectId: "",
   email: "",
   projectName: "New Project",
   newProject: () => {
     const projectId = nanoid(20);
-    set({
+    const newState = {
       projectId,
       projectName: "New Project",
       lastPublish: "",
@@ -43,27 +46,51 @@ export const useMainStore = create<AppState>((set, get) => ({
       email: "",
       preview: composePreview(initFileContents, projectId),
       error: "",
-    });
+    };
+    set(newState);
+    indexedDBService.saveState(newState); // Save to IndexedDB
     return projectId;
   },
-  setProjectName: (name) => set({ projectName: name }),
+  setProjectName: (name) => {
+    set((state) => {
+      const newState = { ...state, projectName: name };
+      indexedDBService.saveState(newState); // Save to IndexedDB
+      return newState;
+    });
+  },
   lastPublish: "",
   error: "",
-  setError: (error) => set({ error }),
+  setError: (error) => {
+    set((state) => {
+      const newState = { ...state, error };
+      return newState;
+    });
+  },
   files: ["index.html", "style.css", "script.js"],
   selectedFile: "index.html",
-  setSelectedFile: (file: string) => set({ selectedFile: file }),
+  setSelectedFile: (file: string) => {
+    set((state) => {
+      const newState = { ...state, selectedFile: file };
+      return newState;
+    });
+  },
   fileContents: initFileContents,
-  setFileContent: (file: string, content: string) =>
-    set((state) => ({
-      fileContents: { ...state.fileContents, [file]: content },
-    })),
+  setFileContent: (file: string, content: string) => {
+    set((state) => {
+      const newFileContents = { ...state.fileContents, [file]: content };
+      const newState = { ...state, fileContents: newFileContents };
+      indexedDBService.saveState(newState); // Save to IndexedDB
+      return newState;
+    });
+  },
   preview: "",
-  triggerPreview: () =>
+  triggerPreview: () => {
     set((state) => {
       const preview = composePreview(state.fileContents, state.projectId);
-      return { preview };
-    }),
+      const newState = { ...state, preview };
+      return newState;
+    });
+  },
   uploadFiles: async (image: string) => {
     const { projectId, fileContents, projectName: name } = get();
     try {
@@ -98,35 +125,79 @@ export const useMainStore = create<AppState>((set, get) => ({
     }
   },
   loadFileContents: async (id: string) => {
-    try {
-      const response = await fetch(
-        `https://storage.yandexcloud.net/playground-yat/${id}`
-      );
-
-      if (response.ok) {
-        const { content, email, name = "" } = await response.json();
-        set({
-          fileContents: content,
-          projectId: id,
-          email,
-          projectName: name,
-          error: "",
-          lastPublish: "",
-          preview: composePreview(content, id),
-        });
-      } else {
-        console.error("Failed to load file contents:", response.statusText);
-      }
-    } catch (err) {
-      console.error("Error loading file contents:", err);
+    const loadedState = await loadProject(id);
+    if (loadedState) {
+      set(loadedState);
     }
   },
   cloneProject: () => {
-    set({ projectId: nanoid(20), projectName: "New Project", lastPublish: "" });
+    const projectId = nanoid(20);
+    const newState = { projectId, projectName: "New Project", lastPublish: "" };
+    set(newState);
+    indexedDBService.saveState(newState); // Save to IndexedDB
   },
 }));
 
-const composePreview = (fileContents: Record<string, string>, projectId: string) => {
+const loadProject = async (id: string) => {
+  try {
+    const response = await fetch(
+      `https://storage.yandexcloud.net/playground-yat/${id}`
+    );
+
+    if (response.ok) {
+      const { content, email, name = "" } = await response.json();
+      return {
+        fileContents: content,
+        projectId: id,
+        email,
+        projectName: name,
+        error: "",
+        lastPublish: "",
+        preview: composePreview(content, id),
+      };
+    } else {
+      console.error("Failed to load file contents:", response.statusText);
+    }
+  } catch (err) {
+    console.error("Error loading file contents:", err);
+  }
+};
+
+const init = async () => {
+  let id = "";
+  await indexedDBService.initDB();
+  const paths = window.location.pathname.split("/");
+  if (paths.length > 2 && paths[1] === "view") {
+    id = paths[2];
+    const loadedState = await loadProject(id);
+    if (loadedState) {
+      useActiveStore.setState(loadedState);
+    }
+    return;
+  }
+
+  const savedState = await indexedDBService.loadState();
+  if (paths.length > 2 && savedState?.projectId !== paths[2]) {
+    id = paths[2];
+    const loadedState = await loadProject(id);
+    if (loadedState) {
+      return useActiveStore.setState(loadedState);
+    }
+    return useActiveStore.setState({
+      ...useActiveStore.getInitialState(),
+      projectId: id,
+    });
+  }
+
+  if (savedState) {
+    useActiveStore.setState(savedState);
+  }
+};
+
+const composePreview = (
+  fileContents: Record<string, string>,
+  projectId: string
+) => {
   const htmlContent = fileContents["index.html"] || "";
   const cssContent = fileContents["style.css"] || "";
   const jsContent = fileContents["script.js"] || "";
@@ -144,7 +215,7 @@ const composePreview = (fileContents: Record<string, string>, projectId: string)
             ${htmlContent}
             <script>
               (function() {
-                const projectId = '${projectId || ''}';
+                const projectId = '${projectId || ""}';
                 // Override console.log to post messages to the parent window
                 const originalLog = console.log;
                 console.log = function(...args) {
@@ -165,3 +236,5 @@ const composePreview = (fileContents: Record<string, string>, projectId: string)
         </html>
       `;
 };
+
+init();

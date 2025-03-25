@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
-import { useMainStore } from "../../stores/useMainStore";
+import { useActiveStore } from "../../stores/useActiveStore";
 
 const getLanguageFromExtension = (fileName: string) => {
   const extension = fileName.split(".").pop();
@@ -23,9 +23,9 @@ interface EditorPanelProps {
 }
 
 const EditorPanel: React.FC<EditorPanelProps> = ({ width }) => {
-  const selectedFile = useMainStore((state) => state.selectedFile);
-  const fileContent = useMainStore((state) => state.fileContents[selectedFile]);
-  const setFileContent = useMainStore((state) => state.setFileContent);
+  const selectedFile = useActiveStore((state) => state.selectedFile);
+  const fileContent = useActiveStore((state) => state.fileContents[selectedFile]);
+  const setFileContent = useActiveStore((state) => state.setFileContent);
   const editorRef = useRef<any>(null);
 
   const language = getLanguageFromExtension(selectedFile);

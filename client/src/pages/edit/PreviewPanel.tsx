@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useMainStore } from "../../stores/useMainStore";
+import { useActiveStore } from "../../stores/useActiveStore";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import {
@@ -18,8 +18,8 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
   isCollapsed,
   toggleCollapse,
 }) => {
-  const preview = useMainStore((state) => state.preview);
-  const triggerPreview = useMainStore((state) => state.triggerPreview);
+  const preview = useActiveStore((state) => state.preview);
+  const triggerPreview = useActiveStore((state) => state.triggerPreview);
   const [consoleOutput, setConsoleOutput] = useState<string[]>([]);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
