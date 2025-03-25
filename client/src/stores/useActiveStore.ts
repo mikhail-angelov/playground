@@ -6,10 +6,10 @@ const indexedDBService = new IndexedDB("playground", "active");
 
 interface ActiveState {
   projectId: string;
-  projectName: string;
+  name: string;
   email: string;
   newProject: () => string;
-  setProjectName: (name: string) => void;
+  setName: (name: string) => void;
   lastPublish: string;
   error: string;
   setError: (error: string) => void;
@@ -35,12 +35,12 @@ const initFileContents = {
 export const useActiveStore = create<ActiveState>((set, get) => ({
   projectId: "",
   email: "",
-  projectName: "New Project",
+  name: "New Project",
   newProject: () => {
     const projectId = nanoid(20);
     const newState = {
       projectId,
-      projectName: "New Project",
+      name: "New Project",
       lastPublish: "",
       fileContents: initFileContents,
       email: "",
@@ -51,9 +51,9 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
     indexedDBService.saveState(newState); // Save to IndexedDB
     return projectId;
   },
-  setProjectName: (name) => {
+  setName: (name) => {
     set((state) => {
-      const newState = { ...state, projectName: name };
+      const newState = { ...state, name: name };
       indexedDBService.saveState(newState); // Save to IndexedDB
       return newState;
     });
@@ -92,7 +92,7 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
     });
   },
   uploadFiles: async (image: string) => {
-    const { projectId, fileContents, projectName: name } = get();
+    const { projectId, fileContents: content, name } = get();
     try {
       const response = await fetch("/api/project/upload", {
         method: "POST",
@@ -103,7 +103,7 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
         body: JSON.stringify({
           projectId,
           name,
-          content: fileContents,
+          content,
           image,
         }),
       });
@@ -132,7 +132,7 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
   },
   cloneProject: () => {
     const projectId = nanoid(20);
-    const newState = { projectId, projectName: "New Project", lastPublish: "" };
+    const newState = { projectId, name: "New Project", lastPublish: "" };
     set(newState);
     indexedDBService.saveState(newState); // Save to IndexedDB
   },
@@ -150,7 +150,7 @@ const loadProject = async (id: string) => {
         fileContents: content,
         projectId: id,
         email,
-        projectName: name,
+        name,
         error: "",
         lastPublish: "",
         preview: composePreview(content, id),

@@ -19,10 +19,10 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ project, onClick }) => {
         <img
           src={project.image}
           alt={project.name}
-          className="max-w-32 h-32 object-cover cursor-pointer"
+          className="max-w-100 h-32 object-cover cursor-pointer"
         />
       ) : (
-        <div className="w-32 h-32 bg-gray-700 flex items-center justify-center">
+        <div className="w-100 h-32 bg-gray-700 flex items-center justify-center">
           <span className="text-gray-500">No Image</span>
         </div>
       )}

@@ -41,6 +41,10 @@ msgstr "Почта"
 msgid "File: {selectedFile}"
 msgstr "Файл: {selectedFile}"
 
+#: src/pages/edit/LeftPanel.tsx:54
+msgid "Files"
+msgstr "Файлы"
+
 #: src/pages/edit/EditApp.tsx:79
 msgid "Fork"
 msgstr "Клонировать"
@@ -94,7 +98,7 @@ msgid "Sign in"
 msgstr "Вход"
 
 #: src/components/HomeButton.tsx:28
-msgid "This is online project editor made by impression of https://codepen.io."
+msgid "This is online project editor made by impression of https://codepen.io"
 msgstr "Это приложения для создания, редактирования и публикации небольших онлайн проектов. Создано по мотивам сайта https://codepen.io."
 
 #: src/components/LoginModal.tsx:46

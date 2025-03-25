@@ -42,13 +42,13 @@ const ProjectList: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center p-4 flex-1 bg-gray-900">
+    <div className="flex flex-col items-center flex-1 overflow-hidden">
       {isLoading && (
-        <div className="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-opacity-50 flex items-center justify-center">
           <LoaderIcon className="w-12 h-12 text-white animate-spin" />
         </div>
       )}
-      <div className="flex space-x-2 mb-4">
+      <div className="flex space-x-2 m-2">
         <Button
           variant={activeTab === "trends" ? "default" : "outline"}
           onClick={() => setActiveTab("trends")}
@@ -64,7 +64,7 @@ const ProjectList: React.FC = () => {
       </div>
 
       <div
-        className="grid grid-cols-3 gap-4 overflow-y-auto overflow-x-hidden flex-1 px-4 custom-scrollbar"
+        className="grid grid-cols-3 gap-4 overflow-y-auto overflow-x-hidden flex-1 px-4 pb-4 custom-scrollbar"
         style={{
           gridTemplateRows: "repeat(auto-fill, minmax(200px, 1fr))",
         }}

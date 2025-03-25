@@ -16,13 +16,13 @@ import { CheckIcon } from "lucide-react";
 
 const EditApp: React.FC = () => {
   const {t} = useLingui();
-  const projectName = useActiveStore((state) => state.projectName);
-  const setProjectName = useActiveStore((state) => state.setProjectName);
+  const name = useActiveStore((state) => state.name);
+  const setName = useActiveStore((state) => state.setName);
   const projectEmail = useActiveStore((state) => state.email);
   const error = useActiveStore((state) => state.error);
   const setError = useActiveStore((state) => state.setError);
   const [isEditing, setIsEditing] = useState(false);
-  const [newProjectName, setNewProjectName] = useState(projectName);
+  const [newProjectName, setNewProjectName] = useState(name);
   const cloneProject = useActiveStore((state) => state.cloneProject);
   const selectedFile = useActiveStore((state) => state.selectedFile);
   const lastPublish = useActiveStore((state) => state.lastPublish);
@@ -32,7 +32,7 @@ const EditApp: React.FC = () => {
   const showPublishButton = userEmail === projectEmail || !projectEmail;
 
   const handleSave = () => {
-    setProjectName(newProjectName);
+    setName(newProjectName);
     setIsEditing(false);
   };
 
@@ -65,7 +65,7 @@ const EditApp: React.FC = () => {
                 className="border border-gray-700 p-2 h-[36px] rounded-lg"
                 onClick={() => setIsEditing(true)}
               >
-                {projectName}
+                {name}
               </Label>
             )}
           </div>

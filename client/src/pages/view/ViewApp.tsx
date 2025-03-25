@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { Trans } from "@lingui/react/macro";
 
 const ViewApp: React.FC = () => {
-  const projectName = useActiveStore((state) => state.projectName);
+  const name = useActiveStore((state) => state.name);
   const projectId = useActiveStore((state) => state.projectId); // Get projectId from useActiveStore
   const navigate = useNavigate();
 
@@ -20,7 +20,7 @@ const ViewApp: React.FC = () => {
   return (
     <div className="flex flex-col h-screen">
       <Header
-        center={<h1 className="text-lg">{projectName}</h1>}
+        center={<h1 className="text-lg">{name}</h1>}
         right={
           <Button variant="outline" onClick={handleEdit}>
             <Trans>Edit</Trans>

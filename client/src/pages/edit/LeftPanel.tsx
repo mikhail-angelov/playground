@@ -2,6 +2,7 @@ import React from "react";
 import { useActiveStore } from "../../stores/useActiveStore";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, FileCode, FileText, FileJson } from "lucide-react";
+import { Trans } from "@lingui/react/macro";
 
 interface LeftPanelProps {
   isCollapsed: boolean;
@@ -50,7 +51,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between bg-gray-800">
-        <span className="p-2 text-white">Files</span>
+        <span className="p-2 text-white"><Trans>Files</Trans></span>
         <Button onClick={toggleCollapse} variant="ghost">
           <ChevronLeft className="w-6 h-6 text-white" />
         </Button>

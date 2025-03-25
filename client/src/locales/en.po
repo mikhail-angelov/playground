@@ -41,6 +41,10 @@ msgstr "Email"
 msgid "File: {selectedFile}"
 msgstr "File: {selectedFile}"
 
+#: src/pages/edit/LeftPanel.tsx:54
+msgid "Files"
+msgstr "Files"
+
 #: src/pages/edit/EditApp.tsx:79
 msgid "Fork"
 msgstr "Fork"
