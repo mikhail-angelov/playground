@@ -15,7 +15,7 @@ import PublishButton from "@/components/PublishButton";
 import { CheckIcon } from "lucide-react";
 
 const EditApp: React.FC = () => {
-  const {t} = useLingui();
+  const { t } = useLingui();
   const name = useActiveStore((state) => state.name);
   const setName = useActiveStore((state) => state.setName);
   const projectEmail = useActiveStore((state) => state.email);
@@ -28,8 +28,9 @@ const EditApp: React.FC = () => {
   const lastPublish = useActiveStore((state) => state.lastPublish);
 
   const userEmail = useAuthStore((state) => state.email);
-  const showForkButton = userEmail !== projectEmail && projectEmail;
-  const showPublishButton = userEmail === projectEmail || !projectEmail;
+  const showForkButton = userEmail !== projectEmail && userEmail;
+  const showPublishButton =
+    userEmail && (userEmail === projectEmail || !projectEmail);
 
   const handleSave = () => {
     setName(newProjectName);
@@ -100,7 +101,9 @@ const EditApp: React.FC = () => {
         left={<Label>{t`File: ${selectedFile}`}</Label>}
         right={
           <Label>
-            {`${t`Last published`}: ${lastPublish ? lastPublish : t`Not published yet`}`}
+            {`${t`Last published`}: ${
+              lastPublish ? lastPublish : t`Not published yet`
+            }`}
           </Label>
         }
       />
