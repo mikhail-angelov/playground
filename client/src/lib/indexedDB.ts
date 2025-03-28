@@ -17,7 +17,7 @@ class IndexedDB {
         request.onupgradeneeded = (event: any) => {
           const db = event.target.result;
           if (!db.objectStoreNames.contains(this.storeName)) {
-            db.createObjectStore(this.storeName, { keyPath: "projectId" });
+            db.createObjectStore(this.storeName, { keyPath: "id" });
           }
         };
   

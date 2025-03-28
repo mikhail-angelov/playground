@@ -2,7 +2,8 @@ import React from "react";
 import { useActiveStore } from "../../stores/useActiveStore";
 
 const ViewProject: React.FC = () => {
-  const preview = useActiveStore((state) => state.preview);
+  const getPreview = useActiveStore((state) => state.getPreview);
+  const preview = getPreview(); // Get the preview HTML from the store
 
   return (
     <div className="flex-1 p-2">

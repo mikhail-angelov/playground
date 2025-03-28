@@ -32,24 +32,12 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
 
   useEffect(() => {
     triggerPreview();
-
     window.addEventListener("message", handleConsoleMessage);
 
     return () => {
       window.removeEventListener("message", handleConsoleMessage);
     };
   }, []);
-
-  const onPreview = () => {
-    const url = `${location.origin}/view/${projectId}`;
-    const newWindow = window.open();
-    if (newWindow) {
-      newWindow.document.write(preview); // Write the preview content to the new tab
-      newWindow.document.close(); // Close the document to render the content
-    } else {
-      console.error("Failed to open a new tab for the preview.");
-    }
-  };
 
   if (isCollapsed) {
     return (
@@ -89,7 +77,7 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
         />
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel>
+      <ResizablePanel defaultSize={4}>
         <div className="w-full h-full overflow-y-auto">
           <h3 className="mx-2">
             <Trans>Console Output</Trans>

@@ -5,6 +5,7 @@ import IndexedDB from "@/lib/indexedDB"; // Import the IndexedDB service
 const indexedDBService = new IndexedDB("playground", "active");
 
 interface ActiveState {
+  id: string;
   projectId: string;
   name: string;
   email: string;
@@ -19,6 +20,7 @@ interface ActiveState {
   fileContents: Record<string, string>;
   setFileContent: (file: string, content: string) => void;
   preview: string;
+  getPreview: () => string;
   triggerPreview: () => void;
   uploadFiles: (image: string) => Promise<{ success: boolean; url?: string }>;
   loadFileContents: (id: string) => Promise<void>;
@@ -33,6 +35,7 @@ const initFileContents = {
 };
 
 export const useActiveStore = create<ActiveState>((set, get) => ({
+  id: "DvlCI&xf*:XG",
   projectId: "",
   email: "",
   name: "New Project",
@@ -84,6 +87,11 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
     });
   },
   preview: "",
+  getPreview: () => {
+    const { fileContents, projectId } = get();
+    const preview = composePreview(fileContents, projectId);
+    return preview;
+  },
   triggerPreview: () => {
     set((state) => {
       const preview = composePreview(state.fileContents, state.projectId);
@@ -166,31 +174,34 @@ const loadProject = async (id: string) => {
 const init = async () => {
   let id = "";
   await indexedDBService.initDB();
+  const savedState = await indexedDBService.loadState();
   const paths = window.location.pathname.split("/");
-  if (paths.length > 2 && paths[1] === "view") {
-    id = paths[2];
-    const loadedState = await loadProject(id);
-    if (loadedState) {
-      useActiveStore.setState(loadedState);
-    }
+  id = paths[2];
+  if (paths.length > 2 && savedState?.projectId === id) {
+    // If the saved state matches the URL path, use it
+    // This allows the user to continue from where they left off
+    useActiveStore.setState(savedState);
     return;
   }
 
-  const savedState = await indexedDBService.loadState();
-  if (paths.length > 2 && savedState?.projectId !== paths[2]) {
-    id = paths[2];
+  if (paths.length > 2 && id) {
     const loadedState = await loadProject(id);
-    if (loadedState) {
-      return useActiveStore.setState(loadedState);
+    if (!loadedState && paths[1] === "view") {
+      // redirect to home if the project cannot be loaded
+      // This handles the case when a user tries to access a non-existing project
+      window.location.href = "/"; // Redirect to home if the project cannot be loaded
+      console.error("Project not found, redirecting to home.");
+      return;
     }
-    return useActiveStore.setState({
-      ...useActiveStore.getInitialState(),
-      projectId: id,
-    });
-  }
-
-  if (savedState) {
-    useActiveStore.setState(savedState);
+    const newState = loadedState
+      ? loadedState
+      : {
+          ...useActiveStore.getInitialState(), // Fallback to initial state if loading fails
+          projectId: id, // Ensure projectId is set
+        };
+    useActiveStore.setState(newState);
+    indexedDBService.saveState(newState); // Save to IndexedDB
+    return;
   }
 };
 
