@@ -59,14 +59,16 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
           <span className="text-white font-bold">
             <Trans>Preview</Trans>
           </span>
-          <Button asChild variant="outline">
-            <a href={`${location.origin}/view/${projectId}`} target="_blank">
-              <ViewIcon className="w-6 h-6" />
-            </a>
-          </Button>
-          <Button onClick={triggerPreview} variant="outline">
-            <Trans>Run ▶</Trans>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button asChild variant="outline">
+              <a href={`${location.origin}/view/${projectId}`} target="_blank">
+                <ViewIcon className="w-6 h-6" />
+              </a>
+            </Button>
+            <Button onClick={triggerPreview} variant="outline">
+              <Trans>Run ▶</Trans>
+            </Button>
+          </div>
         </div>
         <iframe
           id="iframe"

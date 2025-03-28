@@ -11,8 +11,8 @@ import {
 const Main: React.FC = () => {
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
   const [isPreviewCollapsed, setIsPreviewCollapsed] = useState(false);
-  const [leftPanelWidth, setLeftPanelWidth] = useState(160);
-  const [previewPanelWidth, setPreviewPanelWidth] = useState(300);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(100);
+  const [previewPanelWidth, setPreviewPanelWidth] = useState(100);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -30,15 +30,16 @@ const Main: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const editorPanelWidth =
-    windowSize.width - leftPanelWidth * 10 - previewPanelWidth * 10 - 4;
+  const editorPanelWidth = Math.round(
+    (windowSize.width * (100 - leftPanelWidth - previewPanelWidth)) / 100
+  );
 
   return (
     <ResizablePanelGroup direction="horizontal">
       <ResizablePanel
         onResize={(width) => setLeftPanelWidth(width)}
         defaultSize={16}
-        maxSize={isLeftPanelCollapsed ? 3 : 160}
+        maxSize={isLeftPanelCollapsed ? 3 : 100}
         minSize={isLeftPanelCollapsed ? 3 : 16}
       >
         <LeftPanel
@@ -54,7 +55,7 @@ const Main: React.FC = () => {
       <ResizablePanel
         onResize={(width) => setPreviewPanelWidth(width)}
         defaultSize={36}
-        maxSize={isPreviewCollapsed ? 3 : 300}
+        maxSize={isPreviewCollapsed ? 3 : 100}
         minSize={isPreviewCollapsed ? 3 : 30}
       >
         <PreviewPanel
