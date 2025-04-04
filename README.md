@@ -52,19 +52,6 @@ npm run build
 
 This will create an optimized build of your application in the `dist` directory.
 
-## Deploying to GitHub Pages
-
-To deploy the application to GitHub Pages, follow these steps:
-
-1. **Push to the main branch**:
-   Ensure your changes are committed and push to the `main` branch:
-   ```bash
-   git push origin main
-   ```
-
-2. **GitHub Actions**:
-   The GitHub Actions workflow will automatically build and deploy your application to GitHub Pages.
-
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
