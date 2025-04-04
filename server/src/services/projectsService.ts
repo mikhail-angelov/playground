@@ -16,7 +16,7 @@ export const projectsService = {
   }): Promise<string> {
     const baseUrl = process.env.CLIENT_URL || "http://localhost:5000";
     const projectUrl = `${baseUrl}/view/${projectId}`;
-    const image = `https://storage.yandexcloud.net/playground-yat/${projectId}-image`;
+    const image = `https://app.js2go.ru/${projectId}-image`;
     const description = `${name} app` || "js2go.ru";
     const htmlContent =
       Object.entries(content).find(([key]) => key.includes(".html"))?.[1] || "";

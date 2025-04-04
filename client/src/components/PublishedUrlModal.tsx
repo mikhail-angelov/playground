@@ -37,34 +37,52 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
   );
 
   const drawSelection = useCallback(() => {
-    if (canvasRef.current && cropStart && cropEnd) {
+    if (canvasRef.current && currentImage) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
       if (ctx) {
-        // Clear only the selection rectangle area
-        const x = Math.min(cropStart.x, cropEnd.x);
-        const y = Math.min(cropStart.y, cropEnd.y);
-        const width = Math.abs(cropEnd.x - cropStart.x);
-        const height = Math.abs(cropEnd.y - cropStart.y);
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-        currentImage && ctx.drawImage(currentImage, 0, 0);
+        // Calculate the aspect ratio and position to fit the image on the canvas
+        const canvasAspectRatio = canvas.width / canvas.height;
+        const imageAspectRatio = currentImage.width / currentImage.height;
 
-        ctx.setLineDash([5, 5]); // Dashed line
-        ctx.lineDashOffset = -antsOffset; // Animate the dashes
-        ctx.strokeStyle = "pink";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x, y, width, height);
-      }
-    } else if (canvasRef.current && currentImage) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-        ctx.drawImage(currentImage, 0, 0);
+        let drawWidth, drawHeight, offsetX, offsetY;
+
+        if (imageAspectRatio > canvasAspectRatio) {
+          // Image is wider than the canvas
+          drawWidth = canvas.width;
+          drawHeight = canvas.width / imageAspectRatio;
+          offsetX = 0;
+          offsetY = (canvas.height - drawHeight) / 2; // Center vertically
+        } else {
+          // Image is taller than the canvas
+          drawWidth = canvas.height * imageAspectRatio;
+          drawHeight = canvas.height;
+          offsetX = (canvas.width - drawWidth) / 2; // Center horizontally
+          offsetY = 0;
+        }
+
+        // Draw the image on the canvas
+        ctx.drawImage(currentImage, offsetX, offsetY, drawWidth, drawHeight);
+
+        // If there's a selection, draw the selection rectangle
+        if (cropStart && cropEnd) {
+          const x = Math.min(cropStart.x, cropEnd.x);
+          const y = Math.min(cropStart.y, cropEnd.y);
+          const width = Math.abs(cropEnd.x - cropStart.x);
+          const height = Math.abs(cropEnd.y - cropStart.y);
+
+          ctx.setLineDash([5, 5]); // Dashed line
+          ctx.lineDashOffset = -antsOffset; // Animate the dashes
+          ctx.strokeStyle = "pink";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x, y, width, height);
+        }
       }
     }
-  }, [cropStart, cropEnd, antsOffset]);
+  }, [cropStart, cropEnd, antsOffset, currentImage]);
 
   // Animate the marching ants
   useEffect(() => {
@@ -72,8 +90,6 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
 
     // Set the canvas size
     if (canvasRef.current && currentImage) {
-      canvasRef.current.width = currentImage.width;
-      canvasRef.current.height = currentImage.height;
       drawSelection();
     }
 
@@ -92,10 +108,13 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = canvasRef.current?.getBoundingClientRect();
-    if (rect) {
+    if (rect && canvasRef.current) {
+      const scaleX = canvasRef.current.width / rect.width; // Scale factor for X
+      const scaleY = canvasRef.current.height / rect.height; // Scale factor for Y
+
       setCropStart({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY,
       });
       setCropEnd(null); // Reset cropEnd
       setIsDragging(true);
@@ -105,10 +124,13 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (isDragging && cropStart) {
       const rect = canvasRef.current?.getBoundingClientRect();
-      if (rect) {
+      if (rect && canvasRef.current) {
+        const scaleX = canvasRef.current.width / rect.width; // Scale factor for X
+        const scaleY = canvasRef.current.height / rect.height; // Scale factor for Y
+
         setCropEnd({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
+          x: (e.clientX - rect.left) * scaleX,
+          y: (e.clientY - rect.top) * scaleY,
         });
       }
     }
@@ -119,22 +141,54 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
   };
 
   const handlePublish = async () => {
-    if (!image || !cropStart || !cropEnd) return;
+    if (!image || !canvasRef.current) return;
 
     try {
-      // Crop the selected area
-      const croppedImage = await getCroppedImg(image, {
-        x: Math.min(cropStart.x, cropEnd.x),
-        y: Math.min(cropStart.y, cropEnd.y),
-        width: Math.abs(cropEnd.x - cropStart.x),
-        height: Math.abs(cropEnd.y - cropStart.y),
-      });
+      // Calculate the scale factors to map canvas coordinates to the original image
+      const canvas = canvasRef.current;
+      const canvasAspectRatio = canvas.width / canvas.height;
+      const imageAspectRatio = image.width / image.height;
+
+      let drawWidth, drawHeight, offsetX, offsetY;
+
+      if (imageAspectRatio > canvasAspectRatio) {
+        // Image is wider than the canvas
+        drawWidth = canvas.width;
+        drawHeight = canvas.width / imageAspectRatio;
+        offsetX = 0;
+        offsetY = (canvas.height - drawHeight) / 2; // Center vertically
+      } else {
+        // Image is taller than the canvas
+        drawWidth = canvas.height * imageAspectRatio;
+        drawHeight = canvas.height;
+        offsetX = (canvas.width - drawWidth) / 2; // Center horizontally
+        offsetY = 0;
+      }
+
+      // Map the selection coordinates from the canvas to the original image
+      const scaleX = image.width / drawWidth;
+      const scaleY = image.height / drawHeight;
+
+      let croppedImage = image.src;
+      if (cropStart && cropEnd) {
+        const cropX = (Math.min(cropStart.x, cropEnd.x) - offsetX) * scaleX;
+        const cropY = (Math.min(cropStart.y, cropEnd.y) - offsetY) * scaleY;
+        const cropWidth = Math.abs(cropEnd.x - cropStart.x) * scaleX;
+        const cropHeight = Math.abs(cropEnd.y - cropStart.y) * scaleY;
+
+        croppedImage = await getCroppedImg(image, {
+          x: Math.max(0, cropX),
+          y: Math.max(0, cropY),
+          width: Math.min(image.width - cropX, cropWidth),
+          height: Math.min(image.height - cropY, cropHeight),
+        });
+      }
 
       // Upload the cropped image
       const { success, url = "" } = await uploadFiles(croppedImage);
 
       if (success) {
-        setPublishedUrl(url); // Set the published URL
+        setPublishedUrl(url);
 
         const newImage = new Image();
         newImage.src = croppedImage;
@@ -179,6 +233,8 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
           <div className="flex items-center flex-col w-full">
             <div className="my-4">
               <canvas
+                width={400}
+                height={400}
                 ref={canvasRef}
                 className="border shadow w-full h-auto"
                 onMouseDown={handleMouseDown}
