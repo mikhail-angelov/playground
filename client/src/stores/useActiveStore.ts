@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
-import IndexedDB from "@/lib/indexedDB"; // Import the IndexedDB service
+import IndexedDB, { STORE_ID } from "@/lib/indexedDB"; // Import the IndexedDB service
 
 const indexedDBService = new IndexedDB("playground", "active");
 
@@ -38,7 +38,7 @@ const initFileContents = {
 };
 
 export const useActiveStore = create<ActiveState>((set, get) => ({
-  id: "DvlCI&xf*:XG",
+  id: STORE_ID,
   projectId: "",
   email: "",
   name: "New Project",
@@ -160,6 +160,7 @@ const loadProject = async (id: string) => {
     if (response.ok) {
       const { content, email, name = "" } = await response.json();
       return {
+        id: STORE_ID,
         fileContents: content,
         projectId: id,
         email,
@@ -182,6 +183,7 @@ const init = async () => {
   const savedState = await indexedDBService.loadState();
   const paths = window.location.pathname.split("/");
   id = paths[2];
+  console.log("init", id);
   if (paths.length > 2 && savedState?.projectId === id) {
     // If the saved state matches the URL path, use it
     // This allows the user to continue from where they left off

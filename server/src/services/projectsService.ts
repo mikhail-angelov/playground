@@ -15,8 +15,8 @@ export const projectsService = {
     content: Record<string, string>;
   }): Promise<string> {
     const baseUrl = process.env.CLIENT_URL || "http://localhost:5000";
-    const projectUrl = `${baseUrl}/view/${projectId}`;
-    const image = `https://app.js2go.ru/${projectId}-image`;
+    const projectUrl = `${baseUrl}/edit/${projectId}`;
+    const image = `https://app.js2go.ru/${projectId}.png`;
     const description = `${name} app` || "js2go.ru";
     const htmlContent =
       Object.entries(content).find(([key]) => key.includes(".html"))?.[1] || "";
@@ -27,7 +27,6 @@ export const projectsService = {
 
     const templatePath = path.resolve(__dirname, "../templates/preview.ejs");
 
-    // Render the EJS template with the provided data
     return ejs.renderFile(templatePath, {
       name,
       description,
@@ -72,7 +71,7 @@ export const projectsService = {
     // Decode the base64 image string
     const base64Image = image.split(";base64,").pop(); // Extract the base64 part
     const imageBuffer = Buffer.from(base64Image || "", "base64");
-    await uploadFileToS3(`${projectId}-image`, imageBuffer, "image/png");
+    await uploadFileToS3(`${projectId}.png`, imageBuffer, "image/png");
 
     // Generate the preview HTML
     const previewHtml = await this.generatePreviewHtml({
@@ -101,7 +100,6 @@ export const projectsService = {
         email,
         name,
         projectId,
-        image,
         rating: 0,
       });
     }

@@ -18,7 +18,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ project, onClick }) => {
       <div className="w-100 h-32 flex items-center justify-center">
         {project ? (
           <img
-            src={project.image}
+            src={`https://app.js2go.ru/${project.projectId}.png`}
             alt={project.name}
             className="max-w-100 h-32 object-cover cursor-pointer"
           />

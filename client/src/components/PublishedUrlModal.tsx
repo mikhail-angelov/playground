@@ -11,6 +11,7 @@ import { Trans } from "@lingui/react/macro";
 import { LoaderIcon, CopyIcon } from "lucide-react";
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import getCroppedImg from "@/lib/cropImage";
+import { toast } from "sonner";
 
 interface PublishedUrlModalProps {
   onClose: () => void;
@@ -208,8 +209,14 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
     }
   };
 
-  const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(publishedUrl);
+  const handleCopyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(publishedUrl);
+      toast.success("URL copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy URL:", err);
+      toast.error("Failed to copy URL. Please try again.");
+    }
   };
 
   const handleView = () => {
