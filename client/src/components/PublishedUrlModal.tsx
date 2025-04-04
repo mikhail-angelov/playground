@@ -3,13 +3,12 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
 } from "@/components/ui/dialog";
 import { useActiveStore } from "@/stores/useActiveStore";
 import { Trans } from "@lingui/react/macro";
-import { CopyIcon } from "lucide-react";
+import { LoaderIcon, CopyIcon } from "lucide-react";
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import getCroppedImg from "@/lib/cropImage";
 
@@ -24,6 +23,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
 }) => {
   const uploadFiles = useActiveStore((state) => state.uploadFiles);
   const setError = useActiveStore((state) => state.setError);
+  const isLoading = useActiveStore((state) => state.isLoading);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [cropStart, setCropStart] = useState<{ x: number; y: number } | null>(
     null
@@ -32,6 +32,9 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [antsOffset, setAntsOffset] = useState(0);
   const [publishedUrl, setPublishedUrl] = useState("");
+  const [currentImage, setCurrentImage] = useState<HTMLImageElement | null>(
+    image
+  );
 
   const drawSelection = useCallback(() => {
     if (canvasRef.current && cropStart && cropEnd) {
@@ -45,7 +48,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
         const height = Math.abs(cropEnd.y - cropStart.y);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-        image && ctx.drawImage(image, 0, 0);
+        currentImage && ctx.drawImage(currentImage, 0, 0);
 
         ctx.setLineDash([5, 5]); // Dashed line
         ctx.lineDashOffset = -antsOffset; // Animate the dashes
@@ -53,12 +56,12 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, width, height);
       }
-    } else if (canvasRef.current && image) {
+    } else if (canvasRef.current && currentImage) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-        ctx.drawImage(image, 0, 0);
+        ctx.drawImage(currentImage, 0, 0);
       }
     }
   }, [cropStart, cropEnd, antsOffset]);
@@ -68,9 +71,9 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
     let animationFrameId: number;
 
     // Set the canvas size
-    if (canvasRef.current && image) {
-      canvasRef.current.width = image.width;
-      canvasRef.current.height = image.height;
+    if (canvasRef.current && currentImage) {
+      canvasRef.current.width = currentImage.width;
+      canvasRef.current.height = currentImage.height;
       drawSelection();
     }
 
@@ -85,7 +88,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
     return () => {
       cancelAnimationFrame(animationFrameId); // Cancel the animation when the component unmounts or modal closes
     };
-  }, [image, canvasRef.current, drawSelection]);
+  }, [currentImage, canvasRef.current, drawSelection]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -132,6 +135,16 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
 
       if (success) {
         setPublishedUrl(url); // Set the published URL
+
+        const newImage = new Image();
+        newImage.src = croppedImage;
+        newImage.onload = () => {
+          setCurrentImage(newImage);
+        };
+
+        // Clear the selection
+        setCropStart(null);
+        setCropEnd(null);
       } else {
         setError("Failed to publish the project. Please try again.");
       }
@@ -150,52 +163,63 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>
-            <Trans>Published URL</Trans>
-          </DialogTitle>
-        </DialogHeader>
-        <div className="flex items-center flex-col w-full">
-          <div className="my-4">
-            <canvas
-              ref={canvasRef}
-              className="border shadow w-full h-auto"
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-            />
-          </div>
-          {publishedUrl && (
-            <div className="flex items-center flex-wrap w-full">
-              <div
-                className="flex-1 mr-2 text-ellipsis overflow-hidden whitespace-nowrap"
-                title={publishedUrl}
-              >
-                {publishedUrl}
-              </div>
-              <Button onClick={handleCopyToClipboard} variant="outline" title="Copy to clipboard">
-                <CopyIcon className="w-6 h-6" />
-              </Button>
-            </div>
-          )}
+    <>
+      {isLoading && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-500">
+          <LoaderIcon className="w-12 h-12 text-white animate-spin" />
         </div>
-        <DialogFooter>
-          {!publishedUrl && (
-            <Button onClick={handlePublish}>
-              <Trans>Publish</Trans>
+      )}
+      <Dialog open onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>
+              <Trans>Published URL</Trans>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center flex-col w-full">
+            <div className="my-4">
+              <canvas
+                ref={canvasRef}
+                className="border shadow w-full h-auto"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+              />
+            </div>
+            {publishedUrl && (
+              <div className="flex items-center flex-wrap w-full">
+                <div
+                  className="flex-1 mr-2 text-ellipsis overflow-hidden whitespace-nowrap"
+                  title={publishedUrl}
+                >
+                  {publishedUrl}
+                </div>
+                <Button
+                  onClick={handleCopyToClipboard}
+                  variant="outline"
+                  title="Copy to clipboard"
+                >
+                  <CopyIcon className="w-6 h-6" />
+                </Button>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            {!publishedUrl && (
+              <Button onClick={handlePublish}>
+                <Trans>Publish</Trans>
+              </Button>
+            )}
+            <Button onClick={handleView} title="Open in new tab">
+              <Trans>View</Trans>
             </Button>
-          )}
-          <Button onClick={handleView} title="Open in new tab">
-            <Trans>View</Trans>
-          </Button>
-          <Button onClick={onClose} variant="destructive">
-            <Trans>Close</Trans>
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            <Button onClick={onClose} variant="destructive">
+              <Trans>Close</Trans>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

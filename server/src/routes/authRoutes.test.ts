@@ -75,7 +75,7 @@ describe('Auth Routes', () => {
       });
       (generateToken as jest.Mock).mockReturnValue(mockAuthToken);
 
-      const sendMailMock = jest.fn().mockRejectedValue(new Error('Mailgun error'));
+      const sendMailMock = jest.fn().mockRejectedValue(new Error('Mail error'));
       (nodemailer.createTransport as jest.Mock).mockReturnValue({
         sendMail: sendMailMock,
       });

@@ -4,6 +4,8 @@ import IndexedDB from "@/lib/indexedDB"; // Import the IndexedDB service
 
 const indexedDBService = new IndexedDB("playground", "active");
 
+const PUBLIC_APP_URL = "https://app.js2go.ru";
+
 interface ActiveState {
   id: string;
   projectId: string;
@@ -12,6 +14,7 @@ interface ActiveState {
   newProject: () => string;
   setName: (name: string) => void;
   lastPublish: string;
+  isLoading: boolean;
   error: string;
   setError: (error: string) => void;
   files: string[];
@@ -63,6 +66,7 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
   },
   lastPublish: "",
   error: "",
+  isLoading: false,
   setError: (error) => {
     set((state) => {
       const newState = { ...state, error };
@@ -101,6 +105,7 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
   },
   uploadFiles: async (image: string) => {
     const { projectId, fileContents: content, name } = get();
+    set({ isLoading: true });
     try {
       const response = await fetch("/api/project/upload", {
         method: "POST",
@@ -116,21 +121,23 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
         }),
       });
 
-      if (!response.ok) {
-        set({ error: "Failed to upload files" });
-        const error = await response.json();
-        console.error("Failed to upload files:", error);
-        return { success: false, error: error.message || "Upload failed" };
+      if (response.ok) {
+        console.log("Files uploaded successfully");
+        set({
+          error: "",
+          lastPublish: new Date().toLocaleString(),
+          isLoading: false,
+        });
+        return { success: true, url: `${PUBLIC_APP_URL}/${projectId}.html` };
       }
 
-      console.log("Files uploaded successfully");
-      set({ error: "", lastPublish: new Date().toLocaleString() });
-      return { success: true, url: `${location.origin}/view/${projectId}` };
+      console.error("Failed to upload files:", response.statusText);
     } catch (err) {
-      set({ error: "Failed to upload files" });
       console.error("Error uploading files:", err);
-      return { success: false, error: "An unexpected error occurred" };
     }
+    // error case
+    set({ error: "Failed to upload files", isLoading: false });
+    return { success: false, error: "Upload failed" };
   },
   loadFileContents: async (id: string) => {
     const loadedState = await loadProject(id);
@@ -148,9 +155,7 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
 
 const loadProject = async (id: string) => {
   try {
-    const response = await fetch(
-      `https://storage.yandexcloud.net/playground-yat/${id}`
-    );
+    const response = await fetch(`${PUBLIC_APP_URL}/${id}`);
 
     if (response.ok) {
       const { content, email, name = "" } = await response.json();

@@ -17,7 +17,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:5174", "http://localhost:5000"],
+    origin: ["http://localhost:5174", "http://localhost:5000", "https://app.js2go.ru"],
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -27,7 +27,7 @@ setupSocketIO(io);
 app.use(bodyParser.json());
 app.use(cookieParser());
 if (process.env.NODE_ENV === "development") {
-  const corsOrigins = ["http://localhost:5174", "http://localhost:5000"];
+  const corsOrigins = ["http://localhost:5174", "http://localhost:5000", "https://app.js2go.ru"];
   app.use(
     cors({
       origin: (origin, callback) => {

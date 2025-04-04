@@ -1,8 +1,45 @@
 import { Project } from "../models/Project";
 import { v4 } from "uuid";
+import ejs from "ejs";
+import path from "path";
 import { uploadFileToS3 } from "./s3Service";
 
 export const projectsService = {
+  async generatePreviewHtml({
+    name,
+    projectId,
+    content,
+  }: {
+    name: string;
+    projectId: string;
+    content: Record<string, string>;
+  }): Promise<string> {
+    const baseUrl = process.env.CLIENT_URL || "http://localhost:5000";
+    const projectUrl = `${baseUrl}/view/${projectId}`;
+    const image = `https://storage.yandexcloud.net/playground-yat/${projectId}-image`;
+    const description = `${name} app` || "js2go.ru";
+    const htmlContent =
+      Object.entries(content).find(([key]) => key.includes(".html"))?.[1] || "";
+    const cssContent =
+      Object.entries(content).find(([key]) => key.includes(".css"))?.[1] || "";
+    const jsContent =
+      Object.entries(content).find(([key]) => key.includes(".js"))?.[1] || "";
+
+    const templatePath = path.resolve(__dirname, "../templates/preview.ejs");
+
+    // Render the EJS template with the provided data
+    return ejs.renderFile(templatePath, {
+      name,
+      description,
+      projectUrl,
+      image,
+      htmlContent,
+      cssContent,
+      jsContent,
+      projectId,
+    });
+  },
+
   async upload({
     name = "",
     projectId = v4(),
@@ -13,16 +50,12 @@ export const projectsService = {
   }: {
     name: string;
     projectId?: string;
-    content: any;
+    content: Record<string, string>;
     image: string;
     userId: string;
     email?: string;
   }) {
-    const s3Key = projectId;
-
-    // Check if a file with the same s3Key already exists
     const existingProject = await Project.findOne({ where: { projectId } });
-
     if (existingProject && existingProject.userId != userId) {
       console.log(
         `File ${projectId} with the same key already exists for another user: ${existingProject.userId}, but current user is ${userId}`
@@ -32,9 +65,24 @@ export const projectsService = {
 
     // Upload the file to S3
     await uploadFileToS3(
-      s3Key,
+      projectId,
       JSON.stringify({ projectId, name, content, email })
     );
+
+    // Decode the base64 image string
+    const base64Image = image.split(";base64,").pop(); // Extract the base64 part
+    const imageBuffer = Buffer.from(base64Image || "", "base64");
+    await uploadFileToS3(`${projectId}-image`, imageBuffer, "image/png");
+
+    // Generate the preview HTML
+    const previewHtml = await this.generatePreviewHtml({
+      name,
+      projectId,
+      content,
+    });
+
+    // Upload the preview HTML to S3 with the key `${projectId}-share`
+    await uploadFileToS3(`${projectId}.html`, previewHtml, "text/html");
 
     if (existingProject) {
       await Project.update(
