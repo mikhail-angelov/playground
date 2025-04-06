@@ -26,9 +26,12 @@ const ProjectList: React.FC = () => {
 
   useEffect(() => {
     loadProjects(activeTab === "myProjects");
-    }, [activeTab, loadProjects]);
+  }, [activeTab, loadProjects]);
 
-  const projects9 = [...projects, ...Array(9 - projects.length).fill(null)];
+  let projects9 = projects;
+  if(projects.length < 9) {
+    projects9 = [...projects, ...Array(9 - projects.length).fill(null)];
+  }
 
   const handleProjectClick = (projectId?: string) => {
     let id = projectId;
@@ -44,7 +47,7 @@ const ProjectList: React.FC = () => {
   return (
     <div className="flex flex-col items-center flex-1 overflow-hidden">
       {isLoading && (
-        <div className="absolute inset-0 bg-opacity-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
           <LoaderIcon className="w-12 h-12 text-white animate-spin" />
         </div>
       )}
@@ -72,14 +75,19 @@ const ProjectList: React.FC = () => {
         {projects9.map((project, index) => (
           <ContextMenu key={index}>
             <ContextMenuTrigger>
-              <ProjectTile
-                project={project}
-                onClick={handleProjectClick}
-              />
+              <ProjectTile project={project} onClick={handleProjectClick} />
             </ContextMenuTrigger>
             <ContextMenuContent>
-              <ContextMenuItem onClick={()=>handleProjectClick(project?.projectId)}>Open</ContextMenuItem>
-              <ContextMenuItem onClick={()=>deleteProject(project?.projectId)}>Delete</ContextMenuItem>
+              <ContextMenuItem
+                onClick={() => handleProjectClick(project?.projectId)}
+              >
+                Open
+              </ContextMenuItem>
+              <ContextMenuItem
+                onClick={() => deleteProject(project?.projectId)}
+              >
+                Delete
+              </ContextMenuItem>
             </ContextMenuContent>
           </ContextMenu>
         ))}

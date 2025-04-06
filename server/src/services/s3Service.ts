@@ -1,31 +1,50 @@
-import AWS from 'aws-sdk';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  ListObjectsV2Command,
+  CopyObjectCommand,
+  PutObjectCommandInput,
+  CopyObjectCommandInput,
+} from "@aws-sdk/client-s3";
+import { Readable } from "stream";
 
-export const uploadFileToS3 = async (key: string, content: AWS.S3.Body, type?: string): Promise<string> => {
-  const s3 = new AWS.S3({
-    endpoint: process.env.S3_ENDPOINT_URL || "",
-    accessKeyId: process.env.S3_ACCESS_KEY_ID || "",
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "",
+console.log("S3_BUCKET", process.env.S3_SECRET_ACCESS_KEY);
+const getS3 = () => {
+  return new S3Client({
+    endpoint: process.env.S3_ENDPOINT_URL || "https://storage.yandexcloud.net",
+    credentials: {
+      accessKeyId: process.env.S3_ACCESS_KEY_ID || "",
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "",
+    },
   });
+};
+
+export const uploadFileToS3 = async (
+  key: string,
+  content: Buffer | string,
+  type?: string
+): Promise<string> => {
   const bucket = process.env.S3_BUCKET || "";
 
-  const params: AWS.S3.PutObjectRequest = {
+  const params: PutObjectCommandInput = {
     Bucket: bucket,
     Key: key,
     Body: content,
     ContentType: type,
-    ACL: 'public-read',
+    ACL: "public-read",
   };
 
-  await s3.upload(params).promise();
-  return key;
+  try {
+    await getS3().send(new PutObjectCommand(params));
+    return key;
+  } catch (error) {
+    console.error("Error uploading file to S3:", error);
+    throw error;
+  }
 };
 
 export const getFileFromS3 = async (key: string): Promise<string> => {
-  const s3 = new AWS.S3({
-    endpoint: process.env.S3_ENDPOINT_URL || "",
-    accessKeyId: process.env.S3_ACCESS_KEY_ID || "",
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "",
-  });
   const bucket = process.env.S3_BUCKET || "";
 
   const params = {
@@ -33,40 +52,52 @@ export const getFileFromS3 = async (key: string): Promise<string> => {
     Key: key,
   };
 
-  const data = await s3.getObject(params).promise();
-  return data.Body?.toString('utf-8') || '';
+  try {
+    const data = await getS3().send(new GetObjectCommand(params));
+    const stream = data.Body as Readable;
+    const chunks: Uint8Array[] = [];
+    for await (const chunk of stream) {
+      chunks.push(chunk);
+    }
+    return Buffer.concat(chunks).toString("utf-8");
+  } catch (error) {
+    console.error("Error getting file from S3:", error);
+    throw error;
+  }
 };
 
-
-export const copyAllObjects = async (sourceBucket: string, destinationBucket: string) => {
+export const copyAllObjects = async (
+  sourceBucket: string,
+  destinationBucket: string
+) => {
   try {
-    const s3 = new AWS.S3({
-      endpoint: process.env.S3_ENDPOINT_URL || "",
-      accessKeyId: process.env.S3_ACCESS_KEY_ID || "",
-      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "",
-    });
-    // List all objects in the source bucket
-    const listParams: AWS.S3.ListObjectsV2Request = {
-      Bucket: sourceBucket,
-    };
-
     let continuationToken: string | undefined;
+    const s3 = getS3();
+
     do {
-      const listResponse = await s3.listObjectsV2({ ...listParams, ContinuationToken: continuationToken }).promise();
+      // List objects in the source bucket
+      const listResponse = await s3.send(
+        new ListObjectsV2Command({
+          Bucket: sourceBucket,
+          ContinuationToken: continuationToken,
+        })
+      );
 
       if (listResponse.Contents) {
         for (const object of listResponse.Contents) {
           if (object.Key) {
             // Copy each object to the destination bucket
-            const copyParams: AWS.S3.CopyObjectRequest = {
+            const copyParams: CopyObjectCommandInput = {
               Bucket: destinationBucket,
               CopySource: `/${sourceBucket}/${object.Key}`, // Source bucket and key
               Key: object.Key, // Destination key (same as source key)
-              ACL: 'public-read', // Optional: Set ACL for the copied object
+              ACL: "public-read", // Optional: Set ACL for the copied object
             };
 
-            console.log(`Copying ${object.Key} from ${sourceBucket} to ${destinationBucket}`);
-            await s3.copyObject(copyParams).promise();
+            console.log(
+              `Copying ${object.Key} from ${sourceBucket} to ${destinationBucket}`
+            );
+            await s3.send(new CopyObjectCommand(copyParams));
           }
         }
       }
@@ -75,8 +106,11 @@ export const copyAllObjects = async (sourceBucket: string, destinationBucket: st
       continuationToken = listResponse.NextContinuationToken;
     } while (continuationToken);
 
-    console.log(`All objects copied from ${sourceBucket} to ${destinationBucket}`);
+    console.log(
+      `All objects copied from ${sourceBucket} to ${destinationBucket}`
+    );
   } catch (error) {
     console.error("Error copying objects:", error);
+    throw error;
   }
 };
