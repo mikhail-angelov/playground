@@ -234,7 +234,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              <Trans>Published URL</Trans>
+              <Trans>Select part of image to crop</Trans>
             </DialogTitle>
           </DialogHeader>
           <div className="flex items-center flex-col w-full">

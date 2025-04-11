@@ -19,16 +19,15 @@ const PublishButton: React.FC = () => {
       return;
     }
     try {
-      // Select the iframe element
       const iframe = document.querySelector("iframe");
       if (iframe && iframe.contentDocument) {
         const iframeBody = iframe.contentDocument.body;
 
-        // Capture the iframe content as an image
         const canvas = await html2canvas(iframeBody, {
           useCORS: true,
           logging: true,
           scale: 1,
+          backgroundColor: '#888',
         });
 
         const imageSrc = canvas.toDataURL("image/png");

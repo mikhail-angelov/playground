@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
 import IndexedDB, { STORE_ID } from "@/lib/indexedDB"; // Import the IndexedDB service
+import { useAuthStore } from "@/stores/useAuthStore"; // Import useAuthStore
 
 const indexedDBService = new IndexedDB("playground", "active");
 
@@ -44,22 +45,27 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
   name: "New Project",
   newProject: () => {
     const projectId = nanoid(20);
-    const newState = {
-      projectId,
-      name: "New Project",
-      lastPublish: "",
-      fileContents: initFileContents,
-      email: "",
-      preview: composePreview(initFileContents, projectId),
-      error: "",
-    };
-    set(newState);
-    indexedDBService.saveState(newState); // Save to IndexedDB
+    const authEmail = useAuthStore.getState().email; // Get email from useAuthStore
+
+    set((state) => {
+      const newState = {
+        ...state,
+        projectId,
+        email: authEmail || "",
+        name: "New Project",
+        lastPublish: "",
+        fileContents: initFileContents,
+        preview: composePreview(initFileContents, projectId),
+        error: "",
+      };
+      indexedDBService.saveState(newState); // Save to IndexedDB
+      return newState;
+    });
     return projectId;
   },
   setName: (name) => {
     set((state) => {
-      const newState = { ...state, name: name };
+      const newState = { ...state, name };
       indexedDBService.saveState(newState); // Save to IndexedDB
       return newState;
     });
@@ -97,11 +103,8 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
     return preview;
   },
   triggerPreview: () => {
-    set((state) => {
-      const preview = composePreview(state.fileContents, state.projectId);
-      const newState = { ...state, preview };
-      return newState;
-    });
+    const { fileContents, projectId } = get();
+    set({ preview: composePreview(fileContents, projectId) });
   },
   uploadFiles: async (image: string) => {
     const { projectId, fileContents: content, name } = get();
@@ -147,7 +150,14 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
   },
   cloneProject: () => {
     const projectId = nanoid(20);
-    const newState = { projectId, name: "New Project", lastPublish: "" };
+    const authEmail = useAuthStore.getState().email;
+    const newState = {
+      projectId,
+      name: "New Project",
+      lastPublish: "",
+      email: authEmail || "",
+      error: "",
+    };
     set(newState);
     indexedDBService.saveState(newState); // Save to IndexedDB
   },
