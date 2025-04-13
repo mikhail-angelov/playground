@@ -36,6 +36,15 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ width }) => {
     }
   }, [width]);
 
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.setModelLanguage(
+        editorRef.current.getModel(),
+        getLanguageFromExtension(selectedFile)
+      );
+    }
+  }, [selectedFile]);
+
   return (
     <div className="flex-grow p-1 h-full" style={{ width: `${width}px` }}>
       <Editor
