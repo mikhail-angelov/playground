@@ -7,6 +7,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { useActiveStore } from "../../stores/useActiveStore";
 
 const Main: React.FC = () => {
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
@@ -17,6 +18,7 @@ const Main: React.FC = () => {
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  const selectedFile = useActiveStore((state) => state.selectedFile);
 
   useEffect(() => {
     const handleResize = () => {
@@ -49,7 +51,7 @@ const Main: React.FC = () => {
       </ResizablePanel>
       <ResizableHandle />
       <ResizablePanel>
-        <EditorPanel width={editorPanelWidth} />
+        <EditorPanel key={selectedFile} width={editorPanelWidth} />
       </ResizablePanel>
       <ResizableHandle />
       <ResizablePanel
