@@ -193,7 +193,7 @@ const init = async () => {
   try{
   const tg = retrieveLaunchParams();
   if (tg) {
-    alert("Telegram Web App launched" + JSON.stringify(tg));
+    console.log("Telegram Web App launched" + JSON.stringify(tg));
   }
 } catch (error) {
   console.error("Error initializing app:", error);
@@ -211,7 +211,7 @@ const init = async () => {
     return;
   }
 
-  alert("Telegram Web App launched: " + id);
+  console.log("Telegram Web App launched: " + id);
   if (id) {
     const loadedState = await loadProject(id);
     if (!loadedState) {
