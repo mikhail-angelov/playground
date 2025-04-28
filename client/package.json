@@ -18,6 +18,7 @@
     "@radix-ui/react-hover-card": "^1.1.6",
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.2",
+    "@telegram-apps/bridge": "^2.8.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "html2canvas": "^1.4.1",

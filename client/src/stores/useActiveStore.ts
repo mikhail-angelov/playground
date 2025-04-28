@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
+import { retrieveLaunchParams } from '@telegram-apps/bridge';
 import IndexedDB, { STORE_ID } from "@/lib/indexedDB"; // Import the IndexedDB service
 import { useAuthStore } from "@/stores/useAuthStore"; // Import useAuthStore
 
@@ -189,6 +190,14 @@ const loadProject = async (id: string) => {
 
 const init = async () => {
   let id = "";
+  try{
+  const tg = retrieveLaunchParams();
+  if (tg) {
+    alert("Telegram Web App launched" + JSON.stringify(tg));
+  }
+} catch (error) {
+  console.error("Error initializing app:", error);
+}
   await indexedDBService.initDB();
   const savedState = await indexedDBService.loadState();
 
@@ -202,6 +211,7 @@ const init = async () => {
     return;
   }
 
+  alert("Telegram Web App launched: " + id);
   if (id) {
     const loadedState = await loadProject(id);
     if (!loadedState) {
