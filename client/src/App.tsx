@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useAuthStore } from "./stores/useAuthStore";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomeApp from "./pages/home/HomeApp";
 import EditApp from "./pages/edit/EditApp";
 import ViewApp from "./pages/view/ViewApp";
@@ -10,8 +10,7 @@ import { I18nProvider } from "./providers/I18nProvider";
 
 const App: React.FC = () => {
   const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
-  const location = useLocation();
-
+ 
   useEffect(() => {
     checkAuthStatus();
   }, [checkAuthStatus]);
