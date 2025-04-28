@@ -191,31 +191,29 @@ const init = async () => {
   let id = "";
   await indexedDBService.initDB();
   const savedState = await indexedDBService.loadState();
-  const paths = window.location.pathname.split("/");
-  id = paths[2];
-  console.log("init", id);
-  if (paths.length > 2 && savedState?.projectId === id) {
-    // If the saved state matches the URL path, use it
-    // This allows the user to continue from where they left off
+
+  // Get id from query parameter or second path segment
+  const queryParams = new URLSearchParams(window.location.search);
+  id = queryParams.get("view") || window.location.pathname.split("/")[2] || "";
+
+  if (id && savedState?.projectId === id) {
+    // If the saved state matches the id, use it
     useActiveStore.setState(savedState);
     return;
   }
 
-  if (paths.length > 2 && id) {
+  if (id) {
     const loadedState = await loadProject(id);
-    if (!loadedState && paths[1] === "view") {
-      // redirect to home if the project cannot be loaded
-      // This handles the case when a user tries to access a non-existing project
-      window.location.href = "/"; // Redirect to home if the project cannot be loaded
+    if (!loadedState) {
+      // Redirect to home if the project cannot be loaded
+      window.location.href = "/";
       console.error("Project not found, redirecting to home.");
       return;
     }
-    const newState = loadedState
-      ? loadedState
-      : {
-          ...useActiveStore.getInitialState(), // Fallback to initial state if loading fails
-          projectId: id, // Ensure projectId is set
-        };
+    const newState = loadedState || {
+      ...useActiveStore.getInitialState(), // Fallback to initial state if loading fails
+      projectId: id, // Ensure projectId is set
+    };
     useActiveStore.setState(newState);
     indexedDBService.saveState(newState); // Save to IndexedDB
     return;
