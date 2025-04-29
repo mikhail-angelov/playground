@@ -189,10 +189,7 @@ const loadProject = async (id: string) => {
 
 const init = async () => {
   let id = "";
-  const telegramViewId = new URLSearchParams(location.search).get('tgWebAppStartParam');
-  if (telegramViewId) {
-    id = telegramViewId;
-  }
+
   await indexedDBService.initDB();
   const savedState = await indexedDBService.loadState();
 
@@ -200,13 +197,18 @@ const init = async () => {
   const queryParams = new URLSearchParams(window.location.search);
   id = queryParams.get("view") || window.location.pathname.split("/")[2] || "";
 
+  const telegramViewId = new URLSearchParams(location.search).get('tgWebAppStartParam');
+  if (!id && telegramViewId) {
+    id = telegramViewId;
+    console.log("Telegram Web App launched: " + id);
+  }
+
   if (id && savedState?.projectId === id) {
     // If the saved state matches the id, use it
     useActiveStore.setState(savedState);
     return;
   }
-
-  console.log("Telegram Web App launched: " + id);
+ 
   if (id) {
     const loadedState = await loadProject(id);
     if (!loadedState) {
