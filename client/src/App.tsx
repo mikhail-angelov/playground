@@ -15,8 +15,7 @@ const App: React.FC = () => {
     checkAuthStatus();
   }, [checkAuthStatus]);
 
-  const queryParams = new URLSearchParams(location.search);
-  const viewId = queryParams.get("view");
+  const telegramViewId = new URLSearchParams(location.search).get('tgWebAppStartParam');
 
   return (
     <React.StrictMode>
@@ -24,7 +23,7 @@ const App: React.FC = () => {
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           <Router>
             <Routes>
-              {viewId ? (
+              {telegramViewId ? (
                 <Route path="*" element={<ViewApp />} />
               ) : (
                 <>
