@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
-import { retrieveLaunchParams } from '@telegram-apps/bridge';
+import { retrieveLaunchParams, retrieveRawInitData } from '@telegram-apps/bridge';
 import IndexedDB, { STORE_ID } from "@/lib/indexedDB"; // Import the IndexedDB service
 import { useAuthStore } from "@/stores/useAuthStore"; // Import useAuthStore
 
@@ -193,7 +193,9 @@ const init = async () => {
   try{
   const tg = retrieveLaunchParams();
   if (tg) {
-    console.log("Telegram Web App launched" + JSON.stringify(tg));
+    console.log("Telegram Web App launched " + JSON.stringify(tg));
+    console.log("Telegram Web App launched2 " + JSON.stringify(retrieveRawInitData()));
+    console.log("Telegram Web App launched3 " + location.href);
   }
 } catch (error) {
   console.error("Error initializing app:", error);
