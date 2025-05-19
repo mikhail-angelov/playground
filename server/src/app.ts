@@ -24,8 +24,8 @@ const io = new Server(httpServer, {
 });
 setupSocketIO(io);
 
-app.use(bodyParser.json({ limit: "5mb" }));
-app.use(bodyParser.urlencoded({ limit: "5mb", extended: true }));
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
 if (process.env.NODE_ENV === "development") {
   const corsOrigins = ["http://localhost:5174", "http://localhost:5000", "https://app.js2go.ru"];
