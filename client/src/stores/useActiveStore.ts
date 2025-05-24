@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { nanoid } from "nanoid";
 import IndexedDB, { STORE_ID } from "@/lib/indexedDB"; // Import the IndexedDB service
 import { useAuthStore } from "@/stores/useAuthStore"; // Import useAuthStore
+import { toast } from "sonner"
 
 const indexedDBService = new IndexedDB("playground", "active");
 
@@ -125,7 +126,7 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
       });
 
       if (response.ok) {
-        console.log("Files uploaded successfully");
+        toast.success("Project is uploaded successfully");
         set({
           error: "",
           lastPublish: new Date().toLocaleString(),
@@ -134,9 +135,9 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
         return { success: true, url: `${PUBLIC_APP_URL}/${projectId}.html` };
       }
 
-      console.error("Failed to upload files:", response.statusText);
+      toast.error(`Failed to upload files: ${response.statusText}`);
     } catch (err) {
-      console.error("Error uploading files:", err);
+      toast.error(`Error uploading files: ${err}`);
     }
     // error case
     set({ error: "Failed to upload files", isLoading: false });

@@ -62,12 +62,15 @@ export const projectsService = {
       throw new Error("File with the same key already exists for another user");
     }
 
+    console.log(`Uploading project with ID: ${projectId}`);
+
     // Upload the file to S3
     await uploadFileToS3(
       projectId,
       JSON.stringify({ projectId, name, content, email })
     );
 
+    console.log(`Project ${projectId} uploaded successfully to S3`);
     // Decode the base64 image string
     const base64Image = image.split(";base64,").pop(); // Extract the base64 part
     const imageBuffer = Buffer.from(base64Image || "", "base64");
@@ -80,8 +83,10 @@ export const projectsService = {
       content,
     });
 
+    console.log(`Generated preview HTML for project ${projectId}`);
     // Upload the preview HTML to S3 with the key `${projectId}-share`
     await uploadFileToS3(`${projectId}.html`, previewHtml, "text/html");
+    console.log(`Preview HTML uploaded for project ${projectId}`);
 
     if (existingProject) {
       await Project.update(

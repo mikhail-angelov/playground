@@ -13,11 +13,11 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/PublishedUrlModal.tsx:52
+#: src/components/PublishedUrlModal.tsx:280
 msgid "Close"
 msgstr "Close"
 
-#: src/pages/edit/PreviewPanel.tsx:78
+#: src/pages/edit/PreviewPanel.tsx:85
 msgid "Console Output"
 msgstr "Console Output"
 
@@ -25,19 +25,19 @@ msgstr "Console Output"
 msgid "CotPen"
 msgstr "CotPen"
 
-#: src/pages/edit/EditApp.tsx:94
+#: src/pages/edit/EditApp.tsx:95
 msgid "Dismiss"
 msgstr "Dismiss"
 
-#: src/pages/view/ViewApp.tsx:26
+#: src/pages/view/ViewApp.tsx:43
 msgid "Edit"
 msgstr "Edit"
 
-#: src/components/LoginModal.tsx:54
+#: src/components/LoginModal.tsx:65
 msgid "Email"
 msgstr "Email"
 
-#: src/pages/edit/EditApp.tsx:100
+#: src/pages/edit/EditApp.tsx:101
 msgid "File: {selectedFile}"
 msgstr "File: {selectedFile}"
 
@@ -45,11 +45,11 @@ msgstr "File: {selectedFile}"
 msgid "Files"
 msgstr "Files"
 
-#: src/pages/edit/EditApp.tsx:79
+#: src/pages/edit/EditApp.tsx:80
 msgid "Fork"
 msgstr "Fork"
 
-#: src/pages/edit/EditApp.tsx:103
+#: src/pages/edit/EditApp.tsx:104
 msgid "Last published"
 msgstr "Last published"
 
@@ -61,7 +61,7 @@ msgstr "Login"
 msgid "Logout"
 msgstr "Logout"
 
-#: src/pages/home/ProjectList.tsx:62
+#: src/pages/home/ProjectList.tsx:65
 msgid "My Projects"
 msgstr "My Projects"
 
@@ -69,7 +69,7 @@ msgstr "My Projects"
 msgid "New"
 msgstr "New"
 
-#: src/pages/edit/EditApp.tsx:103
+#: src/pages/edit/EditApp.tsx:105
 msgid "Not published yet"
 msgstr "Not published yet"
 
@@ -77,23 +77,24 @@ msgstr "Not published yet"
 msgid "Preview"
 msgstr "Preview"
 
-#: src/components/PublishButton.tsx:81
+#: src/components/PublishedUrlModal.tsx:273
+#: src/components/PublishButton.tsx:50
 msgid "Publish"
 msgstr "Publish"
 
-#: src/components/PublishedUrlModal.tsx:38
-msgid "Published URL"
-msgstr "Published URL"
-
-#: src/pages/edit/PreviewPanel.tsx:63
+#: src/pages/edit/PreviewPanel.tsx:69
 msgid "Run ▶"
 msgstr "Run ▶"
 
-#: src/components/LoginModal.tsx:70
+#: src/components/PublishedUrlModal.tsx:237
+msgid "Select part of image to crop for preview"
+msgstr "Select part of image to crop for preview"
+
+#: src/components/LoginModal.tsx:81
 msgid "Send"
 msgstr "Send"
 
-#: src/components/LoginModal.tsx:44
+#: src/components/LoginModal.tsx:53
 msgid "Sign in"
 msgstr "Sign in"
 
@@ -101,14 +102,14 @@ msgstr "Sign in"
 msgid "This is online project editor made by impression of https://codepen.io"
 msgstr "This is online project editor made by impression of https://codepen.io"
 
-#: src/components/LoginModal.tsx:46
+#: src/components/LoginModal.tsx:56
 msgid "To authorize, please enter your email address, then you'll receive a magic link in your inbox."
 msgstr "To authorize, please enter your email address, then you'll receive a magic link in your inbox."
 
-#: src/pages/home/ProjectList.tsx:56
+#: src/pages/home/ProjectList.tsx:59
 msgid "Trends"
 msgstr "Trends"
 
-#: src/components/PublishedUrlModal.tsx:49
+#: src/components/PublishedUrlModal.tsx:277
 msgid "View"
 msgstr "View"

@@ -234,7 +234,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              <Trans>Select part of image to crop</Trans>
+              <Trans>Select part of image to crop for preview</Trans>
             </DialogTitle>
           </DialogHeader>
           <div className="flex items-center flex-col w-full">
@@ -269,7 +269,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
           </div>
           <DialogFooter>
             {!publishedUrl && (
-              <Button onClick={handlePublish}>
+              <Button onClick={handlePublish} disabled={isLoading}>
                 <Trans>Publish</Trans>
               </Button>
             )}
