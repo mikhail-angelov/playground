@@ -11,6 +11,12 @@ build:
 	npm run build --prefix client
 	npm run build --prefix server
 
+migrate:
+	@echo "Running migrations..."
+	scp root@js2go.ru:/opt/playground/database.sqlite server/database-prod.sqlite
+	cd server; npx sequelize-cli db:migrate --env production;cd ..
+	scp server/database-prod.sqlite root@js2go.ru:/opt/playground/database.sqlite
+
 install:
 	@echo "Installing server..."
 	-ssh root@js2go.ru "mkdir -p /opt/playground"

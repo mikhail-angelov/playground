@@ -9,6 +9,7 @@ import { setupSocketIO } from "./services/socketService"; // Import the socket s
 import authRoutes from "./routes/authRoutes";
 import sequelize from "./db";
 import projectsRoutes from "./routes/projectsRoutes";
+import profileRoutes from "./routes/profileRoutes";
 import { join } from "node:path";
 
 dotenv.config();
@@ -49,6 +50,7 @@ app.use(express.static(clientDistPath, { immutable: true }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/project", projectsRoutes);
+app.use("/api/profile", profileRoutes);
 
 app.get("*", (req, res) => {
   if (!req.path.startsWith("/api") && !/\.[^/]+$/.test(req.path)) {

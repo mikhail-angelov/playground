@@ -7,6 +7,7 @@ import ViewApp from "./pages/view/ViewApp";
 import { ThemeProvider } from "./components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { I18nProvider } from "./providers/I18nProvider";
+import Profile from "./pages/profile/Profile";
 
 const App: React.FC = () => {
   const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
@@ -29,6 +30,7 @@ const App: React.FC = () => {
                 <>
                   <Route path="/view/:id" element={<ViewApp />} />
                   <Route path="/edit/:id" element={<EditApp />} />
+                  <Route path="/profile" element={<Profile />} />
                   <Route path="/" element={<HomeApp />} />
                 </>
               )}
