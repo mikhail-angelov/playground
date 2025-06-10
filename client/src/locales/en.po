@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/pages/profile/Profile.tsx:75
+msgid "API Key"
+msgstr "API Key"
+
 #: src/components/PublishedUrlModal.tsx:280
 msgid "Close"
 msgstr "Close"
@@ -49,15 +53,19 @@ msgstr "Files"
 msgid "Fork"
 msgstr "Fork"
 
+#: src/pages/profile/Profile.tsx:33
+msgid "Home"
+msgstr "Home"
+
 #: src/pages/edit/EditApp.tsx:104
 msgid "Last published"
 msgstr "Last published"
 
-#: src/components/AuthButtons.tsx:15
+#: src/components/AuthButtons.tsx:31
 msgid "Login"
 msgstr "Login"
 
-#: src/components/AuthButtons.tsx:18
+#: src/components/AuthButtons.tsx:25
 msgid "Logout"
 msgstr "Logout"
 
@@ -77,6 +85,14 @@ msgstr "Not published yet"
 msgid "Preview"
 msgstr "Preview"
 
+#: src/components/AuthButtons.tsx:21
+msgid "Profile"
+msgstr "Profile"
+
+#: src/pages/profile/Profile.tsx:54
+msgid "Provider"
+msgstr "Provider"
+
 #: src/components/PublishedUrlModal.tsx:273
 #: src/components/PublishButton.tsx:50
 msgid "Publish"
@@ -85,6 +101,10 @@ msgstr "Publish"
 #: src/pages/edit/PreviewPanel.tsx:69
 msgid "Run ▶"
 msgstr "Run ▶"
+
+#: src/pages/profile/Profile.tsx:94
+msgid "Save"
+msgstr "Save"
 
 #: src/components/PublishedUrlModal.tsx:237
 msgid "Select part of image to crop for preview"
