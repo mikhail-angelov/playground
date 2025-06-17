@@ -20,7 +20,7 @@ router.post("/", async (req, res) => {
     }
 
     // Generate auth token
-    const authToken = generateToken({ userId: user.id, email: user.email });
+    const authToken = generateToken({ userId: user.id, email: user.email, hasAi: !!user.api?.key  });
 
     // Store auth token in the database
     user.token = authToken;
@@ -56,7 +56,7 @@ router.get("/login", async (req, res) => {
     }
 
     // Generate JWT for the user
-    const jwtToken = generateToken({ userId: user.id, email: user.email });
+    const jwtToken = generateToken({ userId: user.id, email: user.email, hasAi: !!user.api?.key });
 
     // Set JWT as an HTTP-only cookie
     res.cookie("auth", jwtToken, {
@@ -92,7 +92,7 @@ router.get("/validate", async (req, res) => {
 
     res.json({
       message: "Authentication is valid",
-      user: { email: user.email },
+      user: { email: user.email,hasAi: !!user.api?.key },
     });
   } catch (err) {
     console.error("Error validating token:", err);

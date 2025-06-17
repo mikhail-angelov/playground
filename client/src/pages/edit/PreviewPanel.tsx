@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useActiveStore } from "../../stores/useActiveStore";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ChevronLeft, ViewIcon } from "lucide-react";
+import { ViewIcon } from "lucide-react";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -9,15 +9,7 @@ import {
 } from "@/components/ui/resizable";
 import { Trans } from "@lingui/react/macro";
 
-interface PreviewPanelProps {
-  isCollapsed: boolean;
-  toggleCollapse: () => void;
-}
-
-const PreviewPanel: React.FC<PreviewPanelProps> = ({
-  isCollapsed,
-  toggleCollapse,
-}) => {
+const PreviewPanel: React.FC = () => {
   const preview = useActiveStore((state) => state.preview);
   const projectId = useActiveStore((state) => state.projectId);
   const triggerPreview = useActiveStore((state) => state.triggerPreview);
@@ -39,36 +31,18 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
     };
   }, []);
 
-  if (isCollapsed) {
-    return (
-      <div className="bg-gray-900 border-l border-gray-700 flex flex-col">
-        <Button variant="ghost" onClick={toggleCollapse}>
-          <ChevronLeft className="w-6 h-6 text-white" />
-        </Button>
-      </div>
-    );
-  }
-
   return (
     <ResizablePanelGroup direction="vertical">
       <ResizablePanel>
         <div className="flex justify-between items-center bg-gray-800 px-2 py-1">
-          <Button onClick={toggleCollapse} variant="ghost">
-            <ChevronRight className="w-6 h-6 text-white" />
+          <Button asChild variant="outline">
+            <a href={`${location.origin}/view/${projectId}`} target="_blank">
+              <ViewIcon className="w-6 h-6" />
+            </a>
           </Button>
-          <span className="text-white font-bold">
-            <Trans>Preview</Trans>
-          </span>
-          <div className="flex items-center space-x-2">
-            <Button asChild variant="outline">
-              <a href={`${location.origin}/view/${projectId}`} target="_blank">
-                <ViewIcon className="w-6 h-6" />
-              </a>
-            </Button>
-            <Button onClick={triggerPreview} variant="outline">
-              <Trans>Run ▶</Trans>
-            </Button>
-          </div>
+          <Button onClick={triggerPreview} variant="outline">
+            <Trans>Run ▶</Trans>
+          </Button>
         </div>
         <iframe
           id="iframe"

@@ -1,10 +1,12 @@
 import { create } from "zustand";
 import { toast } from "sonner"
+import { u } from "@lingui/react/dist/shared/react.db1293d4";
 
 interface AuthState {
   isAuthenticated: boolean;
   email?: string;
   isLoading: boolean;
+  hasAi: boolean
   login: (email: string) => Promise<"success" | "error">;
   checkAuthStatus: () => Promise<void>;
   logout: () => Promise<void>;
@@ -13,6 +15,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   email: '',
+  hasAi: false,
   isLoading: false,
   login: async (email: string) => {
     try {
@@ -39,12 +42,12 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const response = await fetch('/api/auth/validate', {
         method: "GET",
-        credentials: "include", // Include cookies in the request
+        credentials: "include"
       });
 
       if (response.ok) {
         const { user } = await response.json();
-        set({ isAuthenticated: true, email: user.email });
+        set({ isAuthenticated: true, email: user.email, hasAi: user.hasAi });
       } else {
         set({ isAuthenticated: false });
       }
@@ -58,11 +61,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isLoading: true });
       const response = await fetch('/api/auth/logout', {
         method: "POST",
-        credentials: "include", // Include cookies in the request
+        credentials: "include",
       });
 
       if (response.ok) {
-        set({ isAuthenticated: false, email: undefined, isLoading: false });
+        set({ isAuthenticated: false, email: undefined, isLoading: false, hasAi: false });
         toast.success("Logged out successfully");
         console.log("Logged out successfully");
         return;
