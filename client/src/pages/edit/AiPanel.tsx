@@ -8,13 +8,54 @@ import {
 } from "@/components/ui/resizable";
 import { useAiStore } from "@/stores/useAi";
 import ReactMarkdown from "react-markdown";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
+import { Content, useActiveStore } from "@/stores/useActiveStore";
 
 const AiPanel: React.FC = () => {
+  const setContent = useActiveStore((state) => state.setContent);
   const isLoading = useAiStore((state) => state.isLoading);
   const response = useAiStore((state) => state.response);
   const requestAi = useAiStore((state) => state.requestAi);
   const [text, setText] = React.useState("");
   const markdownRef = React.useRef<HTMLDivElement>(null);
+
+  const codeSummary: Content = {
+    "index.html": "",
+    "script.js": "",
+    "style.css": "",
+  };
+  const collectCode = (className: string, code: string) => {
+    if(isLoading) return;
+    if (
+      className.includes("language-html") &&
+      codeSummary["index.html"].length < code.length
+    ) {
+      codeSummary["index.html"] += code + "\n";
+    } else if (
+      className.includes("language-css") &&
+      codeSummary["style.css"].length < code.length
+    ) {
+      codeSummary["style.css"] += code + "\n";
+    } else if (
+      className.includes("language-javascript") &&
+      codeSummary["script.js"].length < code.length
+    ) {
+      codeSummary["script.js"] += code + "\n";
+    }
+  };
+  const copyCodeToProject = () => {
+    if (
+      !codeSummary["index.html"] &&
+      !codeSummary["style.css"] &&
+      !codeSummary["script.js"]
+    ) {
+      toast.error("No code to copy");
+      return;
+    }
+    setContent(codeSummary);
+    toast.success("Code copied to project");
+  };
 
   // Scroll to bottom when response changes
   React.useEffect(() => {
@@ -28,6 +69,12 @@ const AiPanel: React.FC = () => {
     setText("");
   };
 
+  // Copy code to clipboard helper
+  const handleCopy = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast.success("Copied to clipboard");
+  };
+
   return (
     <ResizablePanelGroup direction="vertical">
       <ResizablePanel className="flex flex-col !overflow-y-auto">
@@ -39,32 +86,47 @@ const AiPanel: React.FC = () => {
           <ReactMarkdown
             components={{
               code({ node, className, children, ...props }) {
-                return !className ? (
-                  <code
-                    className={className}
-                    style={{
-                      background: "#222",
-                      borderRadius: "4px",
-                      padding: "2px 4px",
-                      fontSize: "90%",
-                    }}
-                    {...props}
-                  >
-                    {children}
-                  </code>
-                ) : (
-                  <pre
-                    className="overflow-x-auto rounded bg-[#18181b] p-3 my-2"
-                    style={{
-                      maxWidth: "100%",
-                      whiteSpace: "pre-wrap",
-                      wordBreak: "break-all",
-                    }}
-                  >
-                    <code className={className} {...props}>
+                // Only show copy button for code blocks (not inline)
+                if (!className) {
+                  return (
+                    <code
+                      className={className}
+                      style={{
+                        background: "#222",
+                        borderRadius: "4px",
+                        padding: "2px 4px",
+                        fontSize: "90%",
+                      }}
+                      {...props}
+                    >
                       {children}
                     </code>
-                  </pre>
+                  );
+                }
+                collectCode(className, String(children).trim());
+                return (
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      className="absolute top-2 left-2 z-10 opacity-70 hover:opacity-100 bg-[#232323] rounded p-1 transition"
+                      onClick={() => handleCopy(String(children).trim())}
+                      title="Copy to clipboard"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <pre
+                      className="overflow-x-auto rounded bg-[#18181b] p-3 my-2"
+                      style={{
+                        maxWidth: "100%",
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-all",
+                      }}
+                    >
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    </pre>
+                  </div>
                 );
               },
             }}
@@ -97,8 +159,19 @@ const AiPanel: React.FC = () => {
             autoCorrect="off"
             style={{ resize: "none" }}
           />
-          <Button className="m-2" onClick={handleRequestAi}>
+          <Button
+            className="m-2"
+            onClick={handleRequestAi}
+            disabled={isLoading}
+          >
             <SparklesIcon className="w-6 h-6" />
+          </Button>
+          <Button
+            className="m-2"
+            onClick={copyCodeToProject}
+            disabled={isLoading}
+          >
+            <Copy className="w-6 h-6" />
           </Button>
         </div>
       </ResizablePanel>

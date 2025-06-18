@@ -2,11 +2,17 @@ import { create } from "zustand";
 import { nanoid } from "nanoid";
 import IndexedDB, { STORE_ID } from "@/lib/indexedDB"; // Import the IndexedDB service
 import { useAuthStore } from "@/stores/useAuthStore"; // Import useAuthStore
-import { toast } from "sonner"
+import { toast } from "sonner";
 
 const indexedDBService = new IndexedDB("playground", "active");
 
 const PUBLIC_APP_URL = "https://app.js2go.ru";
+
+export interface Content {
+  'index.html': string;
+  'style.css': string;
+  "script.js": string;
+}
 
 interface ActiveState {
   id: string;
@@ -20,10 +26,11 @@ interface ActiveState {
   error: string;
   setError: (error: string) => void;
   files: string[];
-  selectedFile: string;
-  setSelectedFile: (file: string) => void;
-  fileContents: Record<string, string>;
+  selectedFile: keyof Content;
+  setSelectedFile: (file: keyof Content) => void;
+  fileContents: Content;
   setFileContent: (file: string, content: string) => void;
+  setContent: (data: Content) => void;
   preview: string;
   getPreview: () => string;
   triggerPreview: () => void;
@@ -32,7 +39,7 @@ interface ActiveState {
   cloneProject: () => void;
 }
 
-const initFileContents = {
+const initFileContents: Content = {
   "index.html": `<canvas id="canvas" tabindex="0" style:"width:100%; height:100%; border:1px solid;"></canvas>`,
   "style.css":
     "html{ width:100%; height:100%; background-color: #333; color:  #f0f0f0; margin:0px; padding:0px; display:flex; flex-direction:column;} canvas { flex:1; margin:5px; }",
@@ -82,7 +89,7 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
   },
   files: ["index.html", "style.css", "script.js"],
   selectedFile: "index.html",
-  setSelectedFile: (file: string) => {
+  setSelectedFile: (file: keyof Content) => {
     set((state) => {
       const newState = { ...state, selectedFile: file };
       return newState;
@@ -92,6 +99,14 @@ export const useActiveStore = create<ActiveState>((set, get) => ({
   setFileContent: (file: string, content: string) => {
     set((state) => {
       const newFileContents = { ...state.fileContents, [file]: content };
+      const newState = { ...state, fileContents: newFileContents };
+      indexedDBService.saveState(newState); // Save to IndexedDB
+      return newState;
+    });
+  },
+  setContent: (data: Content) => {
+    set((state) => {
+      const newFileContents = { ...state.fileContents, ...data };
       const newState = { ...state, fileContents: newFileContents };
       indexedDBService.saveState(newState); // Save to IndexedDB
       return newState;
@@ -198,7 +213,9 @@ const init = async () => {
   const queryParams = new URLSearchParams(window.location.search);
   id = queryParams.get("view") || window.location.pathname.split("/")[2] || "";
 
-  const telegramViewId = new URLSearchParams(location.search).get('tgWebAppStartParam');
+  const telegramViewId = new URLSearchParams(location.search).get(
+    "tgWebAppStartParam"
+  );
   if (!id && telegramViewId) {
     id = telegramViewId;
     console.log("Telegram Web App launched: " + id);
@@ -209,7 +226,7 @@ const init = async () => {
     useActiveStore.setState(savedState);
     return;
   }
- 
+
   if (id) {
     const loadedState = await loadProject(id);
     if (!loadedState) {
@@ -229,7 +246,7 @@ const init = async () => {
 };
 
 const composePreview = (
-  fileContents: Record<string, string>,
+  fileContents: Content,
   projectId: string
 ) => {
   const htmlContent = fileContents["index.html"] || "";
