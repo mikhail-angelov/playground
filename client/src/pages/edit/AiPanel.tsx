@@ -17,7 +17,10 @@ const AiPanel: React.FC = () => {
   const isLoading = useAiStore((state) => state.isLoading);
   const response = useAiStore((state) => state.response);
   const requestAi = useAiStore((state) => state.requestAi);
+  const history = useAiStore((state) => state.history); // <-- get history from store
   const [text, setText] = React.useState("");
+  const [historyIndex, setHistoryIndex] = React.useState<number | null>(null);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const markdownRef = React.useRef<HTMLDivElement>(null);
 
   const codeSummary: Content = {
@@ -26,7 +29,7 @@ const AiPanel: React.FC = () => {
     "style.css": "",
   };
   const collectCode = (className: string, code: string) => {
-    if(isLoading) return;
+    if (isLoading) return;
     if (
       className.includes("language-html") &&
       codeSummary["index.html"].length < code.length
@@ -67,6 +70,7 @@ const AiPanel: React.FC = () => {
   const handleRequestAi = () => {
     requestAi(text);
     setText("");
+    setHistoryIndex(null);
   };
 
   // Copy code to clipboard helper
@@ -74,6 +78,47 @@ const AiPanel: React.FC = () => {
     navigator.clipboard.writeText(code);
     toast.success("Copied to clipboard");
   };
+
+  // Handle Arrow Up for prompt history
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (
+      e.key === "ArrowUp" &&
+      text.trim() === "" &&
+      document.activeElement === textareaRef.current &&
+      history.length > 0
+    ) {
+      e.preventDefault();
+      // If not already browsing history, start from the last prompt
+      const newIndex =
+        historyIndex === null
+          ? history.length - 1
+          : Math.max(0, historyIndex - 1);
+      setText(history[newIndex] || "");
+      setHistoryIndex(newIndex);
+    } else if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleRequestAi();
+    } else if (e.key === "ArrowDown" && historyIndex !== null) {
+      e.preventDefault();
+      // Move forward in history or clear if at the end
+      if (historyIndex < history.length - 1) {
+        const newIndex = historyIndex + 1;
+        setText(history[newIndex] || "");
+        setHistoryIndex(newIndex);
+      } else {
+        setText("");
+        setHistoryIndex(null);
+      }
+    }
+  };
+
+  // Reset history index if user types
+  React.useEffect(() => {
+    if (text !== (history[historyIndex ?? -1] || "")) {
+      setHistoryIndex(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text]);
 
   return (
     <ResizablePanelGroup direction="vertical">
@@ -139,6 +184,7 @@ const AiPanel: React.FC = () => {
       <ResizablePanel defaultSize={10}>
         <div className="flex overflow-y-auto">
           <textarea
+            ref={textareaRef}
             className="w-full h-full p-2 bg-gray-900 text-white"
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -147,12 +193,7 @@ const AiPanel: React.FC = () => {
             }
             rows={3}
             autoFocus
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleRequestAi();
-              }
-            }}
+            onKeyDown={handleKeyDown}
             disabled={isLoading}
             spellCheck="false"
             autoCapitalize="off"

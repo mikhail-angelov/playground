@@ -76,7 +76,7 @@ const Profile: React.FC = () => {
             </label>
             <input
               id="key"
-              type="text"
+              type="password"
               className="input input-bordered w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-background"
               value={api.key || ""}
               onChange={(e) =>

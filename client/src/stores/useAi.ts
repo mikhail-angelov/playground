@@ -5,13 +5,19 @@ interface AiState {
   requestAi: (text: string) => Promise<void>;
   isLoading: boolean;
   response: string;
+  history: string[];
 }
 
 export const useAiStore = create<AiState>((set, get) => ({
   response: "",
   isLoading: false,
+  history: [],
   requestAi: async (text: string) => {
-    set({ isLoading: true, response: "✨ AI magic is processing..." });
+    set((state) => ({
+      isLoading: true,
+      history: [...state.history, text],
+      response: "✨ AI magic is processing...",
+    }));
     try {
       const response = await fetch("/api/ai", {
         method: "POST",
