@@ -1,22 +1,25 @@
 import React, { useEffect } from "react";
 import { useAuthStore } from "./stores/useAuthStore";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomeApp from "./pages/home/HomeApp";
+import Top from "./pages/top/Top"
 import EditApp from "./pages/edit/EditApp";
 import ViewApp from "./pages/view/ViewApp";
 import { ThemeProvider } from "./components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { I18nProvider } from "./providers/I18nProvider";
 import Profile from "./pages/profile/Profile";
+import Home from "./pages/Home"
 
 const App: React.FC = () => {
   const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
- 
+
   useEffect(() => {
     checkAuthStatus();
   }, [checkAuthStatus]);
 
-  const telegramViewId = new URLSearchParams(location.search).get('tgWebAppStartParam');
+  const telegramViewId = new URLSearchParams(location.search).get(
+    "tgWebAppStartParam",
+  );
 
   return (
     <React.StrictMode>
@@ -31,7 +34,8 @@ const App: React.FC = () => {
                   <Route path="/view/:id" element={<ViewApp />} />
                   <Route path="/edit/:id" element={<EditApp />} />
                   <Route path="/profile" element={<Profile />} />
-                  <Route path="/" element={<HomeApp />} />
+                  <Route path="/top" element={<Top />} />
+                  <Route path="/" element={<Home />} />
                 </>
               )}
             </Routes>

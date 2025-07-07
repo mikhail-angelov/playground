@@ -6,10 +6,9 @@ import { useActiveStore } from "../../stores/useActiveStore";
 import Header from "@/components/Header";
 import NewProjectButton from "@/components/NewProjectButton";
 import AuthButtons from "@/components/AuthButtons";
-import { Trans } from "@lingui/react/macro";
 import Footer from "@/components/Footer";
 
-const HomeApp: React.FC = () => {
+const Top: React.FC = () => {
   const loadFileContents = useActiveStore((state) => state.loadFileContents);
   const triggerPreview = useActiveStore((state) => state.triggerPreview);
 
@@ -38,4 +37,4 @@ const HomeApp: React.FC = () => {
   );
 };
 
-export default HomeApp;
+export default Top;
