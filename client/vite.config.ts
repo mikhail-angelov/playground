@@ -22,13 +22,6 @@ export default defineConfig({
   publicDir: "public",
   build: {
     outDir: "dist",
-    ssr: true,
-    rollupOptions: {
-      input: {
-        client: resolve(__dirname, "src/entry-client.tsx"),
-        server: resolve(__dirname, "src/entry-server.tsx"),
-      },
-    },
   },
   server: {
     port: 5174,
@@ -38,8 +31,5 @@ export default defineConfig({
         target: "http://localhost:5000",
       },
     },
-  },
-  ssr: {
-    noExternal: ["react-router-dom"],
   },
 });

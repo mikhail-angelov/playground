@@ -1,14 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense, lazy } from "react";
 import { useAuthStore } from "./stores/useAuthStore";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Top from "./pages/top/Top"
-import EditApp from "./pages/edit/EditApp";
-import ViewApp from "./pages/view/ViewApp";
 import { ThemeProvider } from "./components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { I18nProvider } from "./providers/I18nProvider";
-import Profile from "./pages/profile/Profile";
-import Home from "./pages/Home"
+
+// Lazy-loaded route components
+const Top = lazy(() => import("./pages/top/Top"));
+const EditApp = lazy(() => import("./pages/edit/EditApp"));
+const ViewApp = lazy(() => import("./pages/view/ViewApp"));
+const Profile = lazy(() => import("./pages/profile/Profile"));
+const Home = lazy(() => import("./pages/Home"));
 
 const App: React.FC = () => {
   const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
@@ -25,21 +27,29 @@ const App: React.FC = () => {
     <React.StrictMode>
       <I18nProvider>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <Router>
-            <Routes>
-              {telegramViewId ? (
-                <Route path="*" element={<ViewApp />} />
-              ) : (
-                <>
-                  <Route path="/view/:id" element={<ViewApp />} />
-                  <Route path="/edit/:id" element={<EditApp />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/top" element={<Top />} />
-                  <Route path="/" element={<Home />} />
-                </>
-              )}
-            </Routes>
-          </Router>
+          <Suspense
+            fallback={
+              <div className="flex justify-center items-center min-h-screen text-xl">
+                Loading...
+              </div>
+            }
+          >
+            <Router>
+              <Routes>
+                {telegramViewId ? (
+                  <Route path="*" element={<ViewApp />} />
+                ) : (
+                  <>
+                    <Route path="/view/:id" element={<ViewApp />} />
+                    <Route path="/edit/:id" element={<EditApp />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/top" element={<Top />} />
+                    <Route path="/" element={<Home />} />
+                  </>
+                )}
+              </Routes>
+            </Router>
+          </Suspense>
           <Toaster />
         </ThemeProvider>
       </I18nProvider>
