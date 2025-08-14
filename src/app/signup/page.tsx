@@ -31,7 +31,7 @@ export default function SignUpPage() {
         </div>
       )}
       <header className="w-full flex justify-between items-center px-8 py-6 border-b border-zinc-800 bg-[#23272a]">
-        <Link href="/">
+        <Link href="/" legacyBehavior>
           <h1 className="text-2xl font-bold tracking-tight">JS2Go</h1>
         </Link>
         <div className="flex gap-4">
