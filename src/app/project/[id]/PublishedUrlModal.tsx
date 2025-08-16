@@ -17,11 +17,13 @@ import { toast } from "sonner";
 interface PublishedUrlModalProps {
   onClose: () => void;
   image: HTMLImageElement | null;
+  projectId: string;
 }
 
 const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
   onClose,
   image,
+  projectId,
 }) => {
   const { uploadFiles, setError, isLoading } = useProjectStore(
     (state) => state,
@@ -187,7 +189,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
       }
 
       // Upload the cropped image
-      const { success, url = "" } = await uploadFiles(croppedImage);
+      const { success, url = "" } = await uploadFiles(projectId, croppedImage);
 
       if (success) {
         setPublishedUrl(url);
@@ -232,7 +234,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
         </div>
       )}
       <Dialog open onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[625px]">
           <DialogHeader>
             <DialogTitle>Select part of image to crop for preview</DialogTitle>
           </DialogHeader>

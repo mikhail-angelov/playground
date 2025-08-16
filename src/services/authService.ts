@@ -107,7 +107,6 @@ export async function getUser() {
     if (!user) {
       return { error: "cannot get user: " + id };
     }
-    console.log("----getUser----", user);
     let hasAi = false;
     const api = getUserApi(user);
     if (api?.key) {

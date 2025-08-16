@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
   const token = cookieStore.get(AUTH_COOKIE)?.value;
 
   try {
+    console.log("--", token);
     const user = await getAuthUser(token);
     const body = await req.json();
 

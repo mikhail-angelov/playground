@@ -1,9 +1,12 @@
 "use server";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
-import { AUTH_COOKIE, JWT_SECRET } from "@/services/authService";
+import {
+  AUTH_COOKIE,
+  JWT_SECRET,
+  login as loginService,
+} from "@/services/authService";
 import { redirect } from "next/navigation";
-import { login as loginService } from "@/services/authService";
 
 function isValidEmail(email: string): boolean {
   // Simple email validation

@@ -2,6 +2,7 @@ import { db, users, projects, Project } from "@/db";
 import { eq } from "drizzle-orm";
 import ejs from "ejs";
 import path from "path";
+import { v4 } from "uuid";
 import { uploadFileToS3 } from "./s3Service";
 
 function parseContent(content: string) {
@@ -78,8 +79,8 @@ export async function generatePreviewHtml({
       Object.entries(content).find(([key]) => key.includes(".js"))?.[1] || "";
 
     const templatePath = path.resolve(
-      __dirname,
-      "../../../templates/preview.ejs",
+      process.cwd(),
+      "src/templates/preview.ejs",
     );
 
     return ejs.renderFile(templatePath, {

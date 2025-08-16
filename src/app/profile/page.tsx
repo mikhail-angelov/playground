@@ -1,8 +1,7 @@
 "use client";
 import React, { useActionState, useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { Home, LoaderIcon } from "lucide-react";
+import { Home } from "lucide-react";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,14 +9,13 @@ import { Button } from "@/components/ui/button";
 import { get, save } from "@/lib/actions/profile";
 import { toast } from "sonner";
 
-export const providers = ["deepSeek", "yandex", "openAI"];
+const providers = ["deepSeek", "yandex", "openAI"];
 
 export default function Profile() {
   const [key, setKey] = useState("");
   const [provider, setProvider] = useState(providers[0]);
   useEffect(() => {
     get().then((res) => {
-      console.log("---", res);
       setKey(res?.key);
       setProvider(res?.provider);
     });
@@ -41,11 +39,9 @@ export default function Profile() {
       <Header
         right={
           <div className="flex items-center space-x-4">
-            <Link href="/" passHref legacyBehavior>
+            <Link href="/" passHref>
               <Button asChild variant="outline">
-                <a>
-                  <Image src={Home} alt="Home" className="w-10 h-6" />
-                </a>
+                <Home className="w-10 h-6" />
               </Button>
             </Link>
           </div>

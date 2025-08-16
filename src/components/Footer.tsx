@@ -37,7 +37,7 @@ const Footer: React.FC<FooterProps> = ({
             target="_blank"
             className="px-2"
           >
-            <GithubIcon className="w-4 h-5" />
+            <GithubIcon className="w-4 h-5" name="github" />
           </a>
         </span>
       )}

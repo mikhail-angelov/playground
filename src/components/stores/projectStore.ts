@@ -2,30 +2,12 @@ import { createStore } from "zustand/vanilla";
 import { nanoid } from "nanoid";
 // import IndexedDB, { STORE_ID } from "@/lib/indexedDB"; // Import the IndexedDB service
 import { toast } from "sonner";
+import { Content, ProjectDto } from "@/dto/project.dto";
+import { composePreview } from "@/lib/actions/preview";
 
 // const indexedDBService = new IndexedDB("playground", "active");
 const STORE_ID = "DvlCI&xf*:XG";
 const PUBLIC_APP_URL = "https://app.js2go.ru";
-
-export interface Content {
-  "index.html": string;
-  "style.css": string;
-  "script.js": string;
-}
-
-export type ProjectState = {
-  id: string;
-  projectId: string;
-  name: string;
-  email: string;
-  lastPublish: string;
-  isLoading: boolean;
-  error: string;
-  files: string[];
-  selectedFile: keyof Content;
-  fileContents: Content;
-  preview: string;
-};
 
 export type ProjectActions = {
   newProject: () => string;
@@ -36,12 +18,15 @@ export type ProjectActions = {
   setContent: (data: Content) => void;
   getPreview: () => string;
   triggerPreview: () => void;
-  uploadFiles: (image: string) => Promise<{ success: boolean; url?: string }>;
+  uploadFiles: (
+    projectId: string,
+    image: string,
+  ) => Promise<{ success: boolean; url?: string }>;
   loadFileContents: (id: string) => Promise<void>;
   cloneProject: () => void;
 };
 
-export type ProjectStore = ProjectState & ProjectActions;
+export type ProjectStore = ProjectDto & ProjectActions;
 
 const initFileContents: Content = {
   "index.html": `<canvas id="canvas" tabindex="0" style:"width:100%; height:100%; border:1px solid;"></canvas>`,
@@ -50,7 +35,7 @@ const initFileContents: Content = {
   "script.js": 'console.log("Hello, World!");',
 };
 
-export const initProjectStore = (): ProjectState => {
+export const initProjectStore = (): ProjectDto => {
   return {
     id: STORE_ID,
     projectId: "",
@@ -66,7 +51,7 @@ export const initProjectStore = (): ProjectState => {
   };
 };
 
-export const defaultInitState: ProjectState = {
+export const defaultInitState: ProjectDto = {
   id: STORE_ID,
   projectId: "",
   email: "",
@@ -81,7 +66,7 @@ export const defaultInitState: ProjectState = {
 };
 
 export const createProjectStore = (
-  initState: ProjectState = defaultInitState,
+  initState: ProjectDto = defaultInitState,
 ) => {
   return createStore<ProjectStore>()((set, get) => ({
     ...initState,
@@ -149,8 +134,8 @@ export const createProjectStore = (
       const { fileContents, projectId } = get();
       set({ preview: composePreview(fileContents, projectId) });
     },
-    uploadFiles: async (image: string) => {
-      const { projectId, fileContents: content, name } = get();
+    uploadFiles: async (projectId: string, image: string) => {
+      const { fileContents: content, name } = get();
       set({ isLoading: true });
       try {
         const response = await fetch("/api/project/upload", {
@@ -270,46 +255,6 @@ const init = async () => {
   //   indexedDBService.saveState(newState); // Save to IndexedDB
   //   return;
   // }
-};
-
-const composePreview = (fileContents: Content, projectId: string) => {
-  const htmlContent = fileContents["index.html"] || "";
-  const cssContent = fileContents["style.css"] || "";
-  const jsContent = fileContents["script.js"] || "";
-
-  return `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Preview</title>
-            <style>${cssContent}</style>
-        </head>
-        <body>
-            ${htmlContent}
-            <script>
-              (function() {
-                const projectId = '${projectId || ""}';
-                // Override console.log to post messages to the parent window
-                const originalLog = console.log;
-                console.log = function(...args) {
-                    window.parent.postMessage({ type: 'console', message: args.join(' ') }, '*');
-                    originalLog.apply(console, args);
-                };
-                //wrap mouse events and propagate to parent window
-                document.addEventListener('mousemove', (event) => {
-                  window.parent.postMessage({ type: 'mousemove', event: { clientX: event.clientX, clientY: event.clientY } }, '*');
-                });
-                document.addEventListener('mouseup', (event) => {
-                  window.parent.postMessage({ type: 'mouseup', event: { clientX: event.clientX, clientY: event.clientY } }, '*');
-                });
-                ${jsContent}
-              })();
-            </script>
-        </body>
-        </html>
-      `;
 };
 
 init();

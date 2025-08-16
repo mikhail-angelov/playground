@@ -8,17 +8,17 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import PublishButton from "./PublishButton";
+import { composePreview } from "@/lib/actions/preview";
+import { ProjectDto } from "@/dto/project.dto";
 
-const PreviewPanel: React.FC = ({ project }: any) => {
-  const { preview, projectId, triggerPreview } = useProjectStore(
-    (state) => state,
-  );
+const PreviewPanel = ({ project }: { project: ProjectDto }) => {
+  const { fileContents, cloneProject } = useProjectStore((state) => state);
   const userEmail = project.email;
-  const hasAi = !!project.hasAi;
   const showForkButton = userEmail !== project.email && userEmail;
   const showPublishButton =
     (userEmail && userEmail === project.email) || !project.email;
 
+  const [preview, setPreview] = useState<string>("");
   const [consoleOutput, setConsoleOutput] = useState<string[]>([]);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -29,7 +29,7 @@ const PreviewPanel: React.FC = ({ project }: any) => {
   };
 
   useEffect(() => {
-    triggerPreview();
+    setPreview(composePreview(project.fileContents, project.projectId));
     window.addEventListener("message", handleConsoleMessage);
 
     return () => {
@@ -42,7 +42,10 @@ const PreviewPanel: React.FC = ({ project }: any) => {
       <ResizablePanel>
         <div className="flex justify-between items-center bg-gray-800 px-2 py-1">
           <Button asChild variant="outline">
-            <a href={`${location.origin}/view/${projectId}`} target="_blank">
+            <a
+              href={`${location.origin}/view/${project?.projectId}`}
+              target="_blank"
+            >
               <ViewIcon className="w-6 h-6" />
             </a>
           </Button>
@@ -52,8 +55,15 @@ const PreviewPanel: React.FC = ({ project }: any) => {
                 Fork
               </Button>
             )}
-            {showPublishButton && <PublishButton />}
-            <Button onClick={triggerPreview} variant="outline">
+            {showPublishButton && (
+              <PublishButton projectId={project.projectId} />
+            )}
+            <Button
+              onClick={() => {
+                setPreview(composePreview(fileContents, project.projectId));
+              }}
+              variant="outline"
+            >
               Run ▶
             </Button>
           </div>

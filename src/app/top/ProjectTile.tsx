@@ -12,7 +12,7 @@ interface ProjectTileProps {
 const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
   return (
     <div className="bg-gray-800 shadow rounded overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center min-h-[200px]">
-      <Link href={`project/${project?.projectId}`} legacyBehavior>
+      <Link href={`project/${project?.projectId}`}>
         <div className="w-100 h-32 flex items-center justify-center">
           {project?.image ? (
             <img
@@ -21,7 +21,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
               className="max-w-100 h-32 object-cover cursor-pointer"
             />
           ) : (
-            <span className="text-gray-500">No Image</span>
+            <span className="text-gray-200">No Image</span>
           )}
         </div>
       </Link>

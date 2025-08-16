@@ -4,9 +4,12 @@ import { eq } from "drizzle-orm";
 import { v4 } from "uuid";
 import { db, projects } from "@/db";
 import { getAuthUser, AUTH_COOKIE } from "@/services/authService";
-import { getProfile, saveProfile } from "@/services/profileService";
+import { getProfile } from "@/services/profileService";
+import { ProjectDto } from "@/dto/project.dto";
 
-export async function getProject(projectId: string) {
+export async function getProject(
+  projectId: string,
+): Promise<[project?: ProjectDto, error?: string]> {
   const cookieStore = await cookies();
   const token = cookieStore.get(AUTH_COOKIE)?.value;
   let myEmail = "";
@@ -16,8 +19,8 @@ export async function getProject(projectId: string) {
     const user = await getAuthUser(token);
     const profile = await getProfile(user.id);
     console.log("+", user, profile);
-    myEmail = profile.email;
-    hasAi = !!profile.key;
+    myEmail = profile?.email;
+    hasAi = !!profile?.key;
   } catch (e) {
     //ignore
   }
@@ -43,7 +46,6 @@ export async function getProject(projectId: string) {
         },
         preview: "",
       },
-      null,
     ];
   }
 
@@ -76,7 +78,6 @@ export async function getProject(projectId: string) {
           },
           preview: "",
         },
-        null,
       ];
     }
     const response = await fetch(`${"https://app.js2go.ru"}/${projectId}`);
@@ -85,24 +86,26 @@ export async function getProject(projectId: string) {
       const { content, email, name = "" } = await response.json();
       return [
         {
-          id: project.id,
           isMy: myEmail === email,
           hasAi,
           fileContents: content,
+          selectedFile: "index.html",
           projectId,
           email,
           name,
           error: "",
+          isLoading: false,
+          files: ["index.html", "style.css", "script.js"],
           lastPublish: "",
+          preview: "",
         },
-        null,
       ];
     } else {
       console.error("Failed to load file contents:", response.statusText);
-      return [null, "Failed to load file content"];
+      return [undefined, "Failed to load file content"];
     }
   } catch (err) {
     console.error("Error loading file contents:", err);
-    return [null, "Failed to load project"];
+    return [undefined, "Failed to load project"];
   }
 }

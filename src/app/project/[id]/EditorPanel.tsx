@@ -30,7 +30,6 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ width }) => {
   const editorRef = useRef<any>(null);
 
   const language = getLanguageFromExtension(selectedFile);
-  console.log("==", fileContent);
 
   useEffect(() => {
     if (editorRef.current) {

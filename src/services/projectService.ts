@@ -1,14 +1,6 @@
 import { db, users, projects } from "@/db";
 import { eq } from "drizzle-orm";
 
-function parseContent(content: string) {
-  try {
-    return JSON.parse(content);
-  } catch {
-    return {};
-  }
-}
-
 export type TopProject = {
   id: number;
   name: string;

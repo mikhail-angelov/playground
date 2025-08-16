@@ -5,8 +5,8 @@ import catImage from "@/../public/cat.png";
 
 const HomeButton: React.FC = () => {
   return (
-    <Link href="/" passHref legacyBehavior>
-      <Image src={catImage} alt="Home" className="w-10 h-6" />
+    <Link href="/top" passHref>
+      <Image src={catImage} alt="Home" className="max-w-10 h-auto" />
     </Link>
   );
 };

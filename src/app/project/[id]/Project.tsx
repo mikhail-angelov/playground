@@ -1,7 +1,5 @@
 "use client";
-import React, { use, useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { useAuth } from "@/components/providers/AuthProvider";
+import React, { useState, useEffect } from "react";
 import { useProjectStore } from "@/components/providers/ProjectStoreProvider";
 import LinkButton from "@/components/LinkButton";
 import HomeButton from "@/components/HomeButton";
@@ -15,8 +13,6 @@ import Header from "@/components/Header";
 import { CheckIcon } from "lucide-react";
 
 export default function Project({ project }: any) {
-  const router = useRouter();
-  const pathname = usePathname();
   const { setContent } = useProjectStore((state) => state);
   useEffect(() => {
     const pathname = window.location.pathname;
@@ -34,7 +30,7 @@ export default function Project({ project }: any) {
   const [newProjectName, setNewProjectName] = useState(project.name);
 
   const handleSave = () => {
-    setName(newProjectName);
+    setNewProjectName(newProjectName);
     setIsEditing(false);
   };
 
@@ -67,7 +63,7 @@ export default function Project({ project }: any) {
                 className="border border-gray-700 p-2 h-[36px] rounded-lg"
                 onClick={() => setIsEditing(true)}
               >
-                {name}
+                {newProjectName}
               </Label>
             )}
           </div>

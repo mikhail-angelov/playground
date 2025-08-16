@@ -6,12 +6,12 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { useAiStore } from "@/lib/stores/useAi";
 import ReactMarkdown from "react-markdown";
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
-import { Content } from "@/components/stores/ProjectStore";
 import { useProjectStore } from "@/components/providers/ProjectStoreProvider";
+import { useAiStore } from "@/components/stores/useAi";
+import { Content } from "@/dto/project.dto";
 
 const AiPanel: React.FC = () => {
   const { setContent } = useProjectStore((state) => state);

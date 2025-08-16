@@ -3,11 +3,10 @@ import React, { useState } from "react";
 import html2canvas from "html2canvas";
 import { useProjectStore } from "@/components/providers/ProjectStoreProvider";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 import PublishedUrlModal from "./PublishedUrlModal";
 
-const PublishButton: React.FC = () => {
+const PublishButton: React.FC = ({ projectId }: { projectId: strng }) => {
   const { setError } = useProjectStore((state) => state);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
 
@@ -45,7 +44,11 @@ const PublishButton: React.FC = () => {
       </Button>
 
       {!!image && (
-        <PublishedUrlModal onClose={() => setImage(null)} image={image} />
+        <PublishedUrlModal
+          onClose={() => setImage(null)}
+          image={image}
+          projectId={projectId}
+        />
       )}
     </>
   );
