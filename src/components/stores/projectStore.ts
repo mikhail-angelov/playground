@@ -1,12 +1,9 @@
 import { createStore } from "zustand/vanilla";
 import { nanoid } from "nanoid";
-// import IndexedDB, { STORE_ID } from "@/lib/indexedDB"; // Import the IndexedDB service
 import { toast } from "sonner";
 import { Content, ProjectDto } from "@/dto/project.dto";
 import { composePreview } from "@/lib/actions/preview";
 
-// const indexedDBService = new IndexedDB("playground", "active");
-const STORE_ID = "DvlCI&xf*:XG";
 const PUBLIC_APP_URL = "https://app.js2go.ru";
 
 export type ProjectActions = {
@@ -22,8 +19,7 @@ export type ProjectActions = {
     projectId: string,
     image: string,
   ) => Promise<{ success: boolean; url?: string }>;
-  loadFileContents: (id: string) => Promise<void>;
-  cloneProject: () => void;
+  cloneProject: (email: string) => void;
 };
 
 export type ProjectStore = ProjectDto & ProjectActions;
@@ -37,14 +33,14 @@ const initFileContents: Content = {
 
 export const initProjectStore = (): ProjectDto => {
   return {
-    id: STORE_ID,
     projectId: "",
+    isMy: true,
+    hasAi: false,
     email: "",
     name: "New Project",
     lastPublish: "",
     error: "",
     isLoading: false,
-    files: ["index.html", "style.css", "script.js"],
     selectedFile: "index.html",
     fileContents: initFileContents,
     preview: "",
@@ -52,14 +48,14 @@ export const initProjectStore = (): ProjectDto => {
 };
 
 export const defaultInitState: ProjectDto = {
-  id: STORE_ID,
   projectId: "",
   email: "",
+  isMy: true,
+  hasAi: false,
   name: "New Project",
   lastPublish: "",
   error: "",
   isLoading: false,
-  files: ["index.html", "style.css", "script.js"],
   selectedFile: "index.html",
   fileContents: initFileContents,
   preview: "",
@@ -170,12 +166,6 @@ export const createProjectStore = (
       set({ error: "Failed to upload files", isLoading: false });
       return { success: false, error: "Upload failed" };
     },
-    loadFileContents: async (id: string) => {
-      const loadedState = await loadProject(id);
-      if (loadedState) {
-        set(loadedState);
-      }
-    },
     cloneProject: (email: string) => {
       const projectId = nanoid(20);
       const newState = {
@@ -190,71 +180,3 @@ export const createProjectStore = (
     },
   }));
 };
-
-const loadProject = async (id: string) => {
-  try {
-    const response = await fetch(`${PUBLIC_APP_URL}/${id}`);
-
-    if (response.ok) {
-      const { content, email, name = "" } = await response.json();
-      return {
-        id: STORE_ID,
-        fileContents: content,
-        projectId: id,
-        email,
-        name,
-        error: "",
-        lastPublish: "",
-        preview: composePreview(content, id),
-      };
-    } else {
-      console.error("Failed to load file contents:", response.statusText);
-    }
-  } catch (err) {
-    console.error("Error loading file contents:", err);
-  }
-};
-
-const init = async () => {
-  let id = "";
-
-  // // await indexedDBService.initDB();
-  // // const savedState = await indexedDBService.loadState();
-
-  // // Get id from query parameter or second path segment
-  // const queryParams = new URLSearchParams(window.location.search);
-  // id = queryParams.get("view") || window.location.pathname.split("/")[2] || "";
-
-  // const telegramViewId = new URLSearchParams(location.search).get(
-  //   "tgWebAppStartParam",
-  // );
-  // if (!id && telegramViewId) {
-  //   id = telegramViewId;
-  //   console.log("Telegram Web App launched: " + id);
-  // }
-
-  // if (id && savedState?.projectId === id) {
-  //   // If the saved state matches the id, use it
-  //   useActiveStore.setState(savedState);
-  //   return;
-  // }
-
-  // if (id) {
-  //   const loadedState = await loadProject(id);
-  //   if (!loadedState) {
-  //     // Redirect to home if the project cannot be loaded
-  //     window.location.href = "/";
-  //     console.error("Project not found, redirecting to home.");
-  //     return;
-  //   }
-  //   const newState = loadedState || {
-  //     ...useActiveStore.getInitialState(), // Fallback to initial state if loading fails
-  //     projectId: id, // Ensure projectId is set
-  //   };
-  //   useActiveStore.setState(newState);
-  //   indexedDBService.saveState(newState); // Save to IndexedDB
-  //   return;
-  // }
-};
-
-init();

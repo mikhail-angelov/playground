@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import * as schema from "./schema";
 
 // Path to your SQLite database file
-const sqlitePath = process.env.SQLITE_DB_PATH || "sqlite.db";
+const sqlitePath = process.env.DB_STORAGE || "sqlite.db";
 
 // Create or open the SQLite database
 export const sqlite = new Database(sqlitePath);

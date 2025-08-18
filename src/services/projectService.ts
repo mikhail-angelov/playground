@@ -6,10 +6,7 @@ export type TopProject = {
   name: string;
   image: string | null;
   projectId: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  content: any;
   userEmail: string | null;
-  userName: string | null;
 };
 
 /**
@@ -25,7 +22,6 @@ export function getTopProjects(limit: number = 9): TopProject[] {
       projectId: projects.projectId,
       // content: projects.content,
       userEmail: users.email,
-      userName: users.name,
     })
     .from(projects)
     .innerJoin(users, eq(projects.userId, users.id))

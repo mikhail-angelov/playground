@@ -75,7 +75,6 @@ async function main() {
       .insert(users)
       .values({
         email: DEMO_EMAIL,
-        name: "Demo User",
       })
       .returning()
       .get();
@@ -95,7 +94,6 @@ async function main() {
       .values({
         name: proj.name,
         userId: user.id,
-        content: JSON.stringify(proj.content),
         image: proj.image,
         projectId: `demo-project-${i + 1}`,
         rating: 0,

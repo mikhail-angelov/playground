@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db, users, getUserApi, Api } from "../db";
 
-export async function getProfile(userId: number): Promise<Api | null> {
+export async function getProfile(userId: number): Promise<Api> {
   const user = db.select().from(users).where(eq(users.id, userId)).get();
   if (!user) {
     throw new Error("User not found");

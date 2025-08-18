@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+export const previewTemplate = `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -93,4 +93,4 @@
       <%- jsContent %>
     </script>
   </body>
-</html>
+</html>`

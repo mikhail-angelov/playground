@@ -31,7 +31,7 @@ export default function SignUpPage() {
         </div>
       )}
       <header className="w-full flex justify-between items-center px-8 py-6 border-b border-zinc-800 bg-[#23272a]">
-        <Link href="/" legacyBehavior>
+        <Link href="/">
           <h1 className="text-2xl font-bold tracking-tight">JS2Go</h1>
         </Link>
         <div className="flex gap-4">
@@ -47,8 +47,8 @@ export default function SignUpPage() {
         <section className="max-w-md w-full text-center bg-[#23272a] rounded-lg shadow-lg p-8">
           <h2 className="text-2xl font-bold mb-2">Sign up for JS2Go</h2>
           <p className="mb-6 text-zinc-300">
-            Enter your email address to create your account. We'll send you a
-            magic link to sign in securely.
+            Enter your email address to create your account. We&apos;ll send you
+            a magic link to sign in securely.
           </p>
 
           <form className="flex flex-col gap-4" action={action}>

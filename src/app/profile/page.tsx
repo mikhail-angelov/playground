@@ -16,11 +16,11 @@ export default function Profile() {
   const [provider, setProvider] = useState(providers[0]);
   useEffect(() => {
     get().then((res) => {
-      setKey(res?.key);
-      setProvider(res?.provider);
+      setKey(res.key);
+      setProvider(res.provider);
     });
   }, []);
-  const [state, action, isLoading] = useActionState(
+  const [state, action] = useActionState(
     async (state: any, formData: FormData) => {
       const request = {
         key,

@@ -18,8 +18,7 @@ export async function getProject(
   try {
     const user = await getAuthUser(token);
     const profile = await getProfile(user.id);
-    console.log("+", user, profile);
-    myEmail = profile?.email;
+    myEmail = user?.email;
     hasAi = !!profile?.key;
   } catch (e) {
     //ignore
@@ -36,7 +35,6 @@ export async function getProject(
         lastPublish: "",
         error: "",
         isLoading: false,
-        files: ["index.html", "style.css", "script.js"],
         selectedFile: "index.html",
         fileContents: {
           "index.html": `<canvas id="canvas" tabindex="0" style:"width:100%; height:100%; border:1px solid;"></canvas>`,
@@ -68,7 +66,6 @@ export async function getProject(
           lastPublish: "",
           error: "",
           isLoading: false,
-          files: ["index.html", "style.css", "script.js"],
           selectedFile: "index.html",
           fileContents: {
             "index.html": `<canvas id="canvas" tabindex="0" style:"width:100%; height:100%; border:1px solid;"></canvas>`,
@@ -95,7 +92,6 @@ export async function getProject(
           name,
           error: "",
           isLoading: false,
-          files: ["index.html", "style.css", "script.js"],
           lastPublish: "",
           preview: "",
         },

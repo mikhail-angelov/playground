@@ -12,7 +12,8 @@ export async function get() {
     const profile = await getProfile(user.id);
     return profile;
   } catch (e) {
-    return { error: "Unauthorized: No token provided" };
+    console.log("get profile error: ", e);
+    throw { error: "Unauthorized: No token provided" };
   }
 }
 
@@ -32,6 +33,7 @@ export async function save(body: any) {
     });
     return { ok: true };
   } catch (e) {
-    return { error: "Unauthorized: No token provided" };
+    console.log("save profile error: ", e);
+    throw { error: "Unauthorized: No token provided" };
   }
 }

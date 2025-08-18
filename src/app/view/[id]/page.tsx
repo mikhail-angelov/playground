@@ -7,7 +7,9 @@ import Link from "next/link";
 import { getProject } from "@/lib/actions/project";
 import { composePreview } from "@/lib/actions/preview";
 
-export default async function Page({ params }) {
+type Params = Promise<{ id: string }>;
+
+export default async function Page({ params }: { params: Params }) {
   const { id } = await params;
   const [project, error] = await getProject(id);
   const preview = composePreview(project?.fileContents, project?.projectId);

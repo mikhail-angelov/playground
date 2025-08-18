@@ -10,7 +10,7 @@ type AuthContextType = {
 const UserContext = createContext<AuthContextType | null>(null);
 
 export function useAuth(): AuthContextType {
-  let context = useContext(UserContext);
+  const context = useContext(UserContext);
   if (context === null) {
     throw new Error("useUser must be used within a UserProvider");
   }

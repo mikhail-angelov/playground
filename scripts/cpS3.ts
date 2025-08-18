@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { copyAllObjects } from "../server/src/services/s3Service";
+import { copyAllObjects } from "../src/services/s3Service";
 
 dotenv.config();
 

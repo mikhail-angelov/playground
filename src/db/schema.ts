@@ -6,18 +6,15 @@ export interface Api {
   key: string;
 }
 
-export function getUserApi(user: User): Api | null {
+export function getUserApi(user: User): Api {
   if (!user.api) {
-    return null;
-  }
-  if (typeof user.api === "object") {
-    return user.api;
+    return { provider: "deepSeek", key: "" };
   }
   try {
     return JSON.parse(user.api as string);
   } catch (e) {
     console.log("parse user api error:", e);
-    return null;
+    return { provider: "deepSeek", key: "" };
   }
 }
 
@@ -25,7 +22,6 @@ export function getUserApi(user: User): Api | null {
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   email: text("email").notNull().unique(),
-  name: text("name"),
   api: text("api", { mode: "json" }),
 });
 
@@ -33,7 +29,7 @@ export const users = sqliteTable("users", {
 export const projects = sqliteTable("projects", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
-  userId: integer("user_id")
+  userId: integer("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   // content: text("content", { mode: "json" }).notNull(),

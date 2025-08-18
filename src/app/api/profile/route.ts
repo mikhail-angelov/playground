@@ -12,9 +12,10 @@ export async function GET() {
     const profile = await getProfile(user.id);
     return NextResponse.json(profile);
   } catch (e) {
+    console.log("get profile error:", e);
     NextResponse.json(
       { error: "Unauthorized: No token provided" },
-      { status: 400 },
+      { status: 401 },
     );
   }
 }
@@ -28,14 +29,22 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     // Expecting { provider: string, key: string } in body
     if (!body || typeof body !== "object" || !body.provider || !body.key) {
-      return { error: "Invalid request body" };
+      console.log("seve profile error (invalid body):", body);
+      return NextResponse.json(
+        { error: "Invalid request body" },
+        { status: 400 },
+      );
     }
     await saveProfile(user.id, {
       provider: body.provider,
       key: body.key,
     });
-    return { ok: true };
+    return NextResponse.json({ ok: true });
   } catch (e) {
-    return { error: "Unauthorized: No token provided" };
+    console.log("seve profile error:", e);
+    return NextResponse.json(
+      { error: "Unauthorized: No token provided" },
+      { status: 401 },
+    );
   }
 }

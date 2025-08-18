@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 import PublishedUrlModal from "./PublishedUrlModal";
 
-const PublishButton: React.FC = ({ projectId }: { projectId: strng }) => {
+const PublishButton = ({ projectId }: { projectId: string }) => {
   const { setError } = useProjectStore((state) => state);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
 

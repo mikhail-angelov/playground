@@ -1,37 +1,26 @@
 import { db, users, projects, Project } from "@/db";
 import { eq } from "drizzle-orm";
 import ejs from "ejs";
-import path from "path";
 import { v4 } from "uuid";
 import { uploadFileToS3 } from "./s3Service";
-
-function parseContent(content: string) {
-  try {
-    return JSON.parse(content);
-  } catch {
-    return {};
-  }
-}
+import { previewTemplate } from "./preview.ejs";
 
 export type TopProject = {
   id: number;
+  projectId: string;
   name: string;
   image: string | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  content: any;
   userEmail: string | null;
-  userName: string | null;
 };
 
 export function getBestProjects(limit: number = 9): TopProject[] {
   const topProjects = db
     .select({
       id: projects.id,
+      projectId: projects.projectId,
       name: projects.name,
       image: projects.image,
-      content: projects.content,
       userEmail: users.email,
-      userName: users.name,
     })
     .from(projects)
     .innerJoin(users, eq(projects.userId, users.id))
@@ -40,20 +29,25 @@ export function getBestProjects(limit: number = 9): TopProject[] {
 
   return topProjects.map((proj) => ({
     ...proj,
-    content: parseContent(proj.content as string),
   }));
 }
 
-export function getMyProjects(userId: number): Project[] {
+export function getMyProjects(userId: number): TopProject[] {
   const items = db
-    .select()
+    .select({
+      id: projects.id,
+      projectId: projects.projectId,
+      name: projects.name,
+      image: projects.image,
+      userEmail: users.email,
+    })
     .from(projects)
+    .innerJoin(users, eq(projects.userId, users.id)) // <-- Add this line
     .where(eq(projects.userId, userId))
     .all();
 
   return items.map((proj) => ({
     ...proj,
-    content: parseContent(proj.content as string),
   }));
 }
 
@@ -78,12 +72,7 @@ export async function generatePreviewHtml({
     const jsContent =
       Object.entries(content).find(([key]) => key.includes(".js"))?.[1] || "";
 
-    const templatePath = path.resolve(
-      process.cwd(),
-      "src/templates/preview.ejs",
-    );
-
-    return ejs.renderFile(templatePath, {
+    return ejs.render(previewTemplate, {
       name,
       description,
       projectUrl,
@@ -108,7 +97,7 @@ export async function upload({
   email,
 }: {
   name: string;
-  projectId: number;
+  projectId: string;
   content: Record<string, string>;
   image: string;
   userId: number;
@@ -117,7 +106,7 @@ export async function upload({
   const existingProject = await db
     .select()
     .from(projects)
-    .where(eq(projects.id, projectId))
+    .where(eq(projects.projectId, projectId))
     .get();
   if (existingProject && existingProject.userId != userId) {
     console.log(
@@ -181,7 +170,7 @@ export async function updateProject(
   return await db
     .update(projects)
     .set(updates)
-    .where(eq(projects.id, projectId));
+    .where(eq(projects.projectId, projectId));
 }
 
 // export async function deleteProject(projectId: string, userId: string) {

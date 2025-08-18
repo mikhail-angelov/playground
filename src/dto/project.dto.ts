@@ -4,6 +4,12 @@ export interface Content {
   "script.js": string;
 }
 
+export const contentFiles = [
+  "index.html",
+  "style.css",
+  "script.js",
+] as (keyof Content)[];
+
 export type ProjectDto = {
   isMy: boolean;
   hasAi: boolean;
@@ -13,7 +19,6 @@ export type ProjectDto = {
   lastPublish: string;
   isLoading: boolean;
   error: string;
-  files: string[];
   selectedFile: keyof Content;
   fileContents: Content;
   preview: string;

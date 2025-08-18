@@ -14,8 +14,8 @@ const ProjectList: React.FC<Props> = ({ projects }: Props) => {
         gridTemplateRows: "repeat(auto-fill, minmax(200px, 1fr))",
       }}
     >
-      {projects.map((project) => (
-        <ProjectTile project={project} key={project.id} />
+      {projects.map((project, index) => (
+        <ProjectTile project={project} key={index} />
       ))}
     </div>
   );

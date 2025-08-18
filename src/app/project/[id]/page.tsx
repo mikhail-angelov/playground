@@ -2,7 +2,9 @@ import React from "react";
 import { getProject } from "@/lib/actions/project";
 import Project from "./Project";
 
-export default async function Page({ params }) {
+type Params = Promise<{ id: string }>;
+
+export default async function Page({ params }: { params: Params }) {
   const { id } = await params;
   const [project, error] = await getProject(id);
 

@@ -8,6 +8,7 @@ import {
   FileText,
   FileJson,
 } from "lucide-react";
+import { contentFiles } from "@/dto/project.dto";
 
 interface LeftPanelProps {
   isCollapsed: boolean;
@@ -18,9 +19,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   isCollapsed,
   toggleCollapse,
 }) => {
-  const { files, selectedFile, setSelectedFile } = useProjectStore(
-    (state) => state,
-  );
+  const { selectedFile, setSelectedFile } = useProjectStore((state) => state);
 
   // Map file extensions to icons
   const getFileIcon = (file: string) => {
@@ -39,7 +38,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
         <Button onClick={toggleCollapse} variant="ghost">
           <ChevronRight className="w-6 h-6 text-white" />
         </Button>
-        {files.map((file) => (
+        {contentFiles.map((file) => (
           <Button
             key={file}
             variant="ghost"
@@ -65,7 +64,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
         </Button>
       </div>
       <ul className="text-white">
-        {files.map((file) => (
+        {contentFiles.map((file) => (
           <li
             key={file}
             className={`cursor-pointer text-sm p-2 ${

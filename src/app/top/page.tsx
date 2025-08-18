@@ -1,15 +1,14 @@
 import React from "react";
-import { getTopProjects } from "@/services/projectService";
 import ProjectList from "./ProjectList";
 import Header from "@/components/Header";
 import LinkButton from "@/components/LinkButton";
 import AuthButtons from "@/components/AuthButtons";
 import Footer from "@/components/Footer";
-import ProjectTabs from "./ProjectTabs";
+import ProjectTabs from "@/components/ProjectTabs";
+import { getTopProjects } from "@/services/projectService";
 
 const Top: React.FC = () => {
   const topProjects = getTopProjects(9);
-  // const [activeTab, setActiveTab] = useState<"trends" | "myProjects">("trends");
 
   return (
     <div className="flex flex-col h-screen">
@@ -22,7 +21,7 @@ const Top: React.FC = () => {
         }
       />
       <div className="flex flex-col items-center flex-1 overflow-hidden">
-        <ProjectTabs />
+        <ProjectTabs active="top" />
         <ProjectList projects={topProjects} />
       </div>
       <Footer />

@@ -51,7 +51,7 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
           </Button>
           <div className="flex items-center gap-2">
             {showForkButton && (
-              <Button variant="outline" onClick={cloneProject}>
+              <Button variant="outline" onClick={() => cloneProject(userEmail)}>
                 Fork
               </Button>
             )}

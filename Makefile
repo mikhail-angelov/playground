@@ -7,9 +7,12 @@ dev:
 
 # Build both client and server
 build:
-	@echo "Building client and server..."
-	npm run build --prefix client
-	npm run build --prefix server
+	@echo "Building nextjs..."
+	npm run build
+
+dock:
+    @echo "Building docker..."
+    docker build . -t playground:latest
 
 migrate:
 	@echo "Running migrations..."

@@ -1,12 +1,9 @@
+import { TopProject } from "@/services/projectsService";
 import Link from "next/link";
 import React from "react";
 
 interface ProjectTileProps {
-  project: {
-    id: string;
-    name: string;
-    image: string;
-  } | null;
+  project: TopProject;
 }
 
 const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {

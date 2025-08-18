@@ -9,7 +9,7 @@ import { logout } from "@/lib/actions/auth";
 const AuthButtons: React.FC = () => {
   const { userPromise } = useAuth();
   const user = use(userPromise);
-  const [state, action] = useActionState(logout, undefined);
+  const [, action] = useActionState(logout, undefined);
   const isAuthenticated = !!user && !!user.id;
 
   return isAuthenticated ? (

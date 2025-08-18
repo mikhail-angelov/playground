@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import LinkButton from "@/components/LinkButton";
 import AuthButtons from "@/components/AuthButtons";
 import Footer from "@/components/Footer";
+import ProjectTabs from "@/components/ProjectTabs";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +36,7 @@ export default async function MyProjectsPage() {
         }
       />
       <div className="flex flex-col items-center flex-1 overflow-hidden">
-        <h2 className="text-2xl font-bold mt-8 mb-4">My Projects</h2>
+        <ProjectTabs active="my" />
         <ProjectList projects={myProjects} />
       </div>
       <Footer />

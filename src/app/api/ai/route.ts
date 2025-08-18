@@ -1,10 +1,9 @@
-import type { NextApiRequest } from "next";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getAuthUser, AUTH_COOKIE } from "@/services/authService";
 import { makeAiRequest } from "@/services/aiService";
 
-export async function POST(req: NextApiRequest) {
+export async function POST(req: NextRequest) {
   try {
     const { prompt } = await req.json();
     const cookieStore = await cookies();

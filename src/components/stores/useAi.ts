@@ -8,7 +8,7 @@ interface AiState {
   history: string[];
 }
 
-export const useAiStore = create<AiState>((set, get) => ({
+export const useAiStore = create<AiState>((set) => ({
   response: "",
   isLoading: false,
   history: [],
