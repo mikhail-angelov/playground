@@ -1,24 +1,13 @@
-# Run both client and server in development mode
-dev: SERVER_DIR=$(shell pwd)/server
-dev: CLIENT_DIR=$(shell pwd)/client
-dev:
-	osascript -e 'tell app "Terminal" to do script "cd ${SERVER_DIR} && npm run dev"'
-	osascript -e 'tell app "Terminal" to do script "cd ${CLIENT_DIR} && npm run dev"'
-
 # Build both client and server
 build:
 	@echo "Building nextjs..."
 	npm run build
 
-dock:
-    @echo "Building docker..."
-    docker build . -t playground:latest
-
 migrate:
 	@echo "Running migrations..."
-	scp root@js2go.ru:/opt/playground/database.sqlite server/database-prod.sqlite
-	cd server; npx sequelize-cli db:migrate --env production;cd ..
-	scp server/database-prod.sqlite root@js2go.ru:/opt/playground/database.sqlite
+	scp root@js2go.ru:/opt/playground/database.sqlite database-prod.sqlite
+	npm run migration:run
+	scp database-prod.sqlite root@js2go.ru:/opt/playground/database.sqlite
 
 install:
 	@echo "Installing server..."
