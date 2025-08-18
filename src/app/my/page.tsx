@@ -10,7 +10,7 @@ import ProjectTabs from "@/components/ProjectTabs";
 
 export const dynamic = "force-dynamic";
 
-export default async function MyProjectsPage() {
+export default async function Page() {
   // Get current user from cookie/JWT
   const user = await getUser();
   if (!user || user.error || !user.id) {

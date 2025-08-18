@@ -5,10 +5,12 @@ import LinkButton from "@/components/LinkButton";
 import AuthButtons from "@/components/AuthButtons";
 import Footer from "@/components/Footer";
 import ProjectTabs from "@/components/ProjectTabs";
-import { getTopProjects } from "@/services/projectService";
+import { getTopProjects, TopProject } from "@/services/projectService";
 
-const Top: React.FC = () => {
-  const topProjects = getTopProjects(9);
+export const dynamic = "force-dynamic"; //prevent static content generation on build time
+
+export default async function Page() {
+  const topProjects: TopProject[] = await getTopProjects(9);
 
   return (
     <div className="flex flex-col h-screen">
@@ -27,6 +29,4 @@ const Top: React.FC = () => {
       <Footer />
     </div>
   );
-};
-
-export default Top;
+}

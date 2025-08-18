@@ -13,8 +13,8 @@ export type TopProject = {
  * Fetch the first N top projects, joined with user info.
  * @param limit Number of projects to fetch (default 9)
  */
-export function getTopProjects(limit: number = 9): TopProject[] {
-  const topProjects = db
+export async function getTopProjects(limit: number = 9): Promise<TopProject[]> {
+  const topProjects = await db
     .select({
       id: projects.id,
       name: projects.name,
@@ -28,8 +28,5 @@ export function getTopProjects(limit: number = 9): TopProject[] {
     .limit(limit)
     .all();
 
-  return topProjects.map((proj) => ({
-    ...proj,
-    // content: parseContent(proj.content as string),
-  }));
+  return topProjects;
 }
