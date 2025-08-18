@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import React from "react";
 import ProjectList from "./ProjectList";
 import Header from "@/components/Header";
