@@ -5,12 +5,19 @@ import LinkButton from "@/components/LinkButton";
 import AuthButtons from "@/components/AuthButtons";
 import Footer from "@/components/Footer";
 import ProjectTabs from "@/components/ProjectTabs";
-import { getTopProjects, TopProject } from "@/services/projectService";
 
-export const dynamic = "force-dynamic"; //prevent static content generation on build time
+const fetchTopProjects = async () => {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/project/best`, {
+    next: { revalidate: 6000 }, // ISR: cache for 60 seconds
+  });
+  if (!res.ok) return [];
+  const projects = await res.json();
+  return projects;
+};
 
-export default async function Page() {
-  const topProjects: TopProject[] = await getTopProjects(9);
+const Top = async () => {
+  const topProjects = await fetchTopProjects();
 
   return (
     <div className="flex flex-col h-screen">
@@ -29,4 +36,6 @@ export default async function Page() {
       <Footer />
     </div>
   );
-}
+};
+
+export default Top;
