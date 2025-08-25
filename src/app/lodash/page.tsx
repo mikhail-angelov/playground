@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Link from "next/link";
+import Image from "next/image";
+import logo from "@/../public/lodash.png";
 
 export default function Page() {
   const [content, setContent] = useState<string>(
@@ -102,9 +104,15 @@ export default function Page() {
       <ResizablePanelGroup direction="vertical">
         <ResizablePanel>
           <div className="flex justify-between items-center bg-gray-800 px-2 py-1">
-            <Button onClick={() => setIframeContent(content)} variant="outline">
-              Run ▶
-            </Button>
+            <div className="flex items-center gap-4">
+              <Image src={logo} alt="logo" className="max-w-6 h-auto ml-2" />
+              <Button
+                onClick={() => setIframeContent(content)}
+                variant="outline"
+              >
+                Run ▶
+              </Button>
+            </div>
             <Link href="https://lodash.com/docs" target="_blank">
               Lodash documentation
             </Link>
