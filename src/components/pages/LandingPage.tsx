@@ -54,6 +54,51 @@ export default async function Home() {
             </span>
           </div>
         </section>
+
+        {/* Predefined Playgrounds Section */}
+        <section className="max-w-2xl w-full mt-16">
+          <h3 className="text-2xl font-bold mb-8 text-center">Predefined Playgrounds</h3>
+          <div className="grid grid-cols-2 gap-4">
+            {/* First Row */}
+            <Link
+              href="/json"
+              className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold p-6 rounded-lg transition-colors flex flex-col items-center justify-center gap-3"
+            >
+              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">{`{}`}</span>
+              </div>
+              <span className="text-lg">JSON</span>
+            </Link>
+            <Link
+              href="/md"
+              className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold p-6 rounded-lg transition-colors flex flex-col items-center justify-center gap-3"
+            >
+              <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">MD</span>
+              </div>
+              <span className="text-lg">Markdown</span>
+            </Link>
+            {/* Second Row */}
+            <Link
+              href="/dayjs"
+              className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold p-6 rounded-lg transition-colors flex flex-col items-center justify-center gap-3"
+            >
+              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                <img src="/dayjs.png" alt="Day.js" className="w-8 h-8" />
+              </div>
+              <span className="text-lg">Day.js</span>
+            </Link>
+            <Link
+              href="/lodash"
+              className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold p-6 rounded-lg transition-colors flex flex-col items-center justify-center gap-3"
+            >
+              <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center">
+                <img src="/lodash.png" alt="Lodash" className="w-8 h-8" />
+              </div>
+              <span className="text-lg">Lodash</span>
+            </Link>
+          </div>
+        </section>
       </main>
 
       <Footer />
