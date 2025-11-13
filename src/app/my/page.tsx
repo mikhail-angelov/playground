@@ -15,9 +15,20 @@ export default async function Page() {
   const user = await getUser();
   if (!user || user.error || !user.id) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-[#18191a] text-white">
-        <h1 className="text-2xl font-bold mb-4">Unauthorized</h1>
-        <p className="mb-4">You must be logged in to view your projects.</p>
+      <div className="flex flex-col h-screen bg-[#18191a] text-white">
+        <Header
+          right={
+            <div className="flex items-center space-x-4">
+              <LinkButton href="/project/new">New</LinkButton>
+              <AuthButtons />
+            </div>
+          }
+        />
+        <div className="flex flex-col items-center justify-center h-screen bg-[#18191a] text-white">
+          <h1 className="text-2xl font-bold mb-4">Unauthorized</h1>
+          <p className="mb-4">You must be logged in to view your projects.</p>
+        </div>
+        <Footer />
       </div>
     );
   }
