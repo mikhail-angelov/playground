@@ -1,5 +1,5 @@
-import TopPage from "./top/page";
-import LandingPage from "@/components/pages/LandingPage";
+import TopPage from "@/app/top/page";
+import LandingPage from "@/app/landing";
 import { getIsAuthenticated } from "@/lib/actions/auth";
 
 export const dynamic = "force-dynamic";
