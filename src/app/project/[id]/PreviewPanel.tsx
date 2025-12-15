@@ -43,7 +43,7 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
         <div className="flex justify-between items-center bg-gray-800 px-2 py-1">
           <Button asChild variant="outline">
             <a
-              href={`${location.origin}/view/${project?.projectId}`}
+              href={`/view/${project?.projectId}`}
               target="_blank"
             >
               <ViewIcon className="w-6 h-6" />

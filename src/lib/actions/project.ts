@@ -7,6 +7,13 @@ import { getAuthUser, AUTH_COOKIE } from "@/services/authService";
 import { getProfile } from "@/services/profileService";
 import { ProjectDto } from "@/dto/project.dto";
 
+const initialFileContents =  {
+          "index.html": `<canvas id="canvas" tabindex="0" style:"width:100%; height:100%; border:1px solid;"></canvas>`,
+          "style.css":
+            "html{ width:100%; height:100%; background-color: #333; color:  #f0f0f0; margin:0px; padding:0px; display:flex; flex-direction:column;} canvas { flex:1; margin:5px; }",
+          "script.js": 'console.log("Hello, World!");',
+        }
+
 export async function getProject(
   projectId: string,
 ): Promise<[project?: ProjectDto, error?: string]> {
@@ -36,13 +43,9 @@ export async function getProject(
         error: "",
         isLoading: false,
         selectedFile: "index.html",
-        fileContents: {
-          "index.html": `<canvas id="canvas" tabindex="0" style:"width:100%; height:100%; border:1px solid;"></canvas>`,
-          "style.css":
-            "html{ width:100%; height:100%; background-color: #333; color:  #f0f0f0; margin:0px; padding:0px; display:flex; flex-direction:column;} canvas { flex:1; margin:5px; }",
-          "script.js": 'console.log("Hello, World!");',
-        },
+        fileContents: initialFileContents,
         preview: "",
+        rating: 0,
       },
     ];
   }
@@ -67,20 +70,16 @@ export async function getProject(
           error: "",
           isLoading: false,
           selectedFile: "index.html",
-          fileContents: {
-            "index.html": `<canvas id="canvas" tabindex="0" style:"width:100%; height:100%; border:1px solid;"></canvas>`,
-            "style.css":
-              "html{ width:100%; height:100%; background-color: #333; color:  #f0f0f0; margin:0px; padding:0px; display:flex; flex-direction:column;} canvas { flex:1; margin:5px; }",
-            "script.js": 'console.log("Hello, World!");',
-          },
+          fileContents: initialFileContents,
           preview: "",
+          rating: 0,
         },
       ];
     }
     const response = await fetch(`${"https://app.js2go.ru"}/${projectId}`);
 
     if (response.ok) {
-      const { content, email, name = "" } = await response.json();
+      const { content, email } = await response.json();
       return [
         {
           isMy: myEmail === email,
@@ -89,11 +88,12 @@ export async function getProject(
           selectedFile: "index.html",
           projectId,
           email,
-          name,
+          name: project.name,
           error: "",
           isLoading: false,
           lastPublish: "",
           preview: "",
+          rating: project.rating,
         },
       ];
     } else {

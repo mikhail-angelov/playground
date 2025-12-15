@@ -8,7 +8,7 @@ const PUBLIC_APP_URL = "https://app.js2go.ru";
 
 export type ProjectActions = {
   newProject: () => string;
-  setName: (name: string) => void;
+  setName: (projectId: string,name: string) => void;
   setError: (error: string) => void;
   setSelectedFile: (file: keyof Content) => void;
   setFileContent: (file: string, content: string) => void;
@@ -17,7 +17,7 @@ export type ProjectActions = {
   triggerPreview: () => void;
   uploadFiles: (
     projectId: string,
-    image: string,
+    image: string
   ) => Promise<{ success: boolean; url?: string }>;
   cloneProject: (email: string) => void;
 };
@@ -44,6 +44,7 @@ export const initProjectStore = (): ProjectDto => {
     selectedFile: "index.html",
     fileContents: initFileContents,
     preview: "",
+    rating: 0,
   };
 };
 
@@ -59,10 +60,11 @@ export const defaultInitState: ProjectDto = {
   selectedFile: "index.html",
   fileContents: initFileContents,
   preview: "",
+  rating: 0,
 };
 
 export const createProjectStore = (
-  initState: ProjectDto = defaultInitState,
+  initState: ProjectDto = defaultInitState
 ) => {
   return createStore<ProjectStore>()((set, get) => ({
     ...initState,
@@ -85,11 +87,38 @@ export const createProjectStore = (
       });
       return projectId;
     },
-    setName: (name) => {
-      set((state) => {
-        const newState = { ...state, name };
-        // indexedDBService.saveState(newState); // Save to IndexedDB
-        return newState;
+    setName: async (projectId,name) => {
+      set({ isLoading: true });
+      try {
+        const response = await fetch("/api/project/name", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            projectId,
+            name,
+          }),
+        });
+
+        if (response.ok) {
+          toast.success("Project name is updated successfully");
+          set({
+            error: "",
+            isLoading: false,
+            name,
+          });
+          return { success: true, url: `${PUBLIC_APP_URL}/${projectId}.html` };
+        }
+
+        toast.error(`Failed to update project name: ${response.statusText}`);
+      } catch (err) {
+        toast.error(`Error updating project name: ${err}`);
+      }
+      set({
+        error: "Failed to update project name",
+        isLoading: false,
       });
     },
     setError: (error) => {

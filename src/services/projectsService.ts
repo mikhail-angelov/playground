@@ -173,6 +173,14 @@ export async function updateProject(
     .where(eq(projects.projectId, projectId));
 }
 
+export async function getProject(  projectId: string) {
+  return await db
+    .select()
+    .from(projects)
+    .where(eq(projects.projectId, projectId))
+    .get();
+}
+
 // export async function deleteProject(projectId: string, userId: string) {
 //   const project = await Project.findOne({
 //     where: { projectId, userId },

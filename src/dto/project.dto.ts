@@ -22,4 +22,5 @@ export type ProjectDto = {
   selectedFile: keyof Content;
   fileContents: Content;
   preview: string;
+  rating: number;
 };

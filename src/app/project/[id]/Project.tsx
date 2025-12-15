@@ -13,24 +13,31 @@ import Header from "@/components/Header";
 import { CheckIcon } from "lucide-react";
 import { ProjectDto } from "@/dto/project.dto";
 
-export default function Project({ project }: {project: ProjectDto}) {
-  const { setContent } = useProjectStore((state) => state);
+export default function Project({ project }: { project: ProjectDto }) {
+  const { setContent, setName } = useProjectStore((state) => state);
   useEffect(() => {
     const pathname = window.location.pathname;
     if (pathname.endsWith("/new") && project?.projectId) {
+      setIsNew(true);
       window.history.replaceState(
         {},
         "",
-        pathname.replace("/new", `/${project.projectId}`),
+        pathname.replace("/new", `/${project.projectId}`)
       );
     }
     setContent(project.fileContents);
   }, []);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isNew, setIsNew] = useState(false);
   const [newProjectName, setNewProjectName] = useState(project.name);
-console.log("Project name:", newProjectName);
   const handleSave = () => {
+    if (project.name === newProjectName || !project.isMy) {
+      return;
+    }
+    if (project.projectId && !isNew) {
+      setName(project?.projectId, newProjectName);
+    }
     setNewProjectName(newProjectName);
     setIsEditing(false);
   };
@@ -54,6 +61,7 @@ console.log("Project name:", newProjectName);
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
                   onKeyDown={handleKeyDown}
+                  disabled={!project.isMy}
                 />
                 <Button variant="ghost" onClick={handleSave}>
                   <CheckIcon className="w-6 h-6" />
@@ -62,7 +70,7 @@ console.log("Project name:", newProjectName);
             ) : (
               <Label
                 className="border border-gray-700 p-2 h-[36px] rounded-lg"
-                onClick={() => setIsEditing(true)}
+                onClick={() => project.isMy && !isNew && setIsEditing(true)}
               >
                 {newProjectName}
               </Label>

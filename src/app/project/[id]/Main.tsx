@@ -12,25 +12,31 @@ import { useProjectStore } from "@/components/providers/ProjectStoreProvider";
 import AiPanel from "./AiPanel";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, SparklesIcon } from "lucide-react";
+import { ProjectDto } from "@/dto/project.dto";
 
 export enum UI_STATE {
   PREVIEW = "preview",
   AI = "ai",
 }
 
-export default function Main({ project }: any) {
+export default function Main({ project }: { project: ProjectDto }) {
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
   const [isPreviewCollapsed, setIsPreviewCollapsed] = useState(false);
   const [leftPanelWidth, setLeftPanelWidth] = useState(100);
   const [previewPanelWidth, setPreviewPanelWidth] = useState(100);
   const [windowSize, setWindowSize] = useState({
-    width: window?.innerWidth,
-    height: window?.innerHeight,
+    width: 0,
+    height: 0,
   });
   const [uiState, setUIState] = useState(UI_STATE.PREVIEW);
   const { selectedFile } = useProjectStore((state) => state);
 
   useEffect(() => {
+    setWindowSize({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+
     const handleResize = () => {
       setWindowSize({
         width: window.innerWidth,
@@ -43,7 +49,7 @@ export default function Main({ project }: any) {
   }, []);
 
   const editorPanelWidth = Math.round(
-    (windowSize.width * (100 - leftPanelWidth - previewPanelWidth)) / 100,
+    (windowSize.width * (100 - leftPanelWidth - previewPanelWidth)) / 100
   );
 
   return (
