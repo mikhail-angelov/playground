@@ -1,6 +1,7 @@
 import { TopProject } from "@/services/projectsService";
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 interface ProjectTileProps {
   project: TopProject;
@@ -12,10 +13,13 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
       <Link href={`project/${project?.projectId}`}>
         <div className="w-100 h-32 flex items-center justify-center">
           {project?.image ? (
-            <img
+            <Image
               src={project.image}
               alt={project.name}
+              width={128}
+              height={128}
               className="max-w-100 h-32 object-cover cursor-pointer"
+              unoptimized={project.image.startsWith('data:')}
             />
           ) : (
             <span className="text-gray-200">No Image</span>

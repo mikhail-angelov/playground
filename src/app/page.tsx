@@ -1,4 +1,4 @@
-import TopPage from "@/components/pages/TopPage";
+import TopPage from "./top/page";
 import LandingPage from "@/components/pages/LandingPage";
 import { getIsAuthenticated } from "@/lib/actions/auth";
 
