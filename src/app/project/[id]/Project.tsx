@@ -11,8 +11,9 @@ import Main from "./Main";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { CheckIcon } from "lucide-react";
+import { ProjectDto } from "@/dto/project.dto";
 
-export default function Project({ project }: any) {
+export default function Project({ project }: {project: ProjectDto}) {
   const { setContent } = useProjectStore((state) => state);
   useEffect(() => {
     const pathname = window.location.pathname;
@@ -28,7 +29,7 @@ export default function Project({ project }: any) {
 
   const [isEditing, setIsEditing] = useState(false);
   const [newProjectName, setNewProjectName] = useState(project.name);
-
+console.log("Project name:", newProjectName);
   const handleSave = () => {
     setNewProjectName(newProjectName);
     setIsEditing(false);

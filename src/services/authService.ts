@@ -1,14 +1,11 @@
 import { db, users, getUserApi } from "@/db";
 import { eq } from "drizzle-orm";
-import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { sendMail } from "./mailService";
+import { signToken, verifyToken } from "./jwtUtils";
 
 // Replace with your app's URL and JWT secret in production
 export const APP_URL = process.env.APP_URL || "http://localhost:3000";
-export const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
-
-// Name of the cookie to store the JWT
 export const AUTH_COOKIE = "auth_token";
 
 export async function login(email: string) {
@@ -24,10 +21,9 @@ export async function login(email: string) {
   }
 
   // Create a short-lived JWT token for magic link (e.g., 10 min)
-  const token = jwt.sign(
+  const token = signToken(
     { userId: user.id, email: user.email, type: "magic" },
-    JWT_SECRET,
-    { expiresIn: "10d" }, //todo: reduce
+    "10d" //todo: reduce
   );
 
   // Compose magic link
@@ -46,17 +42,10 @@ export async function login(email: string) {
   return { ok: true };
 }
 
-// Helper to verify JWT and extract payload
-function verifyToken(token: string) {
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (err) {
-    console.log(err);
-    return null;
-  }
-}
-
 export async function auth(token: string) {
+  if (!token) {
+    throw new Error("invalid_token");
+  }
   const payload = verifyToken(token);
 
   if (
@@ -70,17 +59,19 @@ export async function auth(token: string) {
   }
 
   // Issue a new JWT for session (longer expiry, no "magic" type)
-  const sessionToken = jwt.sign(
+  const sessionToken = signToken(
     { userId: payload.userId, email: payload.email },
-    JWT_SECRET,
-    { expiresIn: "7d" },
+    "30d"
   );
 
   return sessionToken;
 }
 
 export async function getAuthUser(token?: string) {
-  const payload = verifyToken(token || "");
+  if (!token) {
+    throw new Error("invalid_token");
+  }
+  const payload = verifyToken(token);
 
   if (
     !payload ||

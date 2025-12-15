@@ -1,12 +1,11 @@
 "use server";
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import {
   AUTH_COOKIE,
-  JWT_SECRET,
   login as loginService,
 } from "@/services/authService";
 import { redirect } from "next/navigation";
+import { verifyToken } from "@/services/jwtUtils";
 
 function isValidEmail(email: string): boolean {
   // Simple email validation
@@ -39,7 +38,7 @@ export async function getIsAuthenticated() {
     const token = cookieStore.get(AUTH_COOKIE)?.value;
 
     if (token) {
-      const payload = jwt.verify(token, JWT_SECRET);
+      const payload = verifyToken(token);
       isAuthenticated = !!payload;
     }
   } catch {

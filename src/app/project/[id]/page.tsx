@@ -8,7 +8,7 @@ export default async function Page({ params }: { params: Params }) {
   const { id } = await params;
   const [project, error] = await getProject(id);
 
-  if (error) {
+  if (error || !project) {
     return <div className="p-4 bg-red-600 text-white text-center">{error}</div>;
   }
 

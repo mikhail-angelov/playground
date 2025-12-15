@@ -24,8 +24,8 @@ export default function Main({ project }: any) {
   const [leftPanelWidth, setLeftPanelWidth] = useState(100);
   const [previewPanelWidth, setPreviewPanelWidth] = useState(100);
   const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: window?.innerWidth,
+    height: window?.innerHeight,
   });
   const [uiState, setUIState] = useState(UI_STATE.PREVIEW);
   const { selectedFile } = useProjectStore((state) => state);
