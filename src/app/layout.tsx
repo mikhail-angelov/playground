@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { YandexMetricaProvider } from "next-yandex-metrica";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/components/providers/AuthProvider";
@@ -66,14 +67,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const userPromise = getUser();
+  const yandexMetricaId = process.env.NEXT_PUBLIC_YANDEX_METRICA_ID ? Number(process.env.NEXT_PUBLIC_YANDEX_METRICA_ID) : 0;
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
       >
-        <AuthProvider userPromise={userPromise}>
-          <ProjectStoreProvider>{children}</ProjectStoreProvider>
-        </AuthProvider>
+        <YandexMetricaProvider
+          tagID={yandexMetricaId}
+          initParameters={{
+            clickmap: true,
+            trackLinks: true,
+            accurateTrackBounce: true,
+          }}
+          router="app"
+        >
+          <AuthProvider userPromise={userPromise}>
+            <ProjectStoreProvider>{children}</ProjectStoreProvider>
+          </AuthProvider>
+        </YandexMetricaProvider>
         <Toaster />
       </body>
     </html>
