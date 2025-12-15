@@ -42,7 +42,7 @@ export async function login(email: string) {
   return { ok: true };
 }
 
-export async function auth(token: string) {
+export async function auth(token: string): Promise<string> {
   if (!token) {
     throw new Error("invalid_token");
   }

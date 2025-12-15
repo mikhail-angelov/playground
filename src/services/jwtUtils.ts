@@ -16,7 +16,7 @@ export const verifyToken = (token: string): string | jwt.JwtPayload => {
 export const signToken = (
   payload: jwt.JwtPayload,
   expiresIn: StringValue
-): string | jwt.JwtPayload => {
+): string => {
   const token = jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn });
   return token;
 };

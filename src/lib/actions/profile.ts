@@ -17,7 +17,7 @@ export async function get() {
   }
 }
 
-export async function save(body: any) {
+export async function save(body: { key: string; provider: string }) {
   const cookieStore = await cookies();
   const token = cookieStore.get(AUTH_COOKIE)?.value;
 

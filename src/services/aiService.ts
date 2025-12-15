@@ -21,7 +21,7 @@ const getAi = (api: Api) => {
   return openai;
 };
 
-export async function makeAiRequest(request: any): Promise<any> {
+export async function makeAiRequest(request: {userId:number, prompt:string}): Promise<any> {
   const user = db
     .select()
     .from(users)
