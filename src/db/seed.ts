@@ -95,6 +95,7 @@ async function main() {
         name: proj.name,
         userId: user.id,
         image: proj.image,
+        email: DEMO_EMAIL,
         projectId: `demo-project-${i + 1}`,
         rating: 0,
       })
