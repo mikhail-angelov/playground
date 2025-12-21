@@ -104,6 +104,7 @@ export const createProjectStore = (
 
         if (response.ok) {
           toast.success("Project name is updated successfully");
+          console.log("Project name updated:", name);
           set({
             error: "",
             isLoading: false,
@@ -161,6 +162,7 @@ export const createProjectStore = (
     },
     uploadFiles: async (projectId: string, image: string) => {
       const { fileContents: content, name } = get();
+      console.log("---Project name updated:", name);
       set({ isLoading: true });
       try {
         const response = await fetch("/api/project/upload", {

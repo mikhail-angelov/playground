@@ -72,6 +72,8 @@ export async function generatePreviewHtml({
     const jsContent =
       Object.entries(content).find(([key]) => key.includes(".js"))?.[1] || "";
 
+    // Get Yandex Metrica ID from env
+    const yandexMetricaId = process.env.NEXT_PUBLIC_YANDEX_METRICA_ID || '';
     return ejs.render(previewTemplate, {
       name,
       description,
@@ -81,6 +83,7 @@ export async function generatePreviewHtml({
       cssContent,
       jsContent,
       projectId,
+      yandexMetricaId,
     });
   } catch (error) {
     console.error("generatePreviewHtml:", error);

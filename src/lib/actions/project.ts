@@ -79,15 +79,15 @@ export async function getProject(
     const response = await fetch(`${"https://app.js2go.ru"}/${projectId}`);
 
     if (response.ok) {
-      const { content, email } = await response.json();
+      const { content } = await response.json();
       return [
         {
-          isMy: myEmail === email,
+          isMy: myEmail === project.email,
           hasAi,
           fileContents: content,
           selectedFile: "index.html",
           projectId,
-          email,
+          email: project.email,
           name: project.name,
           error: "",
           isLoading: false,

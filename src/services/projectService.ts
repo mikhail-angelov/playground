@@ -22,7 +22,6 @@ export async function getTopProjects(limit: number = 9): Promise<TopProject[]> {
       name: projects.name,
       image: projects.image,
       projectId: projects.projectId,
-      // content: projects.content,
       userEmail: users.email,
     })
     .from(projects)

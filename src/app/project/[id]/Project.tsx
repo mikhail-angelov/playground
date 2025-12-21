@@ -41,6 +41,7 @@ export default function Project({ project }: { project: ProjectDto }) {
     setNewProjectName(newProjectName);
     setIsEditing(false);
   };
+  console.log("---:", project );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -70,7 +71,7 @@ export default function Project({ project }: { project: ProjectDto }) {
             ) : (
               <Label
                 className="border border-gray-700 p-2 h-[36px] rounded-lg"
-                onClick={() => project.isMy && !isNew && setIsEditing(true)}
+                onClick={() => project.isMy && setIsEditing(true)}
               >
                 {newProjectName}
               </Label>
