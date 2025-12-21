@@ -61,8 +61,8 @@ export async function generatePreviewHtml({
   content: Record<string, string>;
 }): Promise<string> {
   try {
-    const baseUrl = process.env.APP_URL || "http://localhost:5000";
-    const projectUrl = `${baseUrl}/edit/${projectId}`;
+    const baseUrl = process.env.APP_URL || "http://localhost:3000";
+    const projectUrl = `${baseUrl}/project/${projectId}`;
     const image = `${baseUrl}/${projectId}.png`;
     const description = `${name} app` || "js2go.ru";
     const htmlContent =

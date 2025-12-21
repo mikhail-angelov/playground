@@ -46,11 +46,13 @@ export const previewTemplate = `<!DOCTYPE html>
       #project-footer {
         height: 27px;
         max-height: 27px;
+        min-height: 27px;
+        width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
         text-align: center;
-        padding: 2px 10px;
+        padding: 2px 0 ;
         font-size: 0.9em;
         color: white;
         background-color: black;
