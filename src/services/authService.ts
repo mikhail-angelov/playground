@@ -23,7 +23,7 @@ export async function login(email: string) {
   // Create a short-lived JWT token for magic link (e.g., 10 min)
   const token = signToken(
     { userId: user.id, email: user.email, type: "magic" },
-    "10d" //todo: reduce
+    "15m"
   );
 
   // Compose magic link

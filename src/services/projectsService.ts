@@ -122,7 +122,7 @@ export async function upload({
   // Upload the file to S3
   await uploadFileToS3(
     projectId,
-    JSON.stringify({ projectId, name, content, email }),
+    JSON.stringify({ projectId, name, content }),
   );
 
   console.log(`Project ${projectId} uploaded successfully to S3`);

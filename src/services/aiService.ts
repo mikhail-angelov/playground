@@ -3,14 +3,18 @@ import { eq } from "drizzle-orm";
 import { db, users, getUserApi, Api } from "../db";
 
 const BASE_URLS: Record<string, string> = {
-  deepseek: "https://api.deepseek.com",
-  openai: "https://api.openai.com/v1",
-  yandex: "https://llm.api.cloud.yandex.net/v1",
+  deepseek: process.env.AI_BASE_URL_DEEPSEEK || "https://api.deepseek.com",
+  openai: process.env.AI_BASE_URL_OPENAI || "https://api.openai.com/v1",
+  yandex:
+    process.env.AI_BASE_URL_YANDEX ||
+    "https://llm.api.cloud.yandex.net/v1",
 };
 const MODELS: Record<string, string> = {
-  deepseek: "deepseek-chat",
-  openai: "gpt-4o",
-  yandex: "gpt://b1gimvlm8a6gf8q18keq/yandexgpt/latest",
+  deepseek: process.env.AI_MODEL_DEEPSEEK || "deepseek-chat",
+  openai: process.env.AI_MODEL_OPENAI || "gpt-4o",
+  yandex:
+    process.env.AI_MODEL_YANDEX ||
+    "gpt://b1gimvlm8a6gf8q18keq/yandexgpt/latest",
 };
 
 const getAi = (api: Api) => {

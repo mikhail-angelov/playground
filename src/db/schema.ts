@@ -32,7 +32,6 @@ export const projects = sqliteTable("projects", {
   userId: integer("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  // content: text("content", { mode: "json" }).notNull(),
   image: text("image"),
   projectId: text("projectId").notNull(),
   email: text("email"),
