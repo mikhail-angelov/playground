@@ -13,7 +13,7 @@ install:
 	@echo "Installing server..."
 	-ssh root@js2go.ru "mkdir -p /opt/playground"
 	scp ./.env.prod root@js2go.ru:/opt/playground/.env
-	scp ./docker-compose.yml root@js2go.ru:/opt/playground/docker-compose.yml
+	scp ./docker-compose-prod.yml root@js2go.ru:/opt/playground/docker-compose.yml
 
 deploy:
 	@echo "Deploying server..."

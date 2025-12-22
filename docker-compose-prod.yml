@@ -1,11 +1,39 @@
 services:
-  app:
+  js2go:
+    container_name: js2go
     image: docker.pkg.github.com/mikhail-angelov/playground/playground:latest
     restart: unless-stopped
     ports:
       - "127.0.0.1:5000:5000"
     env_file:
-      - .env.local
-    command: node /app/server/dist/index.js
+      - .env
+    command: npm start
     volumes:
       - ./database.sqlite:/app/database.sqlite
+
+  monic-js2go:
+    image: ghcr.io/mikhail-angelov/monic:latest
+    container_name: monic-js2go
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - js2go
+    env_file:
+      - ./.env
+    environment:
+      - MONIC_APP_NAME=js2goMonitor
+      
+      - MONIC_CHECK_SYSTEM_INTERVAL=60
+      - MONIC_CHECK_SYSTEM_CPU_THRESHOLD=80
+      - MONIC_CHECK_SYSTEM_MEMORY_THRESHOLD=85
+      - MONIC_CHECK_SYSTEM_DISK_THRESHOLD=90
+
+      - MONIC_CHECK_DOCKER_INTERVAL=60
+      - MONIC_CHECK_DOCKER_CONTAINERS=js2go
+      
+      - MONIC_CHECK_HTTP_INTERVAL=300
+      - MONIC_CHECK_HTTP_URL=https://js2go.ru
+      - MONIC_CHECK_HTTP_METHOD=GET
+      - MONIC_CHECK_HTTP_TIMEOUT=10
+      - MONIC_CHECK_HTTP_EXPECTED_STATUS=200
