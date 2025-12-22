@@ -45,9 +45,9 @@ export default async function Page() {
             <AuthButtons />
           </div>
         }
+        center={<ProjectTabs active="my" />}
       />
       <div className="flex flex-col items-center flex-1 overflow-hidden">
-        <ProjectTabs active="my" />
         <ProjectList projects={myProjects} />
       </div>
       <Footer />

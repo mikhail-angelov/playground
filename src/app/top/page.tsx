@@ -30,9 +30,9 @@ const Top = async () => {
             <AuthButtons />
           </div>
         }
+        center={<ProjectTabs active="top" />}
       />
       <div className="flex flex-col items-center flex-1 overflow-hidden">
-        <ProjectTabs active="top" />
         <ProjectList projects={topProjects} />
       </div>
       <Footer />
