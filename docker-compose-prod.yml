@@ -10,6 +10,11 @@ services:
     command: npm start
     volumes:
       - ./database.sqlite:/app/database.sqlite
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   monic-js2go:
     image: ghcr.io/mikhail-angelov/monic:latest
@@ -23,7 +28,7 @@ services:
       - ./.env
     environment:
       - MONIC_APP_NAME=js2goMonitor
-      
+
       - MONIC_CHECK_SYSTEM_INTERVAL=60
       - MONIC_CHECK_SYSTEM_CPU_THRESHOLD=80
       - MONIC_CHECK_SYSTEM_MEMORY_THRESHOLD=85
@@ -31,9 +36,14 @@ services:
 
       - MONIC_CHECK_DOCKER_INTERVAL=60
       - MONIC_CHECK_DOCKER_CONTAINERS=js2go
-      
+
       - MONIC_CHECK_HTTP_INTERVAL=300
       - MONIC_CHECK_HTTP_URL=https://js2go.ru
       - MONIC_CHECK_HTTP_METHOD=GET
       - MONIC_CHECK_HTTP_TIMEOUT=10
       - MONIC_CHECK_HTTP_EXPECTED_STATUS=200
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
