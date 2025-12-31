@@ -18,47 +18,35 @@ const AiPanel: React.FC = () => {
   const isLoading = useAiStore((state) => state.isLoading);
   const response = useAiStore((state) => state.response);
   const requestAi = useAiStore((state) => state.requestAi);
-  const history = useAiStore((state) => state.history); // <-- get history from store
+  const clearHistory = useAiStore((state) => state.clearHistory);
+  const history = useAiStore((state) => state.history);
   const [text, setText] = React.useState("");
   const [historyIndex, setHistoryIndex] = React.useState<number | null>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const markdownRef = React.useRef<HTMLDivElement>(null);
 
-  const codeSummary: Content = {
-    "index.html": "",
-    "script.js": "",
-    "style.css": "",
-  };
-  const collectCode = (className: string, code: string) => {
-    if (isLoading) return;
-    if (
-      className.includes("language-html") &&
-      codeSummary["index.html"].length < code.length
-    ) {
-      codeSummary["index.html"] += code + "\n";
-    } else if (
-      className.includes("language-css") &&
-      codeSummary["style.css"].length < code.length
-    ) {
-      codeSummary["style.css"] += code + "\n";
-    } else if (
-      className.includes("language-javascript") &&
-      codeSummary["script.js"].length < code.length
-    ) {
-      codeSummary["script.js"] += code + "\n";
+  const codeSummary: Partial<Content> = {};
+
+  const collectCode = (className: string, code: string, isLatest: boolean) => {
+    if (isLoading || !isLatest) return;
+    const lowerClass = className.toLowerCase();
+    
+    if (lowerClass.includes("html")) {
+      codeSummary["index.html"] = code;
+    } else if (lowerClass.includes("css")) {
+      codeSummary["style.css"] = code;
+    } else if (lowerClass.includes("javascript") || lowerClass.includes("js")) {
+      codeSummary["script.js"] = code;
     }
   };
   const copyCodeToProject = () => {
-    if (
-      !codeSummary["index.html"] &&
-      !codeSummary["style.css"] &&
-      !codeSummary["script.js"]
-    ) {
+    if (Object.keys(codeSummary).length === 0) {
       toast.error("No code to copy");
       return;
     }
-    setContent(codeSummary);
-    toast.success("Code copied to project");
+    // Only pass keys that were actually collected
+    setContent(codeSummary as Content);
+    toast.success("Code patched into project");
   };
 
   // Scroll to bottom when response changes
@@ -82,29 +70,28 @@ const AiPanel: React.FC = () => {
 
   // Handle Arrow Up for prompt history
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const userPrompts = (history as any[]).filter(m => m.role === 'user').map(m => m.content);
     if (
       e.key === "ArrowUp" &&
       text.trim() === "" &&
       document.activeElement === textareaRef.current &&
-      history.length > 0
+      userPrompts.length > 0
     ) {
       e.preventDefault();
-      // If not already browsing history, start from the last prompt
       const newIndex =
         historyIndex === null
-          ? history.length - 1
+          ? userPrompts.length - 1
           : Math.max(0, historyIndex - 1);
-      setText(history[newIndex] || "");
+      setText(userPrompts[newIndex] || "");
       setHistoryIndex(newIndex);
     } else if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleRequestAi();
     } else if (e.key === "ArrowDown" && historyIndex !== null) {
       e.preventDefault();
-      // Move forward in history or clear if at the end
-      if (historyIndex < history.length - 1) {
+      if (historyIndex < userPrompts.length - 1) {
         const newIndex = historyIndex + 1;
-        setText(history[newIndex] || "");
+        setText(userPrompts[newIndex] || "");
         setHistoryIndex(newIndex);
       } else {
         setText("");
@@ -115,7 +102,8 @@ const AiPanel: React.FC = () => {
 
   // Reset history index if user types
   React.useEffect(() => {
-    if (text !== (history[historyIndex ?? -1] || "")) {
+    const userPrompts = (history as any[]).filter(m => m.role === 'user').map(m => m.content);
+    if (text !== (userPrompts[historyIndex ?? -1] || "")) {
       setHistoryIndex(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -129,56 +117,70 @@ const AiPanel: React.FC = () => {
           className="flex-1 p-4 text-gray-300 whitespace-pre-wrap overflow-x-auto"
           style={{ minHeight: 0, height: "100%", overflowY: "auto" }}
         >
-          <ReactMarkdown
-            components={{
-              code({ node, className, children, ...props }) {
-                // Only show copy button for code blocks (not inline)
-                if (!className) {
-                  return (
-                    <code
-                      className={className}
-                      style={{
-                        background: "#222",
-                        borderRadius: "4px",
-                        padding: "2px 4px",
-                        fontSize: "90%",
-                      }}
-                      {...props}
-                    >
-                      {children}
-                    </code>
-                  );
-                }
-                collectCode(className, String(children).trim());
-                return (
-                  <div className="relative group">
-                    <button
-                      type="button"
-                      className="absolute top-2 left-2 z-10 opacity-70 hover:opacity-100 bg-[#232323] rounded p-1 transition"
-                      onClick={() => handleCopy(String(children).trim())}
-                      title="Copy to clipboard"
-                    >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                    <pre
-                      className="overflow-x-auto rounded bg-[#18181b] p-3 my-2"
-                      style={{
-                        maxWidth: "100%",
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-all",
-                      }}
-                    >
-                      <code className={className} {...props}>
-                        {children}
-                      </code>
-                    </pre>
-                  </div>
-                );
-              },
-            }}
-          >
-            {response || "What application do you want to build?"}
-          </ReactMarkdown>
+          {history.map((msg, i) => (
+            <div key={i} className={`mb-6 ${msg.role === 'user' ? 'opacity-80' : ''}`}>
+              <div className="text-xs font-bold mb-1 uppercase tracking-wider text-gray-500">
+                {msg.role === 'user' ? '👤 User' : '🤖 Vibe Coder'}
+              </div>
+              <ReactMarkdown
+                components={{
+                  code({ node, className, children, ...props }) {
+                    if (!className) return <code {...props}>{children}</code>;
+                    const isLatest = !isLoading && i === history.length - 1 && msg.role === 'assistant';
+                    collectCode(className, String(children).trim(), isLatest);
+                    return (
+                      <div className="relative group">
+                        <button
+                          type="button"
+                          className="absolute top-2 left-2 z-10 opacity-70 hover:opacity-100 bg-[#232323] rounded p-1 transition"
+                          onClick={() => handleCopy(String(children).trim())}
+                          title="Copy to clipboard"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                        <pre className="overflow-x-auto rounded bg-[#18181b] p-3 my-2 border border-gray-800">
+                          <code className={className} {...props}>{children}</code>
+                        </pre>
+                      </div>
+                    );
+                  }
+                }}
+              >
+                {msg.content}
+              </ReactMarkdown>
+            </div>
+          ))}
+          
+          {isLoading && (
+            <div className="mb-6">
+              <div className="text-xs font-bold mb-1 uppercase tracking-wider text-blue-500 animate-pulse">
+                🪄 Thinking...
+              </div>
+              <ReactMarkdown
+                components={{
+                  code({ node, className, children, ...props }) {
+                    if (!className) return <code {...props}>{children}</code>;
+                    collectCode(className, String(children).trim(), true);
+                    return (
+                      <div className="relative group">
+                        <pre className="overflow-x-auto rounded bg-[#18181b] p-3 my-2 border border-blue-900/30">
+                          <code className={className} {...props}>{children}</code>
+                        </pre>
+                      </div>
+                    );
+                  }
+                }}
+              >
+                {response}
+              </ReactMarkdown>
+            </div>
+          )}
+
+          {!isLoading && history.length === 0 && (
+            <div className="h-full flex items-center justify-center text-gray-500 italic">
+              What application do you want to build?
+            </div>
+          )}
         </div>
       </ResizablePanel>
       <ResizableHandle />
@@ -212,8 +214,17 @@ const AiPanel: React.FC = () => {
             className="m-2"
             onClick={copyCodeToProject}
             disabled={isLoading}
+            title="Patch generated code to project"
           >
             <Copy className="w-6 h-6" />
+          </Button>
+          <Button
+            className="m-2 bg-red-900/20 hover:bg-red-900/40 text-red-500 border border-red-900/50"
+            onClick={clearHistory}
+            disabled={isLoading}
+            title="Clear history and start new session"
+          >
+            <SparklesIcon className="w-6 h-6 rotate-180" />
           </Button>
         </div>
       </ResizablePanel>

@@ -1,27 +1,38 @@
 import { create } from "zustand";
 import { toast } from "sonner"; // Import the toast function
 
-interface AiState {
-  requestAi: (text: string) => Promise<void>;
-  isLoading: boolean;
-  response: string;
-  history: string[];
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
 }
 
-export const useAiStore = create<AiState>((set) => ({
+interface AiState {
+  requestAi: (text: string) => Promise<void>;
+  clearHistory: () => void;
+  isLoading: boolean;
+  response: string;
+  history: ChatMessage[];
+}
+
+export const useAiStore = create<AiState>((set, get) => ({
   response: "",
   isLoading: false,
   history: [],
+  clearHistory: () => set({ history: [], response: "" }),
   requestAi: async (text: string) => {
+    const currentHistory = get().history;
     set((state) => ({
       isLoading: true,
-      history: [...state.history, text],
       response: "✨ AI magic is processing...",
     }));
+
     try {
       const response = await fetch("/api/ai", {
         method: "POST",
-        body: JSON.stringify({ prompt: text }),
+        body: JSON.stringify({ 
+            prompt: text,
+            history: currentHistory
+        }),
       });
 
       if (!response.ok || !response.body) {
@@ -39,12 +50,13 @@ export const useAiStore = create<AiState>((set) => ({
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
-        // Each chunk may contain multiple JSON lines, split and parse each
         for (const line of chunk.replaceAll("data:", "").split("\n")) {
           if (!line.trim()) continue;
           try {
             const json = JSON.parse(line);
             if (json?.content) {
+              if (json.content === "[DONE]") continue;
+              if (result === "✨ AI magic is processing...") result = "";
               result += json.content;
               set({ response: result });
             }
@@ -53,8 +65,15 @@ export const useAiStore = create<AiState>((set) => ({
           }
         }
       }
-      console.log("Final result:", result); // Debugging line
-      set({ isLoading: false });
+      
+      set((state) => ({ 
+        isLoading: false,
+        history: [
+            ...state.history,
+            { role: "user", content: text },
+            { role: "assistant", content: result }
+        ]
+      }));
     } catch (err) {
       console.error("Error ai request:", err);
       toast.error("Error ai request");

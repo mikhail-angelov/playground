@@ -5,12 +5,12 @@ import { makeAiRequest } from "@/services/aiService";
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt } = await req.json();
+    const { prompt, history } = await req.json();
     const cookieStore = await cookies();
     const token = cookieStore.get(AUTH_COOKIE)?.value;
     const user = await getAuthUser(token);
 
-    const chatStream = await makeAiRequest({ userId: user.id, prompt });
+    const chatStream = await makeAiRequest({ userId: user.id, prompt, history });
 
     const encoder = new TextEncoder();
     const ts = new TransformStream();
@@ -18,8 +18,7 @@ export async function POST(req: NextRequest) {
 
     (async () => {
       try {
-        for await (const chunk of chatStream) {
-          const content = chunk.choices[0].delta.content;
+        for await (const content of chatStream) {
           if (content) {
             await writer.write(
               encoder.encode(`data: ${JSON.stringify({ content })}\n\n`),
@@ -43,6 +42,8 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Error:", error);
-    // Handle error appropriately
+    return new NextResponse(JSON.stringify({ error: "Internal Server Error" }), {
+      status: 500,
+    });
   }
 }
