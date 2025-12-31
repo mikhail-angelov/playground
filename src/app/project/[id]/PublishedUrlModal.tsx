@@ -289,130 +289,152 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
         </div>
       )}
       <Dialog open onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[625px]">
-          <DialogHeader>
-            <DialogTitle>Select part of image to crop for preview</DialogTitle>
+        <DialogContent className="sm:max-w-[900px] max-h-[80vh] flex flex-col p-0 overflow-hidden bg-zinc-950 border-zinc-800">
+          <DialogHeader className="p-6 pb-0">
+            <DialogTitle className="text-xl font-semibold text-zinc-100">Publish Preview</DialogTitle>
           </DialogHeader>
-          <div className="flex items-center flex-col w-full">
-            <div className="flex flex-wrap gap-2 mb-4 w-full">
-              <Button
-                onClick={() => document.getElementById('image-upload')?.click()}
-                disabled={isUploading || isLoading}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <UploadIcon className="w-4 h-4" />
-                {isUploading ? 'Uploading...' : 'Upload Image'}
-              </Button>
-              <input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageUpload}
-                disabled={isUploading || isLoading}
-              />
-              
-              {currentImage && (
-                <Button
-                  onClick={handleRemoveImage}
-                  disabled={isLoading}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  <XIcon className="w-4 h-4" />
-                  Remove Image
-                </Button>
-              )}
-              
-              {previousImage && (
-                <Button
-                  onClick={handleRevertToPrevious}
-                  disabled={isLoading}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  <UndoIcon className="w-4 h-4" />
-                  Revert to Previous
-                </Button>
-              )}
+          
+          <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-[1fr_280px] min-h-0">
+            {/* Left Column: Image Area */}
+            <div className="flex-1 bg-black/40 p-4 flex flex-col items-center justify-center overflow-y-auto min-h-0">
+              <div className="w-full max-w-full flex items-center justify-center">
+                {currentImage ? (
+                  <canvas
+                    width={800}
+                    height={800}
+                    ref={canvasRef}
+                    className="border border-zinc-800 shadow-2xl w-full h-auto max-h-[60vh] object-contain cursor-crosshair"
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                  />
+                ) : (
+                  <div className="border-2 border-dashed border-zinc-800 rounded-xl p-12 text-center w-full max-w-md h-64 flex flex-col items-center justify-center bg-zinc-900/50">
+                    <UploadIcon className="w-12 h-12 text-zinc-600 mb-4" />
+                    <p className="text-zinc-400 font-medium mb-1">No preview image</p>
+                    <p className="text-zinc-500 text-sm mb-6">
+                      Upload an image or use the auto-generated one
+                    </p>
+                    <Button
+                      onClick={() => document.getElementById('image-upload')?.click()}
+                      disabled={isUploading || isLoading}
+                      variant="outline"
+                      className="border-zinc-700 hover:bg-zinc-800"
+                    >
+                      <UploadIcon className="w-4 h-4 mr-2" />
+                      Upload Now
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
-            
-            <div className="my-4 w-full">
-              {currentImage ? (
-                <canvas
-                  width={400}
-                  height={400}
-                  ref={canvasRef}
-                  className="border shadow w-full h-auto"
-                  onMouseDown={handleMouseDown}
-                  onMouseMove={handleMouseMove}
-                  onMouseUp={handleMouseUp}
+
+            {/* Right Column: Actions */}
+            <div className="border-l border-zinc-800 bg-zinc-900/30 p-6 flex flex-col h-full overflow-y-auto">
+              {/* Top Section: Image Actions */}
+              <div className="flex-1 flex flex-col gap-4">
+                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Preview Image</h3>
+                
+                <Button
+                  onClick={() => document.getElementById('image-upload')?.click()}
+                  disabled={isUploading || isLoading}
+                  variant="outline"
+                  className="w-full justify-start border-zinc-800 hover:bg-zinc-800 text-zinc-300"
+                >
+                  <UploadIcon className="w-4 h-4 mr-3" />
+                  {isUploading ? 'Uploading...' : 'Change Image'}
+                </Button>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                  disabled={isUploading || isLoading}
                 />
-              ) : (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center w-full h-64 flex flex-col items-center justify-center">
-                  <UploadIcon className="w-12 h-12 text-gray-400 mb-4" />
-                  <p className="text-gray-500 mb-2">No image selected</p>
-                  <p className="text-gray-400 text-sm">
-                    Upload an image or use the default screenshot
-                  </p>
+
+                {currentImage && (
                   <Button
-                    onClick={() => document.getElementById('image-upload')?.click()}
-                    disabled={isUploading || isLoading}
+                    onClick={handleRemoveImage}
+                    disabled={isLoading}
                     variant="outline"
-                    className="mt-4"
+                    className="w-full justify-start border-zinc-800 hover:bg-red-950/20 hover:text-red-400 text-zinc-300"
                   >
-                    <UploadIcon className="w-4 h-4 mr-2" />
-                    Upload Image
+                    <XIcon className="w-4 h-4 mr-3" />
+                    Remove Image
                   </Button>
+                )}
+
+                {previousImage && (
+                  <Button
+                    onClick={handleRevertToPrevious}
+                    disabled={isLoading}
+                    variant="ghost"
+                    className="w-full justify-start text-zinc-500 hover:text-zinc-300"
+                  >
+                    <UndoIcon className="w-4 h-4 mr-3" />
+                    Revert Change
+                  </Button>
+                )}
+
+                <div className="mt-4 p-4 border border-zinc-800 bg-zinc-950/50 rounded-lg">
+                  <p className="text-[11px] text-zinc-500 leading-relaxed italic">
+                    Tip: Drag on the image to crop. The crop will be used as the social share preview.
+                  </p>
                 </div>
-              )}
-            </div>
-            {publishedUrl && (
-              <div className="flex items-center flex-wrap w-full">
-                <div
-                  className="flex-1 mr-2 text-ellipsis overflow-hidden whitespace-nowrap"
-                  title={publishedUrl}
+              </div>
+
+              {/* Bottom Section: Publish Actions */}
+              <div className="mt-auto pt-6 flex flex-col gap-3">
+                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Actions</h3>
+                
+                {publishedUrl && (
+                  <div className="mb-2 flex flex-col gap-2 w-full bg-zinc-950 p-3 rounded-lg border border-zinc-800">
+                    <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Published URL</div>
+                    <div className="flex items-center gap-1">
+                      <div className="flex-1 text-[11px] text-zinc-400 font-mono truncate bg-black/50 p-1.5 rounded border border-zinc-900" title={publishedUrl}>
+                        {publishedUrl}
+                      </div>
+                      <Button
+                        onClick={handleCopyToClipboard}
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-zinc-500 hover:text-white"
+                        title="Copy to clipboard"
+                      >
+                        <CopyIcon className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {!publishedUrl ? (
+                  <Button 
+                    onClick={handlePublish} 
+                    disabled={isLoading || (!currentImage && !image)}
+                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold h-11"
+                  >
+                    {isLoading ? 'Publishing...' : 'Publish Project'}
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={handleView} 
+                    className="w-full bg-zinc-100 hover:bg-white text-zinc-950 font-semibold h-11"
+                  >
+                    View Live Site
+                  </Button>
+                )}
+                
+                <Button 
+                  onClick={onClose} 
+                  variant="ghost"
+                  className="w-full text-zinc-400 hover:text-white"
                 >
-                  {publishedUrl}
-                </div>
-                <Button
-                  onClick={handleCopyToClipboard}
-                  variant="outline"
-                  title="Copy to clipboard"
-                >
-                  <CopyIcon className="w-6 h-6" />
+                  Close
                 </Button>
               </div>
-            )}
+            </div>
           </div>
-          <DialogFooter className="flex flex-wrap gap-2">
-            {!publishedUrl && (
-              <Button 
-                onClick={handlePublish} 
-                disabled={isLoading || (!currentImage && !image)}
-                className="flex-1 min-w-[120px]"
-              >
-                {isLoading ? 'Publishing...' : 'Publish'}
-              </Button>
-            )}
-            {publishedUrl && (
-              <Button 
-                onClick={handleView} 
-                title="Open in new tab"
-                className="flex-1 min-w-[120px]"
-              >
-                View Published
-              </Button>
-            )}
-            <Button 
-              onClick={onClose} 
-              variant="outline"
-              className="flex-1 min-w-[120px]"
-            >
-              Close
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
