@@ -1,16 +1,5 @@
-# Stage 1: Build
-FROM node:22-alpine AS builder
 
-WORKDIR /app
-
-COPY package.json package-lock.json ./
-RUN npm ci
-
-COPY . .
-RUN npm run build
-
-# Stage 2: Run
-FROM node:22-alpine AS runner
+FROM node:22-alpine
 
 WORKDIR /app
 
@@ -19,10 +8,10 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
 # Copy built assets and necessary files from builder
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.ts ./next.config.ts
+COPY ./.next ./.next
+COPY ./dist ./dist
+COPY ./public ./public
+COPY ./next.config.ts ./next.config.ts
 
 EXPOSE 3000
 
