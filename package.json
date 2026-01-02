@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "ts-node --project tsconfig.server.json server.ts",
     "next:dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "NODE_ENV=production ts-node --project tsconfig.server.json server.ts",
+    "build": "next build && npm run build:server",
+    "build:server": "tsc --project tsconfig.server.json",
+    "start": "NODE_ENV=production node dist/server.js",
     "next:start": "next start",
     "lint": "next lint",
     "test": "jest",
