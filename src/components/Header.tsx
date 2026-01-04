@@ -9,7 +9,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ left, center, right }: HeaderProps) => {
   return (
-    <header className="flex items-center justify-between p-4 border-b border-gray-700">
+    <header className="flex items-center justify-between py-2 px-4 border-b border-gray-700">
       {left || <HomeButton />}
       {center}
       {right}

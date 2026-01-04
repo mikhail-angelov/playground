@@ -14,7 +14,8 @@ const HomeButton: React.FC = () => {
 
   return (
     <Link href={href} passHref>
-      <Image src={catImage} alt="Home" className="max-w-10 h-auto" />
+      <h1 className="text-2xl font-bold tracking-tight">JS2Go</h1>
+      {/* <Image src={catImage} alt="Home" className="max-w-10 h-auto" /> */}
     </Link>
   );
 };

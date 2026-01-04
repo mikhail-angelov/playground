@@ -1,26 +1,31 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import { getIsAuthenticated } from "@/lib/actions/auth";
 
 export default async function Home() {
+  const isAuthenticated = await getIsAuthenticated();
   return (
     <div className="min-h-screen bg-[#18191a] text-white flex flex-col font-sans">
-      <header className="flex justify-between items-center px-8 py-6 border-b border-zinc-800 bg-[#23272a]">
-        <h1 className="text-2xl font-bold tracking-tight">JS2Go</h1>
-        <div className="flex gap-4">
-          <Link
-            href="/signup"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded transition-colors"
-          >
-            Sign up
-          </Link>
-          <Link
-            href="/top"
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded transition-colors"
-          >
-            Top
-          </Link>
-        </div>
-      </header>
+      <Header
+        right={
+          <div className="flex gap-4">
+            {!isAuthenticated && (
+              <Link
+                href="/signup"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded transition-colors"
+              >
+                Sign up
+              </Link>)}
+            <Link
+              href="/top"
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded transition-colors"
+            >
+              Top
+            </Link>
+          </div>
+        }
+      />
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
         <section className="max-w-xl w-full text-center">

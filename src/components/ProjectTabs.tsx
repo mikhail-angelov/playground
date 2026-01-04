@@ -4,7 +4,7 @@ import React from "react";
 
 export default function ProjectTabs({ active }: { active: string }) {
   return (
-    <div className="flex space-x-2 m-2 p-1 px-2 bg-gray-800  rounded-md ">
+    <div className="flex space-x-2 p-1 px-2 bg-gray-800  rounded-md ">
       <Link
         href="/top"
         className={cn("px-2 rounded-md text-gray-400", {
