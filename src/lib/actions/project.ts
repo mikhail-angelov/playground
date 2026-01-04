@@ -23,9 +23,9 @@ export async function getProject(
   let hasAi = false;
 
   try {
-    const user = await getAuthUser(token);
-    const profile = await getProfile(user.id);
-    myEmail = user?.email;
+    const {id, email } = await getAuthUser(token);
+    const profile = await getProfile(id);
+    myEmail = email;
     hasAi = !!profile?.key;
   } catch (e) {
     //ignore
@@ -45,7 +45,7 @@ export async function getProject(
         selectedFile: "index.html",
         fileContents: initialFileContents,
         preview: "",
-        rating: 0,
+        tags: [],
       },
     ];
   }
@@ -72,7 +72,7 @@ export async function getProject(
           selectedFile: "index.html",
           fileContents: initialFileContents,
           preview: "",
-          rating: 0,
+          tags: [],
         },
       ];
     }
@@ -93,7 +93,7 @@ export async function getProject(
           isLoading: false,
           lastPublish: "",
           preview: "",
-          rating: project.rating,
+          tags: project.tags,
         },
       ];
     } else {

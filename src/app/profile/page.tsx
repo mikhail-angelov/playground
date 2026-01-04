@@ -14,6 +14,7 @@ const providers = ["deepSeek", "yandex", "openAI"];
 export default function Profile() {
   const [key, setKey] = useState("");
   const [provider, setProvider] = useState(providers[0]);
+  const [telegram, setTelegram] = useState("");
   useEffect(() => {
     get().then((res) => {
       setKey(res.key);
@@ -25,6 +26,7 @@ export default function Profile() {
       const request = {
         key,
         provider,
+        telegram,
       };
       const result = await save(request);
       if (result?.ok) {
@@ -85,6 +87,20 @@ export default function Profile() {
               value={key || ""}
               onChange={(e) => setKey(e.target.value)}
               placeholder="Enter API key"
+              autoComplete="off"
+            />
+          </div>
+          <div className="flex flex-col space-y-1">
+            <label htmlFor="telegram" className="font-medium">
+              Telegram
+            </label>
+            <input
+              id="telegram"
+              type="text"
+              className="input input-bordered w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-background"
+              value={telegram || ""}
+              onChange={(e) => setTelegram(e.target.value)}
+              placeholder="Enter Telegram"
               autoComplete="off"
             />
           </div>

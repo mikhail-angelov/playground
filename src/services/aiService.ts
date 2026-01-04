@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { eq } from "drizzle-orm";
-import { db, users, getUserApi, Api } from "../db";
+import { db, users, getUserApi, ProfileDto } from "../db";
 
 const BASE_URLS: Record<string, string> = {
   deepseek: process.env.AI_BASE_URL_DEEPSEEK || "https://api.deepseek.com",
@@ -17,7 +17,7 @@ const MODELS: Record<string, string> = {
     "gpt://b1gimvlm8a6gf8q18keq/yandexgpt/latest",
 };
 
-const getAi = (api: Api) => {
+const getAi = (api: ProfileDto) => {
   const openai = new OpenAI({
     baseURL: BASE_URLS.deepseek, // Default to Deepseek
     apiKey: api.key,

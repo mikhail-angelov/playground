@@ -10,7 +10,7 @@ CREATE TABLE `__new_projects` (
 	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-INSERT INTO `__new_projects`("id", "name", "userId", "image", "projectId", "email", "rating") SELECT "id", "name", "userId", "image", "projectId", "email", "rating" FROM `projects`;--> statement-breakpoint
+INSERT INTO `__new_projects`("id", "name", "userId", "image", "projectId", "rating") SELECT "id", "name", "userId", "image", "projectId", "rating" FROM `projects`;--> statement-breakpoint
 DROP TABLE `projects`;--> statement-breakpoint
 ALTER TABLE `__new_projects` RENAME TO `projects`;--> statement-breakpoint
 PRAGMA foreign_keys=ON;--> statement-breakpoint

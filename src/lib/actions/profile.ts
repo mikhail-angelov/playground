@@ -17,7 +17,7 @@ export async function get() {
   }
 }
 
-export async function save(body: { key: string; provider: string }) {
+export async function save(body: { key: string; provider: string; telegram: string }) {
   const cookieStore = await cookies();
   const token = cookieStore.get(AUTH_COOKIE)?.value;
 
@@ -30,6 +30,7 @@ export async function save(body: { key: string; provider: string }) {
     await saveProfile(user.id, {
       provider: body.provider,
       key: body.key,
+      telegram: body.telegram,
     });
     return { ok: true };
   } catch (e) {
