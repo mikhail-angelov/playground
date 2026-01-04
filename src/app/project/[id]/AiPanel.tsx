@@ -14,7 +14,7 @@ import { useAiStore } from "@/components/stores/useAi";
 import { Content } from "@/dto/project.dto";
 
 const AiPanel: React.FC = () => {
-  const { setContent } = useProjectStore((state) => state);
+  const { setContent, fileContents } = useProjectStore((state) => state);
   const isLoading = useAiStore((state) => state.isLoading);
   const response = useAiStore((state) => state.response);
   const requestAi = useAiStore((state) => state.requestAi);
@@ -30,7 +30,7 @@ const AiPanel: React.FC = () => {
   const collectCode = (className: string, code: string, isLatest: boolean) => {
     if (isLoading || !isLatest) return;
     const lowerClass = className.toLowerCase();
-    
+
     if (lowerClass.includes("html")) {
       codeSummary["index.html"] = code;
     } else if (lowerClass.includes("css")) {
@@ -57,7 +57,7 @@ const AiPanel: React.FC = () => {
   }, [response]);
 
   const handleRequestAi = () => {
-    requestAi(text);
+    requestAi(text, fileContents);
     setText("");
     setHistoryIndex(null);
   };
@@ -150,7 +150,7 @@ const AiPanel: React.FC = () => {
               </ReactMarkdown>
             </div>
           ))}
-          
+
           {isLoading && (
             <div className="mb-6">
               <div className="text-xs font-bold mb-1 uppercase tracking-wider text-blue-500 animate-pulse">
@@ -184,8 +184,8 @@ const AiPanel: React.FC = () => {
         </div>
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel defaultSize={10}>
-        <div className="flex overflow-y-auto">
+      <ResizablePanel defaultSize={12} minSize={12}>
+        <div className="flex h-full">
           <textarea
             ref={textareaRef}
             className="w-full h-full p-2 bg-gray-900 text-white"
@@ -203,15 +203,14 @@ const AiPanel: React.FC = () => {
             autoCorrect="off"
             style={{ resize: "none" }}
           />
+          <div className="grid grid-cols-2 gap-2 m-1">
           <Button
-            className="m-2"
             onClick={handleRequestAi}
             disabled={isLoading}
           >
             <SparklesIcon className="w-6 h-6" />
           </Button>
           <Button
-            className="m-2"
             onClick={copyCodeToProject}
             disabled={isLoading}
             title="Patch generated code to project"
@@ -219,13 +218,14 @@ const AiPanel: React.FC = () => {
             <Copy className="w-6 h-6" />
           </Button>
           <Button
-            className="m-2 bg-red-900/20 hover:bg-red-900/40 text-red-500 border border-red-900/50"
+            className="bg-red-900/20 hover:bg-red-900/40 text-red-500 border border-red-900/50"
             onClick={clearHistory}
             disabled={isLoading}
             title="Clear history and start new session"
           >
             <SparklesIcon className="w-6 h-6 rotate-180" />
           </Button>
+          </div>
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

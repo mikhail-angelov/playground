@@ -58,6 +58,19 @@ function validateCode(content: string, isRefinement: boolean): string[] {
   if (css && !checkBrackets(css)) issues.push("CSS has unmatched brackets");
   if (js && !checkBrackets(js)) issues.push("JS has unmatched brackets");
 
+  // Partial update detection
+  const partialPatterns = [
+    /\/\/ \.\.\./,
+    /\/* \.\.\. *\//,
+    /\.\.\. \[.*\]/,
+    /\/\/ rest of/i,
+    /\* rest of/i
+  ];
+  
+  if (partialPatterns.some(p => p.test(content))) {
+    issues.push("Detected partial code snippet (omission comment). Please provide the full file content.");
+  }
+
   return issues;
 }
 
@@ -70,6 +83,7 @@ export async function* makeAiRequest(request: {
   userId: number;
   prompt: string;
   history?: ChatMessage[];
+  files?: any;
 }): AsyncGenerator<string> {
   const user = db
     .select()
@@ -97,13 +111,14 @@ Use ONLY these file blocks:
 - \`\`\`css:style.css
 - \`\`\`js:script.js
 
-**Refinement Mode**: If you are refining an existing app, you ONLY need to output the files that changed. If a file is unchanged, you don't need to include it in your response.
+**Refinement Mode**: If you are refining an existing app, you MUST provide the FULL content of any file you modify. DO NOT use comments like "// ... rest of code" or "// ... existing code". If a file is completely unchanged, you may omit it from your response entirely. Always ensure that the files you provide are complete, valid, and ready to be used.
 
 Make sure the designs are "premium" and "wow" the user. Use modern CSS (gradients, glassmorphism, animations).
 Inform the user about your logic and decisions before the code blocks.`;
-
+console.log(request.history);
   const messages: ChatMessage[] = [
     { role: "system", content: systemPrompt },
+    ...(request.files ? [{ role: "system" as const, content: `Current Project Files:\n${Object.entries(request.files).map(([name, content]) => `--- ${name} ---\n${content}`).join('\n\n')}` }] : []),
     ...(request.history || []),
     { role: "user", content: request.prompt },
   ];

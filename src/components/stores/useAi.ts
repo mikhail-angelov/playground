@@ -7,7 +7,7 @@ interface ChatMessage {
 }
 
 interface AiState {
-  requestAi: (text: string) => Promise<void>;
+  requestAi: (text: string, files?: any) => Promise<void>;
   clearHistory: () => void;
   isLoading: boolean;
   response: string;
@@ -19,7 +19,7 @@ export const useAiStore = create<AiState>((set, get) => ({
   isLoading: false,
   history: [],
   clearHistory: () => set({ history: [], response: "" }),
-  requestAi: async (text: string) => {
+  requestAi: async (text: string, files?: any) => {
     const currentHistory = get().history;
     set((state) => ({
       isLoading: true,
@@ -31,7 +31,8 @@ export const useAiStore = create<AiState>((set, get) => ({
         method: "POST",
         body: JSON.stringify({ 
             prompt: text,
-            history: currentHistory
+            history: currentHistory,
+            files
         }),
       });
 

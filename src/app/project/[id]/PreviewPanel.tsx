@@ -79,7 +79,10 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
       <ResizableHandle />
       <ResizablePanel defaultSize={4}>
         <div className="w-full h-full overflow-y-auto">
-          <h3 className="mx-2">Console Output</h3>
+          <div className="flex justify-between">
+            <h3 className="mx-2">Console Output</h3>
+            <Button variant="outline" className="size-xs" onClick={() => setConsoleOutput([])}>x</Button>
+          </div>
           <div className="mx-2 ">
             {consoleOutput.map((message, index) => (
               <div key={index} className="text-sm">

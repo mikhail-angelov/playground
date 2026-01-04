@@ -5,12 +5,12 @@ import { makeAiRequest } from "@/services/aiService";
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, history } = await req.json();
+    const { prompt, history, files } = await req.json();
     const cookieStore = await cookies();
     const token = cookieStore.get(AUTH_COOKIE)?.value;
     const user = await getAuthUser(token);
 
-    const chatStream = await makeAiRequest({ userId: user.id, prompt, history });
+    const chatStream = await makeAiRequest({ userId: user.id, prompt, history, files });
 
     const encoder = new TextEncoder();
     const ts = new TransformStream();
