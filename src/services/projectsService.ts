@@ -98,6 +98,7 @@ export async function upload({
   image,
   userId,
   email,
+  tags,
 }: {
   name: string;
   projectId: string;
@@ -105,6 +106,7 @@ export async function upload({
   image: string;
   userId: number;
   email: string;
+  tags: string[];
 }) {
   const existingProject = await db
     .select()
@@ -159,7 +161,7 @@ export async function upload({
       name,
       projectId,
       image,
-      rating: 0,
+      tags,
     });
   }
 

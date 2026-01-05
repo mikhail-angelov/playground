@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name = "", projectId = v4(), content, image } = body;
+    const { name = "", projectId = v4(), content, image, tags = [] } = body;
     const userId = user.id;
     const email = user.email;
 
@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
       image,
       userId,
       email,
+      tags,
     });
 
     return NextResponse.json(result);

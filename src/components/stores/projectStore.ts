@@ -17,7 +17,8 @@ export type ProjectActions = {
   triggerPreview: () => void;
   uploadFiles: (
     projectId: string,
-    image: string
+    image: string,
+    isTelegram: boolean
   ) => Promise<{ success: boolean; url?: string }>;
   cloneProject: (email: string) => void;
 };
@@ -44,7 +45,7 @@ export const initProjectStore = (): ProjectDto => {
     selectedFile: "index.html",
     fileContents: initFileContents,
     preview: "",
-    rating: 0,
+    tags: [],
   };
 };
 
@@ -60,7 +61,7 @@ export const defaultInitState: ProjectDto = {
   selectedFile: "index.html",
   fileContents: initFileContents,
   preview: "",
-  rating: 0,
+  tags: [],
 };
 
 export const createProjectStore = (
@@ -160,8 +161,9 @@ export const createProjectStore = (
       const { fileContents, projectId } = get();
       set({ preview: composePreview(fileContents, projectId) });
     },
-    uploadFiles: async (projectId: string, image: string) => {
+    uploadFiles: async (projectId: string, image: string, isTelegram: boolean) => {
       const { fileContents: content, name } = get();
+      const tags = isTelegram ? ["telegram"] : [];
       console.log("---Project name updated:", name);
       set({ isLoading: true });
       try {
@@ -176,6 +178,7 @@ export const createProjectStore = (
             name,
             content,
             image,
+            tags,
           }),
         });
 

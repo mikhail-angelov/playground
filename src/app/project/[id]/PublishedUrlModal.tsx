@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { useProjectStore } from "@/components/providers/ProjectStoreProvider";
 
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { LoaderIcon, CopyIcon, UploadIcon, XIcon, UndoIcon } from "lucide-react";
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import getCroppedImg from "@/lib/cropImage";
@@ -30,6 +32,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
     (state) => state,
   );
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isTelegram, setIsTelegram] = useState(false);
   const [cropStart, setCropStart] = useState<{ x: number; y: number } | null>(
     null,
   );
@@ -167,7 +170,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
       // Optimize the image (resize and compress)
       const optimizedDataUrl = await optimizeImage(file);
       const optimizedImage = await dataUrlToImage(optimizedDataUrl);
-      
+
       setCurrentImage(optimizedImage);
       toast.success('Image uploaded and optimized successfully');
     } catch (error) {
@@ -244,7 +247,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
       }
 
       // Upload the cropped image
-      const { success, url = "" } = await uploadFiles(projectId, croppedImage);
+      const { success, url = "" } = await uploadFiles(projectId, croppedImage, isTelegram);
 
       if (success) {
         setPublishedUrl(url);
@@ -293,7 +296,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
           <DialogHeader className="p-6 pb-0">
             <DialogTitle className="text-xl font-semibold text-zinc-100">Publish Preview</DialogTitle>
           </DialogHeader>
-          
+
           <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-[1fr_280px] min-h-0">
             {/* Left Column: Image Area */}
             <div className="flex-1 bg-black/40 p-4 flex flex-col items-center justify-center overflow-y-auto min-h-0">
@@ -334,7 +337,7 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
               {/* Top Section: Image Actions */}
               <div className="flex-1 flex flex-col gap-4">
                 <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Preview Image</h3>
-                
+
                 <Button
                   onClick={() => document.getElementById('image-upload')?.click()}
                   disabled={isUploading || isLoading}
@@ -376,6 +379,13 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
                     Revert Change
                   </Button>
                 )}
+                <div className="mt-4 p-4 border border-zinc-800 bg-zinc-950/50 rounded-lg flex items-center justify-between">
+                  <div className="flex flex-col gap-0.5">
+                    <Label className="text-zinc-200">Telegram Hub</Label>
+                    <p className="text-[10px] text-zinc-500">Add to your Telegram Apps</p>
+                  </div>
+                  <Switch checked={isTelegram} onCheckedChange={setIsTelegram} />
+                </div>
 
                 <div className="mt-4 p-4 border border-zinc-800 bg-zinc-950/50 rounded-lg">
                   <p className="text-[11px] text-zinc-500 leading-relaxed italic">
@@ -384,10 +394,9 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
                 </div>
               </div>
 
-              {/* Bottom Section: Publish Actions */}
               <div className="mt-auto pt-6 flex flex-col gap-3">
                 <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Actions</h3>
-                
+
                 {publishedUrl && (
                   <div className="mb-2 flex flex-col gap-2 w-full bg-zinc-950 p-3 rounded-lg border border-zinc-800">
                     <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Published URL</div>
@@ -409,24 +418,24 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
                 )}
 
                 {!publishedUrl ? (
-                  <Button 
-                    onClick={handlePublish} 
+                  <Button
+                    onClick={handlePublish}
                     disabled={isLoading || (!currentImage && !image)}
                     className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold h-11"
                   >
                     {isLoading ? 'Publishing...' : 'Publish Project'}
                   </Button>
                 ) : (
-                  <Button 
-                    onClick={handleView} 
+                  <Button
+                    onClick={handleView}
                     className="w-full bg-zinc-100 hover:bg-white text-zinc-950 font-semibold h-11"
                   >
                     View Live Site
                   </Button>
                 )}
-                
-                <Button 
-                  onClick={onClose} 
+
+                <Button
+                  onClick={onClose}
                   variant="ghost"
                   className="w-full text-zinc-400 hover:text-white"
                 >

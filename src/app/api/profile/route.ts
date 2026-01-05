@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
     await saveProfile(user.id, {
       provider: body.provider,
       key: body.key,
+      telegram: body.telegram,
     });
     return NextResponse.json({ ok: true });
   } catch (e) {

@@ -97,7 +97,7 @@ async function main() {
         image: proj.image,
         email: DEMO_EMAIL,
         projectId: `demo-project-${i + 1}`,
-        rating: 0,
+        tags: proj.content.tags,
       })
       .run();
   }
