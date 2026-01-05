@@ -28,11 +28,11 @@ const PublishedUrlModal: React.FC<PublishedUrlModalProps> = ({
   image,
   projectId,
 }) => {
-  const { uploadFiles, setError, isLoading } = useProjectStore(
+  const { uploadFiles, setError, isLoading, tags } = useProjectStore(
     (state) => state,
   );
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isTelegram, setIsTelegram] = useState(false);
+  const [isTelegram, setIsTelegram] = useState(tags.includes("telegram"));
   const [cropStart, setCropStart] = useState<{ x: number; y: number } | null>(
     null,
   );

@@ -14,7 +14,7 @@ import { CheckIcon } from "lucide-react";
 import { ProjectDto } from "@/dto/project.dto";
 
 export default function Project({ project }: { project: ProjectDto }) {
-  const { setContent, setName } = useProjectStore((state) => state);
+  const { setContent, setName, setTags } = useProjectStore((state) => state);
   useEffect(() => {
     const pathname = window.location.pathname;
     if (pathname.endsWith("/new") && project?.projectId) {
@@ -26,6 +26,7 @@ export default function Project({ project }: { project: ProjectDto }) {
       );
     }
     setContent(project.fileContents);
+    setTags(project.projectId,project.tags);
   }, []);
 
   const [isEditing, setIsEditing] = useState(false);

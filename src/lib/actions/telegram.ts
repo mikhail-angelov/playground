@@ -12,7 +12,7 @@ export async function getTelegramProjects(telegramNik: string) {
     const user = await db
       .select()
       .from(users)
-      .where(eq(users.telegram, formattedNik))
+      .where(eq(users.telegram, formattedNik.toLowerCase()))
       .get();
 
     if (!user) {

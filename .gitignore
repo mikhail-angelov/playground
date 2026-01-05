@@ -57,6 +57,8 @@ temp/
 
 # IDE files
 .vscode/
+.vite/
+.zed/
 
 # OS files
 .DS_Store

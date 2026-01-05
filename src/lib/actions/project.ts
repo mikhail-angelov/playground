@@ -58,6 +58,7 @@ export async function getProject(
       .from(projects)
       .where(eq(projects.projectId, projectId))
       .get();
+      console.log("---Project loaded:", project);
     if (!project) {
       return [
         {
@@ -76,7 +77,7 @@ export async function getProject(
         },
       ];
     }
-    const response = await fetch(`${"https://app.js2go.ru"}/${projectId}`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_HOST}/${projectId}`);
 
     if (response.ok) {
       const { content } = await response.json();

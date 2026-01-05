@@ -158,7 +158,7 @@ export async function upload({
   if (existingProject) {
     await db
       .update(projects)
-      .set({ name, image })
+      .set({ name, image, tags })
       .where(eq(projects.projectId, projectId));
   } else {
     await db.insert(projects).values({
@@ -171,7 +171,7 @@ export async function upload({
     });
   }
 
-  return { status: "success" };
+  return await getProject(projectId);
 }
 
 export async function updateProject(

@@ -1,9 +1,0 @@
-[
-  {
-    "type": "node",
-    "request": "attach",
-    "name": "Attach to Node.js",
-    "port": 9230,
-    "restart": true
-  }
-]

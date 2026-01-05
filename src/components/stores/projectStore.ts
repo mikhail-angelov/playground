@@ -4,11 +4,10 @@ import { toast } from "sonner";
 import { Content, ProjectDto } from "@/dto/project.dto";
 import { composePreview } from "@/lib/actions/preview";
 
-const PUBLIC_APP_URL = "https://app.js2go.ru";
-
 export type ProjectActions = {
   newProject: () => string;
   setName: (projectId: string,name: string) => void;
+  setTags: (projectId: string, tags: string[]) => void;
   setError: (error: string) => void;
   setSelectedFile: (file: keyof Content) => void;
   setFileContent: (file: string, content: string) => void;
@@ -111,7 +110,7 @@ export const createProjectStore = (
             isLoading: false,
             name,
           });
-          return { success: true, url: `${PUBLIC_APP_URL}/${projectId}.html` };
+          return { success: true, url: `${process.env.NEXT_PUBLIC_APP_HOST}/${projectId}.html` };
         }
 
         toast.error(`Failed to update project name: ${response.statusText}`);
@@ -121,6 +120,11 @@ export const createProjectStore = (
       set({
         error: "Failed to update project name",
         isLoading: false,
+      });
+    },
+    setTags: (projectId, tags) => {
+      set({
+        tags,
       });
     },
     setError: (error) => {
@@ -164,7 +168,7 @@ export const createProjectStore = (
     uploadFiles: async (projectId: string, image: string, isTelegram: boolean) => {
       const { fileContents: content, name } = get();
       const tags = isTelegram ? ["telegram"] : [];
-      console.log("---Project name updated:", name);
+      console.log("---Project updating:", name,tags);
       set({ isLoading: true });
       try {
         const response = await fetch("/api/project/upload", {
@@ -184,12 +188,16 @@ export const createProjectStore = (
 
         if (response.ok) {
           toast.success("Project is uploaded successfully");
+          const a = await response.json();
+          console.log("---Project name updated:", a);
           set({
             error: "",
             lastPublish: new Date().toLocaleString(),
             isLoading: false,
+            name,
+            tags,
           });
-          return { success: true, url: `${PUBLIC_APP_URL}/${projectId}.html` };
+          return { success: true, url: `${process.env.NEXT_PUBLIC_APP_HOST}/${projectId}.html` };
         }
 
         toast.error(`Failed to upload files: ${response.statusText}`);
