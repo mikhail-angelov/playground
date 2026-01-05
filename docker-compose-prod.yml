@@ -9,7 +9,7 @@ services:
       - .env
     command: npm start
     volumes:
-      - ./database.sqlite:/app/database.sqlite
+      - ./database.db:/app/database.db
     logging:
       driver: "json-file"
       options:

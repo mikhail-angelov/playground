@@ -45,18 +45,18 @@ declare global {
 export default function TelegramPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [telegramId, setTelegramId] = useState<string | null>(null);
+  const [telegramNik, setTelegramNik] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDebug, setIsDebug] = useState(false);
-  const [debugId, setDebugId] = useState("");
+  const [debugNik, setDebugNik] = useState("");
 
-  const fetchProjects = async (tid: string) => {
+  const fetchProjects = async (nik: string) => {
     setLoading(true);
     try {
-      const data = await getTelegramProjects(tid);
+      const data = await getTelegramProjects(nik);
       setProjects(data as Project[]);
       if (data.length === 0) {
-        setError(`No projects found for Telegram ID: ${tid}. Make sure you linked this ID in your profile and tagged projects with "telegram".`);
+        setError(`No projects found for Telegram user: ${nik}. Make sure you saved this username in your profile and tagged projects with "telegram".`);
       } else {
         setError(null);
       }
@@ -76,12 +76,12 @@ export default function TelegramPage() {
         webapp.expand();
 
         const user = webapp.initDataUnsafe?.user;
-        if (user?.id) {
-          const tid = user.id.toString();
-          setTelegramId(tid);
-          fetchProjects(tid);
+        if (user?.username) {
+          const nik = user.username.startsWith("@") ? user.username : `@${user.username}`;
+          setTelegramNik(nik);
+          fetchProjects(nik);
         } else {
-          setError("Telegram user data not found. Are you opening this inside Telegram?");
+          setError("Telegram username not found. Make sure you have a username set in Telegram.");
         }
       }
     };
@@ -94,9 +94,10 @@ export default function TelegramPage() {
 
   const handleDebugFetch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (debugId) {
-      setTelegramId(debugId);
-      fetchProjects(debugId);
+    if (debugNik) {
+      const nik = debugNik.startsWith("@") ? debugNik : `@${debugNik}`;
+      setTelegramNik(nik);
+      fetchProjects(nik);
     }
   };
 
@@ -107,12 +108,12 @@ export default function TelegramPage() {
         strategy="beforeInteractive"
         onLoad={() => {
           // Trigger init if script loads after component mount
-          if (window.Telegram?.WebApp && !telegramId) {
+          if (window.Telegram?.WebApp && !telegramNik) {
             const user = window.Telegram.WebApp.initDataUnsafe?.user;
-            if (user?.id) {
-              const tid = user.id.toString();
-              setTelegramId(tid);
-              fetchProjects(tid);
+            if (user?.username) {
+              const nik = user.username.startsWith("@") ? user.username : `@${user.username}`;
+              setTelegramNik(nik);
+              fetchProjects(nik);
             }
           }
         }}
@@ -143,10 +144,10 @@ export default function TelegramPage() {
             <form onSubmit={handleDebugFetch} className="flex gap-2">
               <input
                 type="text"
-                placeholder="Enter Telegram User ID"
+                placeholder="Enter Telegram Username (e.g. @mikhail)"
                 className="flex-1 bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                value={debugId}
-                onChange={(e) => setDebugId(e.target.value)}
+                value={debugNik}
+                onChange={(e) => setDebugNik(e.target.value)}
               />
               <Button type="submit" size="sm">Fetch</Button>
             </form>
@@ -169,8 +170,8 @@ export default function TelegramPage() {
                 {error}
               </p>
             </div>
-            {telegramId && (
-              <p className="text-xs text-zinc-600 font-mono">ID: {telegramId}</p>
+            {telegramNik && (
+              <p className="text-xs text-zinc-600 font-mono">User: {telegramNik}</p>
             )}
           </div>
         ) : (

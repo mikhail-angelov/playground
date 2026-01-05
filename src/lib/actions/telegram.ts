@@ -3,18 +3,20 @@
 import { db, users, projects } from "@/db";
 import { eq, sql } from "drizzle-orm";
 
-export async function getTelegramProjects(telegramId: string) {
+export async function getTelegramProjects(telegramNik: string) {
   try {
-    // 1. Find user by telegram ID
-    // Note: telegramId coming from WebApp is usually numeric string or number
+    // 1. Find user by telegram username (nik)
+    // Ensure the username starts with @ if it's being compared to stored values
+    const formattedNik = telegramNik.startsWith("@") ? telegramNik : `@${telegramNik}`;
+
     const user = await db
       .select()
       .from(users)
-      .where(eq(users.telegram, telegramId))
+      .where(eq(users.telegram, formattedNik))
       .get();
 
     if (!user) {
-      console.log(`No user found for telegram ID: ${telegramId}`);
+      console.log(`No user found for telegram username: ${formattedNik}`);
       return [];
     }
 
