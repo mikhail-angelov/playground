@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState } from "react";
 import Script from "next/script";
 import Link from "next/link";
 import { Loader2, ExternalLink, ShieldAlert, Cpu } from "lucide-react";
 import { getTelegramProjects } from "@/lib/actions/telegram";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 
 interface Project {
@@ -179,7 +178,7 @@ export default function TelegramPage() {
             {projects.map((project) => (
               <Link
                 key={project.id}
-                href={`/project/${project.projectId}`}
+                href={`${process.env.NEXT_PUBLIC_APP_HOST}/${project.projectId}.html`}
                 className="group relative aspect-square bg-[#1a1d23] rounded-2xl border border-zinc-800 overflow-hidden transition-all duration-300 hover:scale-105 hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]"
               >
                 {project.image ? (

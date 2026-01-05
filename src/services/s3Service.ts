@@ -8,6 +8,7 @@ import {
   CopyObjectCommandInput,
 } from "@aws-sdk/client-s3";
 import { Readable } from "stream";
+import zlib from "zlib";
 
 const getS3 = () => {
   return new S3Client({
@@ -24,6 +25,7 @@ export const uploadFileToS3 = async (
   key: string,
   content: Buffer | string,
   type?: string,
+  contentEncoding?: string,
 ): Promise<string> => {
   const bucket = process.env.S3_BUCKET || "";
 
@@ -32,6 +34,7 @@ export const uploadFileToS3 = async (
     Key: key,
     Body: content,
     ContentType: type,
+    ContentEncoding: contentEncoding,
     ACL: "public-read",
   };
 
@@ -59,7 +62,14 @@ export const getFileFromS3 = async (key: string): Promise<string> => {
     for await (const chunk of stream) {
       chunks.push(chunk);
     }
-    return Buffer.concat(chunks).toString("utf-8");
+    const buffer = Buffer.concat(chunks);
+    
+    // Check for gzip magic bytes (0x1f 0x8b)
+    if (buffer.length > 2 && buffer[0] === 0x1f && buffer[1] === 0x8b) {
+      return zlib.gunzipSync(buffer).toString("utf-8");
+    }
+    
+    return buffer.toString("utf-8");
   } catch (error) {
     console.error("Error getting file from S3:", error);
     throw error;

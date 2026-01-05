@@ -4,6 +4,7 @@ import ejs from "ejs";
 import { v4 } from "uuid";
 import { uploadFileToS3 } from "./s3Service";
 import { previewTemplate } from "./preview.ejs";
+import zlib from "zlib";
 
 export type TopProject = {
   id: number;
@@ -125,9 +126,13 @@ export async function upload({
   }
 
   // Upload the file to S3
+  const projectData = JSON.stringify({ projectId, name, content });
+  const compressedProjectData = zlib.gzipSync(projectData);
   await uploadFileToS3(
     projectId,
-    JSON.stringify({ projectId, name, content }),
+    compressedProjectData,
+    "application/json",
+    "gzip"
   );
 
   console.log(`Project ${projectId} uploaded successfully to S3`);
@@ -146,7 +151,8 @@ export async function upload({
 
   console.log(`Generated preview HTML for project ${projectId}`);
   // Upload the preview HTML to S3 with the key `${projectId}-share`
-  await uploadFileToS3(`${projectId}.html`, previewHtml, "text/html");
+  const compressedPreviewHtml = zlib.gzipSync(previewHtml);
+  await uploadFileToS3(`${projectId}.html`, compressedPreviewHtml, "text/html", "gzip");
   console.log(`Preview HTML uploaded for project ${projectId}`);
 
   if (existingProject) {
