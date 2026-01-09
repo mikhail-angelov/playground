@@ -2,6 +2,9 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getIsAuthenticated } from "@/lib/actions/auth";
+import {
+  Image as ImageIcon,
+} from "lucide-react";
 
 export default async function Home() {
   const isAuthenticated = await getIsAuthenticated();
@@ -101,6 +104,15 @@ export default async function Home() {
                 <img src="/lodash.png" alt="Lodash" className="w-8 h-8" />
               </div>
               <span className="text-lg">Lodash</span>
+            </Link>
+            <Link
+              href="/image"
+              className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold p-6 rounded-lg transition-colors flex flex-col items-center justify-center gap-3"
+            >
+              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                <ImageIcon className="w-8 h-8 text-white" />
+              </div>
+              <span className="text-lg">Image Editor</span>
             </Link>
           </div>
         </section>
