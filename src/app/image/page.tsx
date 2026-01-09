@@ -121,10 +121,9 @@ export default function Page() {
 
   const saveHistory = () => {
     if (!fabricRef.current || isHistoryLoading.current) return;
-
     // We store the canvas state as a JSON string
     // We include custom properties like isCropRect
-    const json = JSON.stringify(fabricRef.current.toJSON(['isCropRect', 'id', 'name', 'selectable', 'hasControls', 'hasBorders']));
+    const json = JSON.stringify(fabricRef.current.toJSON());
 
     setUndoStack(prev => {
       const last = prev[prev.length - 1];
