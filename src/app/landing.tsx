@@ -2,9 +2,7 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getIsAuthenticated } from "@/lib/actions/auth";
-import {
-  Image as ImageIcon,
-} from "lucide-react";
+import { Image as ImageIcon, Box as BoxIcon } from "lucide-react";
 
 export default async function Home() {
   const isAuthenticated = await getIsAuthenticated();
@@ -19,7 +17,8 @@ export default async function Home() {
                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded transition-colors"
               >
                 Sign up
-              </Link>)}
+              </Link>
+            )}
             <Link
               href="/top"
               className="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded transition-colors"
@@ -65,7 +64,9 @@ export default async function Home() {
 
         {/* Predefined Playgrounds Section */}
         <section className="max-w-2xl w-full mt-16">
-          <h3 className="text-2xl font-bold mb-8 text-center">Predefined Playgrounds</h3>
+          <h3 className="text-2xl font-bold mb-8 text-center">
+            Predefined Playgrounds
+          </h3>
           <div className="grid grid-cols-2 gap-4">
             {/* First Row */}
             <Link
@@ -113,6 +114,15 @@ export default async function Home() {
                 <ImageIcon className="w-8 h-8 text-white" />
               </div>
               <span className="text-lg">Image Editor</span>
+            </Link>
+            <Link
+              href="/3d"
+              className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold p-6 rounded-lg transition-colors flex flex-col items-center justify-center gap-3"
+            >
+              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                <BoxIcon className="w-8 h-8 text-white" />
+              </div>
+              <span className="text-lg">3D CAD</span>
             </Link>
           </div>
         </section>
