@@ -46,6 +46,7 @@ export async function getProject(
         fileContents: initialFileContents,
         preview: "",
         tags: [],
+        url: "",
       },
     ];
   }
@@ -74,10 +75,11 @@ export async function getProject(
           fileContents: initialFileContents,
           preview: "",
           tags: [],
+          url: "",
         },
       ];
     }
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_HOST}/${projectId}`);
+    const response = await fetch(`${process.env.APP_HOST}/${projectId}`);
 
     if (response.ok) {
       const { content } = await response.json();
@@ -95,6 +97,7 @@ export async function getProject(
           lastPublish: "",
           preview: "",
           tags: project.tags,
+          url: `${process.env.APP_HOST}/${projectId}.html`,
         },
       ];
     } else {

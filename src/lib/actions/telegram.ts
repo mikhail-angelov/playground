@@ -3,7 +3,15 @@
 import { db, users, projects } from "@/db";
 import { eq, sql } from "drizzle-orm";
 
-export async function getTelegramProjects(telegramNik: string) {
+export interface ProjectTelegramDto {
+  id: number;
+  projectId: string;
+  name: string;
+  image: string | null;
+  url: string;
+}
+
+export async function getTelegramProjects(telegramNik: string): Promise<ProjectTelegramDto[]> {
   try {
     // 1. Find user by telegram username (nik)
     // Ensure the username starts with @ if it's being compared to stored values
@@ -41,7 +49,11 @@ export async function getTelegramProjects(telegramNik: string) {
       )
       .all();
 
-    return userProjects;
+    const result =  userProjects.map((proj) => ({
+      ...proj,
+      url: `${process.env.APP_HOST}/${proj.projectId}.html`,
+    }));
+    return result;
   } catch (error) {
     console.error("Error fetching telegram projects:", error);
     return [];

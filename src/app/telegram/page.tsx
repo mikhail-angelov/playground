@@ -7,13 +7,7 @@ import { Loader2, ExternalLink, ShieldAlert, Cpu } from "lucide-react";
 import { getTelegramProjects } from "@/lib/actions/telegram";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-
-interface Project {
-  id: number;
-  projectId: string;
-  name: string;
-  image: string | null;
-}
+import type { ProjectTelegramDto } from "@/lib/actions/telegram";
 
 declare global {
   interface Window {
@@ -42,7 +36,7 @@ declare global {
 }
 
 export default function TelegramPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<ProjectTelegramDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [telegramNik, setTelegramNik] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +47,7 @@ export default function TelegramPage() {
     setLoading(true);
     try {
       const data = await getTelegramProjects(nik);
-      setProjects(data as Project[]);
+      setProjects(data as ProjectTelegramDto[]);
       if (data.length === 0) {
         setError(`No projects found for Telegram user: ${nik}. Make sure you saved this username in your profile and tagged projects with "telegram".`);
       } else {
@@ -178,7 +172,7 @@ export default function TelegramPage() {
             {projects.map((project) => (
               <Link
                 key={project.id}
-                href={`${process.env.NEXT_PUBLIC_APP_HOST}/${project.projectId}.html`}
+                href={project.url}
                 className="group relative aspect-square bg-[#1a1d23] rounded-2xl border border-zinc-800 overflow-hidden transition-all duration-300 hover:scale-105 hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]"
               >
                 {project.image ? (

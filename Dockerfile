@@ -11,10 +11,8 @@ RUN npm ci --omit=dev
 COPY ./.next ./.next
 COPY ./dist ./dist
 COPY ./public ./public
-COPY ./next.config.ts ./next.config.ts
+COPY ./next.config.js ./next.config.js
 
 EXPOSE 3000
 
 ENV NODE_ENV=production
-
-CMD ["npm", "start"]

@@ -5,6 +5,7 @@ import { v4 } from "uuid";
 import { uploadFileToS3 } from "./s3Service";
 import { previewTemplate } from "./preview.ejs";
 import zlib from "zlib";
+import { ProjectDto } from "@/dto/project.dto";
 
 export type TopProject = {
   id: number;
@@ -74,7 +75,7 @@ export async function generatePreviewHtml({
       Object.entries(content).find(([key]) => key.includes(".js"))?.[1] || "";
 
     // Get Yandex Metrica ID from env
-    const yandexMetricaId = process.env.NEXT_PUBLIC_YANDEX_METRICA_ID || '';
+    const yandexMetricaId = process.env.YANDEX_METRICA_ID || '';
     return ejs.render(previewTemplate, {
       name,
       description,
@@ -108,7 +109,7 @@ export async function upload({
   userId: number;
   email: string;
   tags: string[];
-}) {
+}): Promise<ProjectDto> {
   const existingProject = await db
     .select()
     .from(projects)
@@ -171,7 +172,7 @@ export async function upload({
     });
   }
 
-  return await getProject(projectId);
+  return await getProject(projectId, email);
 }
 
 export async function updateProject(
@@ -184,12 +185,34 @@ export async function updateProject(
     .where(eq(projects.projectId, projectId));
 }
 
-export async function getProject(  projectId: string) {
-  return await db
+export async function getProject(  projectId: string, email: string): Promise<ProjectDto> {
+  const project = await db
     .select()
     .from(projects)
     .where(eq(projects.projectId, projectId))
     .get();
+  if (!project) {
+    throw new Error("Project not found");
+  }
+  return {
+    isMy: project.email===email,
+    hasAi: false,
+    email: project.email,
+    name: project.name,
+    projectId: project.projectId,
+    lastPublish: "",
+    error: "",
+    isLoading: false,
+    selectedFile: "index.html",
+    fileContents: {
+      "index.html": "",
+      "style.css": "",
+      "script.js": "",
+    },
+    preview: "",
+    tags: project.tags,
+    url: `${process.env.APP_HOST}/${projectId}.html`,
+  };
 }
 
 // export async function deleteProject(projectId: string, userId: string) {

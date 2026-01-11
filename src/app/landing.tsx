@@ -122,7 +122,7 @@ export default async function Home() {
               <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
                 <BoxIcon className="w-8 h-8 text-white" />
               </div>
-              <span className="text-lg">3D CAD</span>
+              <span className="text-lg">3D View</span>
             </Link>
           </div>
         </section>

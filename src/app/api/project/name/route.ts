@@ -28,14 +28,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const project = await getProject(projectId);
-    if (project?.userId != userId) {
-      return NextResponse.json(
-        { error: "Unauthorized: No permissions to modify this project" },
-        { status: 400 }
-      );
-    }
-
+    const project = await getProject(projectId, user.email);
     const result = await updateProject(projectId, { name });
 
     return NextResponse.json(result);
@@ -43,7 +36,7 @@ export async function POST(req: NextRequest) {
     console.error("upload error:", e);
 
     return NextResponse.json(
-      { error: "Unauthorized: No token provided" },
+      { error: "Unauthorized: No permissions to modify this project" },
       { status: 400 }
     );
   }

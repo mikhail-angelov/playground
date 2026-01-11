@@ -23,4 +23,5 @@ export type ProjectDto = {
   fileContents: Content;
   preview: string;
   tags: string[];
+  url: string;
 };

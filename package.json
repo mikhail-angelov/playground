@@ -1,13 +1,14 @@
 {
   "name": "dash",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "next:dev": "ts-node --project tsconfig.server.json server.ts",
     "dev": "next dev --turbopack",
     "build": "next build && npm run build:server",
-    "build:server": "tsc --project tsconfig.server.json",
-    "start": "NODE_ENV=production node dist/server.js",
+    "build:server": "tsc --project tsconfig.server.json && mv dist/server.js dist/server.cjs",
+    "start": "NODE_ENV=production node dist/server.cjs",
     "next:start": "next start",
     "lint": "next lint",
     "test": "jest",

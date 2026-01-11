@@ -17,6 +17,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const appUrl = process.env.APP_URL || "http://localhost:3000";
 export const metadata: Metadata = {
   title: "JS2Go",
   description:
@@ -32,16 +33,17 @@ export const metadata: Metadata = {
     "web development",
     "online IDE",
     "creative coding",
+    "vibe coding",
   ],
   openGraph: {
     title: "JS2Go",
     description:
       "Create, share, and discover frontend projects instantly with JS2Go.",
-    url: "https://js2go.ru",
+    url: appUrl,
     siteName: "JS2Go",
     images: [
       {
-        url: "https://js2go.ru/og-image.png",
+        url: `${appUrl}/og-image.png`,
         width: 1200,
         height: 630,
         alt: "JS2Go Playground",
@@ -56,7 +58,7 @@ export const metadata: Metadata = {
     description:
       "Create, share, and discover frontend projects instantly with JS2Go.",
     site: "@js2go",
-    images: ["https://js2go.ru/og-image.png"],
+    images: [`${appUrl}/og-image.png`],
   },
   robots: "index, follow",
 };
@@ -67,7 +69,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const userPromise = getUser();
-  const yandexMetricaId = process.env.NEXT_PUBLIC_YANDEX_METRICA_ID ? Number(process.env.NEXT_PUBLIC_YANDEX_METRICA_ID) : 0;
+  const yandexMetricaId = process.env.YANDEX_METRICA_ID ? Number(process.env.YANDEX_METRICA_ID) : 0;
   return (
     <html lang="en">
       <body

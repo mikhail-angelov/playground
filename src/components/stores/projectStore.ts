@@ -45,6 +45,7 @@ export const initProjectStore = (): ProjectDto => {
     fileContents: initFileContents,
     preview: "",
     tags: [],
+    url: "",
   };
 };
 
@@ -61,6 +62,7 @@ export const defaultInitState: ProjectDto = {
   fileContents: initFileContents,
   preview: "",
   tags: [],
+  url: "",
 };
 
 export const createProjectStore = (
@@ -110,7 +112,7 @@ export const createProjectStore = (
             isLoading: false,
             name,
           });
-          return { success: true, url: `${process.env.NEXT_PUBLIC_APP_HOST}/${projectId}.html` };
+          return { success: true};
         }
 
         toast.error(`Failed to update project name: ${response.statusText}`);
@@ -188,8 +190,8 @@ export const createProjectStore = (
 
         if (response.ok) {
           toast.success("Project is uploaded successfully");
-          const a = await response.json();
-          console.log("---Project name updated:", a);
+          const project = await response.json();
+          console.log("---Project name updated:", project);
           set({
             error: "",
             lastPublish: new Date().toLocaleString(),
@@ -197,7 +199,7 @@ export const createProjectStore = (
             name,
             tags,
           });
-          return { success: true, url: `${process.env.NEXT_PUBLIC_APP_HOST}/${projectId}.html` };
+          return { success: true, url: project.url };
         }
 
         toast.error(`Failed to upload files: ${response.statusText}`);
