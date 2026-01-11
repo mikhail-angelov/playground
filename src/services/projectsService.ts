@@ -1,4 +1,4 @@
-import { db, users, projects, Project } from "@/db";
+import { db as defaultDb, users, projects, Project } from "@/db";
 import { eq } from "drizzle-orm";
 import ejs from "ejs";
 import { v4 } from "uuid";
@@ -15,8 +15,13 @@ export type TopProject = {
   userEmail: string | null;
 };
 
+
 export function getBestProjects(limit: number = 9): TopProject[] {
-  const topProjects = db
+  return getBestProjectsWithDb(defaultDb, limit);
+}
+
+export function getBestProjectsWithDb(dbInstance: typeof defaultDb, limit: number = 9): TopProject[] {
+  const topProjects = dbInstance
     .select({
       id: projects.id,
       projectId: projects.projectId,
@@ -34,8 +39,13 @@ export function getBestProjects(limit: number = 9): TopProject[] {
   }));
 }
 
+
 export function getMyProjects(userId: number): TopProject[] {
-  const items = db
+  return getMyProjectsWithDb(defaultDb, userId);
+}
+
+export function getMyProjectsWithDb(dbInstance: typeof defaultDb, userId: number): TopProject[] {
+  const items = dbInstance
     .select({
       id: projects.id,
       projectId: projects.projectId,
@@ -44,7 +54,7 @@ export function getMyProjects(userId: number): TopProject[] {
       userEmail: users.email,
     })
     .from(projects)
-    .innerJoin(users, eq(projects.userId, users.id)) // <-- Add this line
+    .innerJoin(users, eq(projects.userId, users.id))
     .where(eq(projects.userId, userId))
     .all();
 
@@ -101,6 +111,7 @@ export async function upload({
   userId,
   email,
   tags,
+  dbInstance = defaultDb,
 }: {
   name: string;
   projectId: string;
@@ -109,8 +120,9 @@ export async function upload({
   userId: number;
   email: string;
   tags: string[];
+  dbInstance?: typeof defaultDb;
 }): Promise<ProjectDto> {
-  const existingProject = await db
+  const existingProject = await dbInstance
     .select()
     .from(projects)
     .where(eq(projects.projectId, projectId))
@@ -157,12 +169,12 @@ export async function upload({
   console.log(`Preview HTML uploaded for project ${projectId}`);
 
   if (existingProject) {
-    await db
+    await dbInstance
       .update(projects)
       .set({ name, image, tags })
       .where(eq(projects.projectId, projectId));
   } else {
-    await db.insert(projects).values({
+    await dbInstance.insert(projects).values({
       userId: userId,
       email,
       name,
@@ -172,21 +184,26 @@ export async function upload({
     });
   }
 
-  return await getProject(projectId, email);
+  return await getProject(projectId, email, dbInstance);
 }
 
 export async function updateProject(
   projectId: string,
   updates: Partial<Project>,
+  dbInstance: typeof defaultDb = defaultDb,
 ) {
-  return await db
+  return await dbInstance
     .update(projects)
     .set(updates)
     .where(eq(projects.projectId, projectId));
 }
 
-export async function getProject(  projectId: string, email: string): Promise<ProjectDto> {
-  const project = await db
+export async function getProject(
+  projectId: string,
+  email: string,
+  dbInstance: typeof defaultDb = defaultDb
+): Promise<ProjectDto> {
+  const project = await dbInstance
     .select()
     .from(projects)
     .where(eq(projects.projectId, projectId))
@@ -195,7 +212,7 @@ export async function getProject(  projectId: string, email: string): Promise<Pr
     throw new Error("Project not found");
   }
   return {
-    isMy: project.email===email,
+    isMy: project.email === email,
     hasAi: false,
     email: project.email,
     name: project.name,

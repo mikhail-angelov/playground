@@ -2,10 +2,7 @@ import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
-  ListObjectsV2Command,
-  CopyObjectCommand,
   PutObjectCommandInput,
-  CopyObjectCommandInput,
 } from "@aws-sdk/client-s3";
 import { Readable } from "stream";
 import zlib from "zlib";
@@ -28,6 +25,9 @@ export const uploadFileToS3 = async (
   contentEncoding?: string,
 ): Promise<string> => {
   const bucket = process.env.S3_BUCKET || "";
+  if (!bucket) {
+    throw new Error("S3_BUCKET environment variable is not set");
+  }
 
   const params: PutObjectCommandInput = {
     Bucket: bucket,
