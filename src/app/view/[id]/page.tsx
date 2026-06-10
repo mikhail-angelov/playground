@@ -1,4 +1,5 @@
 import React from "react";
+import { notFound } from "next/navigation";
 import ViewProject from "./ViewProject";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -12,11 +13,11 @@ type Params = Promise<{ id: string }>;
 export default async function Page({ params }: { params: Params }) {
   const { id } = await params;
   const [project, error] = await getProject(id);
-  const preview = composePreview(project?.fileContents, project?.projectId);
-  if (error) {
-    return <div className="p-4 bg-red-600 text-white text-center">{error}</div>;
+  if (error || !project) {
+    notFound();
   }
-  const name = project?.name;
+  const preview = composePreview(project.fileContents, project.projectId);
+  const name = project.name;
 
   return (
     <div className="flex flex-col h-screen">

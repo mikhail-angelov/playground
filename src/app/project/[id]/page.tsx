@@ -1,4 +1,5 @@
 import React from "react";
+import { notFound } from "next/navigation";
 import { getProject } from "@/lib/actions/project";
 import Project from "./Project";
 
@@ -9,7 +10,7 @@ export default async function Page({ params }: { params: Params }) {
   const [project, error] = await getProject(id);
 
   if (error || !project) {
-    return <div className="p-4 bg-red-600 text-white text-center">{error}</div>;
+    notFound();
   }
 
   return <Project project={project}></Project>;
