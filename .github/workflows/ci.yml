@@ -1,8 +1,19 @@
 name: ci
 on:
+  pull_request:
   push:
     branches:
       - master
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
 jobs:
   test:
     name: test and lint
