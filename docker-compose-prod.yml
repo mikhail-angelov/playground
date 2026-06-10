@@ -1,7 +1,7 @@
 services:
   js2go:
     container_name: js2go
-    image: ghcr.io/mikhail-angelov/playground/playground:latest
+    image: ghcr.io/mikhail-angelov/playground:latest
     restart: unless-stopped
     networks:
       - proxy-net

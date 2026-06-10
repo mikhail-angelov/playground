@@ -19,6 +19,6 @@ install:
 
 deploy:
 	@echo "Deploying server..."
-	ssh root@$(HOST) "docker pull ghcr.io/mikhail-angelov/playground/playground:latest"
+	ssh root@$(HOST) "docker pull ghcr.io/mikhail-angelov/playground:latest"
 	ssh root@$(HOST) "cd /opt/playground && docker compose down"
 	ssh root@$(HOST) "cd /opt/playground && docker compose up -d"
