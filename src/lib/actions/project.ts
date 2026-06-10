@@ -59,25 +59,8 @@ export async function getProject(
       .from(projects)
       .where(eq(projects.projectId, projectId))
       .get();
-      console.log("---Project loaded:", project);
     if (!project) {
-      return [
-        {
-          isMy: true,
-          hasAi,
-          email: myEmail,
-          name: "New Project",
-          projectId: v4(),
-          lastPublish: "",
-          error: "",
-          isLoading: false,
-          selectedFile: "index.html",
-          fileContents: initialFileContents,
-          preview: "",
-          tags: [],
-          url: "",
-        },
-      ];
+      return [undefined, "Project not found"];
     }
     const response = await fetch(`${process.env.APP_HOST}/${projectId}`);
 
