@@ -23,7 +23,7 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const handleConsoleMessage = (event: MessageEvent) => {
-    if (event.data.type === "console") {
+    if (event.source === iframeRef.current?.contentWindow && event.data?.type === "console") {
       setConsoleOutput((prevOutput) => [...prevOutput, event.data.message]);
     }
   };
@@ -38,13 +38,14 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
   }, []);
 
   return (
-    <ResizablePanelGroup direction="vertical">
+    <ResizablePanelGroup tagName="section" aria-label="Application preview" direction="vertical">
       <ResizablePanel>
         <div className="flex justify-between items-center bg-gray-800 px-2 py-1">
           <Button asChild variant="outline">
             <a
               href={`/view/${project?.projectId}`}
               target="_blank"
+              aria-label="Open published project in a new tab"
             >
               <ViewIcon className="w-6 h-6" />
             </a>
@@ -60,6 +61,8 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
             )}
             <Button
               id="preview-run"
+              type="button"
+              aria-controls="application-preview"
               onClick={() => {
                 setPreview(composePreview(fileContents, project.projectId));
               }}
@@ -73,18 +76,27 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
           id="application-preview"
           ref={iframeRef}
           srcDoc={preview}
-          title="Preview"
+          title="Application preview"
           className="w-full h-full flex-1"
         />
       </ResizablePanel>
-      <ResizableHandle />
+      <ResizableHandle aria-label="Resize preview and console" />
       <ResizablePanel defaultSize={4}>
         <div className="w-full h-full overflow-y-auto">
           <div className="flex justify-between">
-            <h3 className="mx-2">Console Output</h3>
-            <Button variant="outline" className="size-xs" onClick={() => setConsoleOutput([])}>x</Button>
+            <h3 id="preview-console-title" className="mx-2">Console Output</h3>
+            <Button
+              type="button"
+              aria-label="Clear console output"
+              aria-controls="preview-console"
+              variant="outline"
+              className="size-xs"
+              onClick={() => setConsoleOutput([])}
+            >
+              <span aria-hidden="true">x</span>
+            </Button>
           </div>
-          <div id="preview-console" className="mx-2 ">
+          <div id="preview-console" role="log" aria-labelledby="preview-console-title" className="mx-2">
             {consoleOutput.map((message, index) => (
               <div key={index} className="text-sm">
                 {message}

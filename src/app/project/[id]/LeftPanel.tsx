@@ -34,8 +34,8 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
 
   if (isCollapsed) {
     return (
-      <div className="flex flex-col items-center space-y-4 p-2 bg-gray-900 h-full">
-        <Button onClick={toggleCollapse} variant="ghost">
+      <section aria-label="Project files" className="flex flex-col items-center space-y-4 p-2 bg-gray-900 h-full">
+        <Button type="button" onClick={toggleCollapse} variant="ghost" aria-expanded={false} aria-label="Expand files">
           <ChevronRight className="w-6 h-6 text-white" />
         </Button>
         {contentFiles.map((file) => (
@@ -43,6 +43,9 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
             key={file}
             variant="ghost"
             onClick={() => setSelectedFile(file)}
+            aria-pressed={file === selectedFile}
+            aria-label={file}
+            aria-controls="source-editor"
             className={`flex flex-col items-center p-0 ${
               file === selectedFile ? "bg-gray-700" : ""
             }`}
@@ -51,32 +54,36 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
             <span className="text-xs text-white">{file.split(".")[0]}</span>
           </Button>
         ))}
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <section aria-labelledby="project-files-title" className="flex flex-col h-full">
       <div className="flex justify-between bg-gray-800">
-        <span className="p-2 text-white">Files</span>
-        <Button onClick={toggleCollapse} variant="ghost">
+        <span id="project-files-title" className="p-2 text-white">Files</span>
+        <Button type="button" onClick={toggleCollapse} variant="ghost" aria-expanded={true} aria-label="Collapse files">
           <ChevronLeft className="w-6 h-6 text-white" />
         </Button>
       </div>
       <ul className="text-white">
         {contentFiles.map((file) => (
-          <li
-            key={file}
-            className={`cursor-pointer text-sm p-2 ${
-              file === selectedFile ? "bg-gray-700" : ""
-            }`}
-            onClick={() => setSelectedFile(file)}
-          >
-            {file}
+          <li key={file}>
+            <button
+              type="button"
+              className={`block w-full cursor-pointer p-2 text-left text-sm ${
+                file === selectedFile ? "bg-gray-700" : ""
+              }`}
+              onClick={() => setSelectedFile(file)}
+              aria-controls="source-editor"
+              aria-pressed={file === selectedFile}
+            >
+              {file}
+            </button>
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 };
 

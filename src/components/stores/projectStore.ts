@@ -11,7 +11,7 @@ export type ProjectActions = {
   setError: (error: string) => void;
   setSelectedFile: (file: keyof Content) => void;
   setFileContent: (file: string, content: string) => void;
-  setContent: (data: Content) => void;
+  setContent: (data: Partial<Content>) => void;
   getPreview: () => string;
   triggerPreview: () => void;
   uploadFiles: (
@@ -150,7 +150,7 @@ export const createProjectStore = (
         return newState;
       });
     },
-    setContent: (data: Content) => {
+    setContent: (data) => {
       set((state) => {
         const newFileContents = { ...state.fileContents, ...data };
         const newState = { ...state, fileContents: newFileContents };

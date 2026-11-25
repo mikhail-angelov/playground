@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { toast } from "sonner"; // Import the toast function
+import { toast } from "sonner";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -9,76 +9,85 @@ interface ChatMessage {
 interface AiState {
   requestAi: (text: string, files?: any) => Promise<void>;
   clearHistory: () => void;
-  isLoading: boolean;
+  status: "idle" | "generating" | "completed" | "error";
+  error: string;
   response: string;
   history: ChatMessage[];
 }
 
 export const useAiStore = create<AiState>((set, get) => ({
   response: "",
-  isLoading: false,
+  status: "idle",
+  error: "",
   history: [],
-  clearHistory: () => set({ history: [], response: "" }),
+  clearHistory: () => set({ history: [], response: "", status: "idle", error: "" }),
   requestAi: async (text: string, files?: any) => {
-    const currentHistory = get().history;
-    set((state) => ({
-      isLoading: true,
+    const { history, status } = get();
+    if (status === "generating") return;
+    set({
+      status: "generating",
+      error: "",
       response: "✨ AI magic is processing...",
-    }));
+    });
 
     try {
       const response = await fetch("/api/ai", {
         method: "POST",
         body: JSON.stringify({ 
             prompt: text,
-            history: currentHistory,
+            history,
             files
         }),
       });
 
       if (!response.ok || !response.body) {
-        console.error("Failed to ai request:", response.statusText);
-        toast.error(`Failed to ai request: ${response.statusText}`);
-        set({ isLoading: false });
-        return;
+        throw new Error(`Generation failed (HTTP ${response.status}).`);
       }
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let result = "";
+      let pending = "";
+      let completed = false;
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        for (const line of chunk.replaceAll("data:", "").split("\n")) {
-          if (!line.trim()) continue;
-          try {
-            const json = JSON.parse(line);
-            if (json?.content) {
-              if (json.content === "[DONE]") continue;
-              if (result === "✨ AI magic is processing...") result = "";
-              result += json.content;
-              set({ response: result });
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          pending += decoder.decode(value, { stream: true });
+          const lines = pending.split("\n");
+          pending = lines.pop() ?? "";
+          for (const line of lines) {
+            if (!line.startsWith("data:")) continue;
+            const { content } = JSON.parse(line.slice(5));
+            if (content === "[DONE]") {
+              completed = true;
+            } else if (typeof content === "string" && !completed) {
+              result += content;
             }
-          } catch (e) {
-            // Ignore parse errors for incomplete lines
           }
+          if (result) set({ response: result });
         }
+      } finally {
+        reader.releaseLock();
       }
-      
-      set((state) => ({ 
-        isLoading: false,
+
+      if (!completed) throw new Error("Generation ended before the response was complete.");
+      if (!result.trim()) throw new Error("Generation returned no response.");
+
+      set((state) => ({
+        status: "completed",
         history: [
             ...state.history,
             { role: "user", content: text },
             { role: "assistant", content: result }
         ]
       }));
-    } catch (err) {
-      console.error("Error ai request:", err);
-      toast.error("Error ai request");
-      set({ isLoading: false });
+    } catch (error) {
+      console.error("AI request failed:", error);
+      const message = error instanceof Error ? error.message : "Generation failed.";
+      set({ status: "error", error: message });
+      toast.error(message);
     }
   },
 }));

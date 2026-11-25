@@ -47,16 +47,17 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ width }) => {
   }, [selectedFile]);
 
   return (
-    <div id="source-editor" className="flex-grow p-1 h-full" style={{ width: `${width}px` }}>
+    <section id="source-editor" aria-label="Source editor" className="flex-grow p-1 h-full" style={{ width: `${width}px` }}>
       <Editor
         height="100%"
         defaultLanguage={language}
         value={fileContent}
         onChange={(value) => setFileContent(selectedFile, value || "")}
+        options={{ ariaLabel: `Source code for ${selectedFile}` }}
         theme="vs-dark"
         onMount={(editor) => (editorRef.current = editor)}
       />
-    </div>
+    </section>
   );
 };
 

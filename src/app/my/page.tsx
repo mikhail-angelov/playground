@@ -19,15 +19,15 @@ export default async function Page() {
         <Header
           right={
             <div className="flex items-center space-x-4">
-              <LinkButton id="new-project" href="/project/new">New</LinkButton>
+              <LinkButton id="new-project" href="/project/new" aria-label="New project">New</LinkButton>
               <AuthButtons />
             </div>
           }
         />
-        <div className="flex flex-col items-center justify-center h-screen bg-[#18191a] text-white">
-          <h1 className="text-2xl font-bold mb-4">Unauthorized</h1>
+        <main className="flex flex-col items-center justify-center h-screen bg-[#18191a] text-white" aria-labelledby="projects-unauthorized">
+          <h1 id="projects-unauthorized" className="text-2xl font-bold mb-4">Unauthorized</h1>
           <p className="mb-4">You must be logged in to view your projects.</p>
-        </div>
+        </main>
         <Footer />
       </div>
     );
@@ -41,15 +41,15 @@ export default async function Page() {
       <Header
         right={
           <div className="flex items-center space-x-4">
-            <LinkButton id="new-project" href="/project/new">New</LinkButton>
+            <LinkButton id="new-project" href="/project/new" aria-label="New project">New</LinkButton>
             <AuthButtons />
           </div>
         }
         center={<ProjectTabs active="my" />}
       />
-      <div className="flex flex-col items-center flex-1 overflow-hidden">
-        <ProjectList projects={myProjects} />
-      </div>
+      <main aria-label="My projects" className="flex flex-col items-center flex-1 overflow-hidden">
+        <ProjectList projects={myProjects} label="My projects" />
+      </main>
       <Footer />
     </div>
   );

@@ -4,20 +4,23 @@ import { TopProject } from "@/services/projectsService";
 
 interface Props {
   projects: TopProject[];
+  label: string;
 }
 
-const ProjectList: React.FC<Props> = ({ projects }: Props) => {
+const ProjectList: React.FC<Props> = ({ projects, label }: Props) => {
   return (
-    <div
+    <ul
       id="project-list"
-            className="grid grid-cols-3 gap-4 overflow-y-auto overflow-x-hidden flex-1  w-full max-w-[1500px] p-4 custom-scrollbar"
+      aria-label={label}
+      className="grid grid-cols-3 gap-4 overflow-y-auto overflow-x-hidden flex-1 w-full max-w-[1500px] p-4 custom-scrollbar"
       style={{
         gridTemplateRows: "repeat(auto-fill, minmax(200px, 1fr))",
-      }}    >
-      {projects.map((project, index) => (
-        <ProjectTile project={project} key={index} />
+      }}
+    >
+      {projects.map((project) => (
+        <ProjectTile project={project} key={project.id} />
       ))}
-    </div>
+    </ul>
   );
 };
 

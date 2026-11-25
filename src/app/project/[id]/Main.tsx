@@ -30,6 +30,7 @@ export default function Main({ project }: { project: ProjectDto }) {
   });
   const [uiState, setUIState] = useState(UI_STATE.PREVIEW);
   const { selectedFile } = useProjectStore((state) => state);
+  const panelName = project.hasAi ? "preview and AI panel" : "preview panel";
 
   useEffect(() => {
     setWindowSize({
@@ -53,7 +54,7 @@ export default function Main({ project }: { project: ProjectDto }) {
   );
 
   return (
-    <ResizablePanelGroup direction="horizontal">
+    <ResizablePanelGroup tagName="main" aria-label="Project workspace" direction="horizontal">
       <ResizablePanel
         onResize={(width) => setLeftPanelWidth(width)}
         defaultSize={16}
@@ -65,11 +66,11 @@ export default function Main({ project }: { project: ProjectDto }) {
           toggleCollapse={() => setIsLeftPanelCollapsed(!isLeftPanelCollapsed)}
         />
       </ResizablePanel>
-      <ResizableHandle />
+      <ResizableHandle aria-label="Resize files panel" />
       <ResizablePanel>
         <EditorPanel key={selectedFile} width={editorPanelWidth} />
       </ResizablePanel>
-      <ResizableHandle />
+      <ResizableHandle aria-label="Resize source editor" />
       <ResizablePanel
         onResize={(width) => setPreviewPanelWidth(width)}
         defaultSize={36}
@@ -79,6 +80,9 @@ export default function Main({ project }: { project: ProjectDto }) {
         {isPreviewCollapsed ? (
           <div className="bg-gray-900 border-l border-gray-700 flex flex-col">
             <Button
+              type="button"
+              aria-expanded={false}
+              aria-label={`Expand ${panelName}`}
               variant="ghost"
               onClick={() => setIsPreviewCollapsed(false)}
             >
@@ -90,6 +94,9 @@ export default function Main({ project }: { project: ProjectDto }) {
             {/* Preview and AI Tabs */}
             <div className="flex items-center bg-gray-800 px-2 py-1">
               <Button
+                type="button"
+                aria-expanded={true}
+                aria-label={`Collapse ${panelName}`}
                 onClick={() => setIsPreviewCollapsed(!isPreviewCollapsed)}
                 variant="ghost"
               >
@@ -97,6 +104,8 @@ export default function Main({ project }: { project: ProjectDto }) {
               </Button>
               <Button
                 id="preview-tab"
+                type="button"
+                aria-pressed={uiState === UI_STATE.PREVIEW}
                 onClick={() => setUIState(UI_STATE.PREVIEW)}
                 variant={uiState === UI_STATE.PREVIEW ? "default" : "outline"}
               >
@@ -106,6 +115,8 @@ export default function Main({ project }: { project: ProjectDto }) {
               {project.hasAi && (
                 <Button
                   id="ai-tab"
+                  type="button"
+                  aria-pressed={uiState === UI_STATE.AI}
                   onClick={() => setUIState(UI_STATE.AI)}
                   variant={uiState === UI_STATE.AI ? "default" : "outline"}
                   className="ml-2"

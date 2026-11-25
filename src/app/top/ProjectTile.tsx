@@ -8,18 +8,23 @@ interface ProjectTileProps {
 }
 
 const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
+  const nameId = `project-${project.id}-name`;
+  const hasName = Boolean(project.name.trim());
+
   return (
-    <div className="bg-gray-800 shadow rounded overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col min-h-[180px]">
+    <li className="bg-gray-800 shadow rounded overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col min-h-[180px]">
       <div className="flex-1 flex items-center justify-center w-full">
         <Link
           id={`project-${project.id}`}
+          aria-labelledby={hasName ? nameId : undefined}
+          aria-label={hasName ? undefined : `Project ${project.id}`}
           href={`project/${project?.projectId}`}
           className="w-full h-full flex items-center justify-center relative"
         >
           {project?.image ? (
             <Image
               src={project.image}
-              alt={project.name}
+              alt=""
               fill
               className="object-contain w-full h-full cursor-pointer"
               unoptimized={project.image.startsWith('data:')}
@@ -32,11 +37,11 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
         </Link>
       </div>
       <div className="px-2 py-1 bg-gray-900 w-full flex-shrink-0">
-        <h3 className="text-xs font-bold truncate text-gray-100 text-center">
-          {project ? project.name : "Placeholder"}
+        <h3 id={nameId} className="text-xs font-bold truncate text-gray-100 text-center">
+          {project.name}
         </h3>
       </div>
-    </div>
+    </li>
   );
 };
 

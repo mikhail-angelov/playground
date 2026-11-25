@@ -6,12 +6,14 @@ import HomeButton from "@/components/HomeButton";
 import AuthButtons from "@/components/AuthButtons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Main from "./Main";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { CheckIcon } from "lucide-react";
 import { ProjectDto } from "@/dto/project.dto";
+
+const projectNameClass =
+  "flex items-center border border-gray-700 p-2 h-[36px] rounded-lg text-sm leading-none font-medium select-none";
 
 export default function Project({ project }: { project: ProjectDto }) {
   const { setContent, setName, setTags } = useProjectStore((state) => state);
@@ -44,12 +46,6 @@ export default function Project({ project }: { project: ProjectDto }) {
   };
   console.log("---:", project );
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSave();
-    }
-  };
-
   return (
     <div className="flex flex-col h-screen">
       <Header
@@ -57,31 +53,44 @@ export default function Project({ project }: { project: ProjectDto }) {
           <div className="flex items-center space-x-4">
             <HomeButton />
             {isEditing ? (
-              <div className="flex items-center space-x-2">
+              <form
+                className="flex items-center space-x-2"
+                aria-label="Rename project"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  handleSave();
+                }}
+              >
+                <label htmlFor="project-name" className="sr-only">Project name</label>
                 <Input
+                  id="project-name"
+                  name="projectName"
                   type="text"
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
-                  onKeyDown={handleKeyDown}
                   disabled={!project.isMy}
                 />
-                <Button variant="ghost" onClick={handleSave}>
+                <Button type="submit" variant="ghost" aria-label="Save project name">
                   <CheckIcon className="w-6 h-6" />
                 </Button>
-              </div>
-            ) : (
-              <Label
-                className="border border-gray-700 p-2 h-[36px] rounded-lg"
-                onClick={() => project.isMy && setIsEditing(true)}
+              </form>
+            ) : project.isMy ? (
+              <button
+                type="button"
+                aria-label={newProjectName ? `${newProjectName}, rename project` : "Rename project"}
+                className={projectNameClass}
+                onClick={() => setIsEditing(true)}
               >
                 {newProjectName}
-              </Label>
+              </button>
+            ) : (
+              <span className={projectNameClass}>{newProjectName}</span>
             )}
           </div>
         }
         right={
           <div className="flex space-x-4">
-            <LinkButton id="new-project" href="/project/new">New</LinkButton>
+            <LinkButton id="new-project" href="/project/new" aria-label="New project">New</LinkButton>
             <AuthButtons />
           </div>
         }

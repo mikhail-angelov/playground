@@ -26,15 +26,15 @@ const Top = async () => {
       <Header
         right={
           <div className="flex items-center space-x-4">
-            <LinkButton id="new-project" href="/project/new">New</LinkButton>
+            <LinkButton id="new-project" href="/project/new" aria-label="New project">New</LinkButton>
             <AuthButtons />
           </div>
         }
         center={<ProjectTabs active="top" />}
       />
-      <div className="flex flex-col items-center flex-1 overflow-hidden">
-        <ProjectList projects={topProjects} />
-      </div>
+      <main aria-label="Trends" className="flex flex-col items-center flex-1 overflow-hidden">
+        <ProjectList projects={topProjects} label="Trending projects" />
+      </main>
       <Footer />
     </div>
   );

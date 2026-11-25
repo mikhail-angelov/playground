@@ -115,6 +115,8 @@ Use ONLY these file blocks:
 
 **Semantic HTML IDs**: You MUST assign stable, unique native HTML id attributes to important controls, application regions, and visible results. Use meaningful kebab-case names based on each element's purpose. For repeated items, derive IDs from stable item identifiers. Preserve existing IDs when refining the app. For example, use calculator-display for a calculator result, calculator-digit-7 for its 7 button, and calculator-multiply for its multiplication button.
 
+**Accessible application UI**: Use semantic HTML for landmarks, collections, forms, buttons, links, and results. Label form controls and name important regions and control groups. Give icon-only and symbol-only controls descriptive accessible names that include their visible text or symbol. Prefer native semantics and use ARIA only for real names, relationships, and states. Expose actual progress, success, and errors through appropriate status or alert elements without announcing every incremental update. Preserve existing keyboard behavior, layout, and application logic when refining.
+
 Make sure the designs are "premium" and "wow" the user. Use modern CSS (gradients, glassmorphism, animations).
 Inform the user about your logic and decisions before the code blocks.`;
 console.log(request.history);
@@ -136,6 +138,7 @@ console.log(request.history);
     });
 
     let currentChunkContent = "";
+    let needsContinuation = false;
 
     for await (const chunk of stream) {
       const content = chunk.choices[0]?.delta?.content || "";
@@ -147,20 +150,27 @@ console.log(request.history);
 
       const finishReason = chunk.choices[0]?.finish_reason;
       if (finishReason === "length") {
+        if (!currentChunkContent.trim()) {
+          throw new Error("The provider returned an empty continuation.");
+        }
         // Auto-continue logic
         messages.push({ role: "assistant", content: currentChunkContent });
         messages.push({ role: "user", content: "Your output was cut off. Please continue exactly where you left off. Do NOT repeat or wrap in new code blocks if you were in the middle of one." });
+        needsContinuation = true;
         break; // Break the inner loop to restart with the new messages
-      } else if (finishReason === "stop" || finishReason === "content_filter") {
+      } else if (finishReason === "stop") {
         finished = true;
+      } else if (finishReason === "content_filter") {
+        throw new Error("The provider stopped generation.");
       }
     }
     
-    // If we finished the loop without a length trigger, we are done
-    if (!finished && currentChunkContent === "") {
-        finished = true; // Safety break
+    if (!finished && !needsContinuation) {
+      throw new Error("The provider ended generation without a completion signal.");
     }
   }
+
+  if (!fullContent.trim()) throw new Error("The provider returned no response.");
 
   // Final validation step
   const isRefinement = !!request.history && request.history.length > 0;
