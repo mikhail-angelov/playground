@@ -1,0 +1,8 @@
+{
+  "revision": "R2",
+  "sourceSha": "0358bed018603f2bfba0f1eaac2fbf8b7ef514c4",
+  "sourceTree": "5be7a9f8b17ad8601d177ddffe307dc86b8e4f7a",
+  "provider": "deepseek",
+  "model": "deepseek-chat",
+  "fixtureSha256": "f95b27b82ccbb2d3345be1d117135b6d2edc5aa66bbbffada8951ba60ae9fe19"
+}

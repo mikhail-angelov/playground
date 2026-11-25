@@ -1,0 +1,10 @@
+--- a/harness/report.mjs
++++ b/harness/report.mjs
+@@ -115,4 +115,5 @@
+     for (const [metric, label] of Object.entries(labels)) {
+-      const [r0, r1, r2] = revisions.map((revision) => data[revision][metric]);
+-      const values = [r0, r1, r2, delta(r0, r1), delta(r1, r2)];
++      const [r0, r1, r2] = revisions.map((revision) => data[revision].trials || metric === "trials" ? data[revision][metric] : null);
++      const values = [r0, r1, r2, data.R0.trials && data.R1.trials ? delta(r0, r1) : null,
++        data.R1.trials && data.R2.trials ? delta(r1, r2) : null];
+       md.push(`| ${label} | ${values.map(display).join(" | ")} |`);

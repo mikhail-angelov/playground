@@ -1,0 +1,67 @@
+--- a/index.html
++++ b/index.html
+@@ -16,33 +16,33 @@
+   <main id="calculator" class="calculator" aria-label="Calculator">
+     <div class="display">
+       <div class="display__history" id="history">&nbsp;</div>
+-      <div class="display__result" id="calculator-display">0</div>
++      <output class="display__result" id="calculator-display" aria-label="Result">0</output>
+     </div>
+ 
+-    <div class="keypad">
+-      <button id="calculator-clear" class="btn btn--fn" data-action="clear">AC</button>
+-      <button id="calculator-toggle-sign" class="btn btn--fn" data-action="sign">±</button>
+-      <button id="calculator-percent" class="btn btn--fn" data-action="percent">%</button>
+-      <button id="calculator-divide" class="btn btn--op" data-action="operator" data-op="÷">÷</button>
++    <div class="keypad" role="group" aria-label="Calculator controls">
++      <button id="calculator-clear" type="button" aria-label="AC Clear" class="btn btn--fn" data-action="clear">AC</button>
++      <button id="calculator-toggle-sign" type="button" aria-label="± Toggle sign" class="btn btn--fn" data-action="sign">±</button>
++      <button id="calculator-percent" type="button" aria-label="% Percent" class="btn btn--fn" data-action="percent">%</button>
++      <button id="calculator-divide" type="button" aria-label="÷ Divide" class="btn btn--op" data-action="operator" data-op="÷">÷</button>
+ 
+-      <button id="calculator-digit-7" class="btn btn--num" data-action="digit" data-digit="7">7</button>
+-      <button id="calculator-digit-8" class="btn btn--num" data-action="digit" data-digit="8">8</button>
+-      <button id="calculator-digit-9" class="btn btn--num" data-action="digit" data-digit="9">9</button>
+-      <button id="calculator-multiply" class="btn btn--op" data-action="operator" data-op="×">×</button>
++      <button id="calculator-digit-7" type="button" class="btn btn--num" data-action="digit" data-digit="7">7</button>
++      <button id="calculator-digit-8" type="button" class="btn btn--num" data-action="digit" data-digit="8">8</button>
++      <button id="calculator-digit-9" type="button" class="btn btn--num" data-action="digit" data-digit="9">9</button>
++      <button id="calculator-multiply" type="button" aria-label="× Multiply" class="btn btn--op" data-action="operator" data-op="×">×</button>
+ 
+-      <button id="calculator-digit-4" class="btn btn--num" data-action="digit" data-digit="4">4</button>
+-      <button id="calculator-digit-5" class="btn btn--num" data-action="digit" data-digit="5">5</button>
+-      <button id="calculator-digit-6" class="btn btn--num" data-action="digit" data-digit="6">6</button>
+-      <button id="calculator-subtract" class="btn btn--op" data-action="operator" data-op="−">−</button>
++      <button id="calculator-digit-4" type="button" class="btn btn--num" data-action="digit" data-digit="4">4</button>
++      <button id="calculator-digit-5" type="button" class="btn btn--num" data-action="digit" data-digit="5">5</button>
++      <button id="calculator-digit-6" type="button" class="btn btn--num" data-action="digit" data-digit="6">6</button>
++      <button id="calculator-subtract" type="button" aria-label="− Subtract" class="btn btn--op" data-action="operator" data-op="−">−</button>
+ 
+-      <button id="calculator-digit-1" class="btn btn--num" data-action="digit" data-digit="1">1</button>
+-      <button id="calculator-digit-2" class="btn btn--num" data-action="digit" data-digit="2">2</button>
+-      <button id="calculator-digit-3" class="btn btn--num" data-action="digit" data-digit="3">3</button>
+-      <button id="calculator-add" class="btn btn--op" data-action="operator" data-op="+">+</button>
++      <button id="calculator-digit-1" type="button" class="btn btn--num" data-action="digit" data-digit="1">1</button>
++      <button id="calculator-digit-2" type="button" class="btn btn--num" data-action="digit" data-digit="2">2</button>
++      <button id="calculator-digit-3" type="button" class="btn btn--num" data-action="digit" data-digit="3">3</button>
++      <button id="calculator-add" type="button" aria-label="+ Add" class="btn btn--op" data-action="operator" data-op="+">+</button>
+ 
+-      <button id="calculator-digit-0" class="btn btn--num btn--zero" data-action="digit" data-digit="0">0</button>
+-      <button id="calculator-decimal" class="btn btn--num" data-action="decimal">.</button>
+-      <button id="calculator-equals" class="btn btn--equals" data-action="equals">=</button>
++      <button id="calculator-digit-0" type="button" class="btn btn--num btn--zero" data-action="digit" data-digit="0">0</button>
++      <button id="calculator-decimal" type="button" aria-label=". Decimal point" class="btn btn--num" data-action="decimal">.</button>
++      <button id="calculator-equals" type="button" aria-label="= Equals" class="btn btn--equals" data-action="equals">=</button>
+     </div>
+   </main>
+ 
+--- a/style.css
++++ b/style.css
+@@ -125,6 +125,7 @@
+ }
+ 
+ .display__result {
++  display: block;
+   font-size: 44px;
+   font-weight: 300;
+   letter-spacing: -0.5px;

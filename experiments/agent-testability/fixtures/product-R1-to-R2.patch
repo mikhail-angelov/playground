@@ -1,0 +1,939 @@
+diff --git a/src/app/my/page.tsx b/src/app/my/page.tsx
+index bc45618..bdb5bd6 100644
+--- a/src/app/my/page.tsx
++++ b/src/app/my/page.tsx
+@@ -19,15 +19,15 @@ export default async function Page() {
+         <Header
+           right={
+             <div className="flex items-center space-x-4">
+-              <LinkButton id="new-project" href="/project/new">New</LinkButton>
++              <LinkButton id="new-project" href="/project/new" aria-label="New project">New</LinkButton>
+               <AuthButtons />
+             </div>
+           }
+         />
+-        <div className="flex flex-col items-center justify-center h-screen bg-[#18191a] text-white">
+-          <h1 className="text-2xl font-bold mb-4">Unauthorized</h1>
++        <main className="flex flex-col items-center justify-center h-screen bg-[#18191a] text-white" aria-labelledby="projects-unauthorized">
++          <h1 id="projects-unauthorized" className="text-2xl font-bold mb-4">Unauthorized</h1>
+           <p className="mb-4">You must be logged in to view your projects.</p>
+-        </div>
++        </main>
+         <Footer />
+       </div>
+     );
+@@ -41,15 +41,15 @@ export default async function Page() {
+       <Header
+         right={
+           <div className="flex items-center space-x-4">
+-            <LinkButton id="new-project" href="/project/new">New</LinkButton>
++            <LinkButton id="new-project" href="/project/new" aria-label="New project">New</LinkButton>
+             <AuthButtons />
+           </div>
+         }
+         center={<ProjectTabs active="my" />}
+       />
+-      <div className="flex flex-col items-center flex-1 overflow-hidden">
+-        <ProjectList projects={myProjects} />
+-      </div>
++      <main aria-label="My projects" className="flex flex-col items-center flex-1 overflow-hidden">
++        <ProjectList projects={myProjects} label="My projects" />
++      </main>
+       <Footer />
+     </div>
+   );
+diff --git a/src/app/project/[id]/AiPanel.tsx b/src/app/project/[id]/AiPanel.tsx
+index 9b476e7..5ccdd27 100644
+--- a/src/app/project/[id]/AiPanel.tsx
++++ b/src/app/project/[id]/AiPanel.tsx
+@@ -13,15 +13,28 @@ import { useProjectStore } from "@/components/providers/ProjectStoreProvider";
+ import { useAiStore } from "@/components/stores/useAi";
+ import { Content } from "@/dto/project.dto";
+ 
++const generationStatus = {
++  idle: "Ready to generate",
++  generating: "Generating application",
++  completed: "Generation completed",
++  error: "Generation failed",
++};
++
+ const AiPanel: React.FC = () => {
+   const { setContent, fileContents } = useProjectStore((state) => state);
+-  const isLoading = useAiStore((state) => state.isLoading);
++  const status = useAiStore((state) => state.status);
++  const generationError = useAiStore((state) => state.error);
++  const isLoading = status === "generating";
+   const response = useAiStore((state) => state.response);
+   const requestAi = useAiStore((state) => state.requestAi);
+   const clearHistory = useAiStore((state) => state.clearHistory);
+   const history = useAiStore((state) => state.history);
+   const [text, setText] = React.useState("");
+   const [historyIndex, setHistoryIndex] = React.useState<number | null>(null);
++  const [applyFeedback, setApplyFeedback] = React.useState<{
++    status: "applied" | "error";
++    message: string;
++  } | null>(null);
+   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+   const markdownRef = React.useRef<HTMLDivElement>(null);
+ 
+@@ -40,13 +53,17 @@ const AiPanel: React.FC = () => {
+     }
+   };
+   const copyCodeToProject = () => {
+-    if (Object.keys(codeSummary).length === 0) {
+-      toast.error("No code to copy");
++    const files = Object.keys(codeSummary);
++    if (files.length === 0) {
++      const message = "No generated code to apply";
++      setApplyFeedback({ status: "error", message });
++      toast.error(message);
+       return;
+     }
+-    // Only pass keys that were actually collected
+-    setContent(codeSummary as Content);
+-    toast.success("Code patched into project");
++    setContent(codeSummary);
++    const message = `Code applied to ${files.join(", ")}`;
++    setApplyFeedback({ status: "applied", message });
++    toast.success(message);
+   };
+ 
+   // Scroll to bottom when response changes
+@@ -56,8 +73,10 @@ const AiPanel: React.FC = () => {
+     }
+   }, [response]);
+ 
+-  const handleRequestAi = () => {
++  const handleRequestAi = (event: React.FormEvent<HTMLFormElement>) => {
++    event.preventDefault();
+     requestAi(text, fileContents);
++    setApplyFeedback(null);
+     setText("");
+     setHistoryIndex(null);
+   };
+@@ -86,7 +105,7 @@ const AiPanel: React.FC = () => {
+       setHistoryIndex(newIndex);
+     } else if (e.key === "Enter" && !e.shiftKey) {
+       e.preventDefault();
+-      handleRequestAi();
++      e.currentTarget.form?.requestSubmit();
+     } else if (e.key === "ArrowDown" && historyIndex !== null) {
+       e.preventDefault();
+       if (historyIndex < userPrompts.length - 1) {
+@@ -110,14 +129,22 @@ const AiPanel: React.FC = () => {
+   }, [text]);
+ 
+   return (
+-    <ResizablePanelGroup direction="vertical">
++    <ResizablePanelGroup tagName="section" aria-label="AI assistant" direction="vertical">
+       <ResizablePanel className="flex flex-col !overflow-y-auto">
++        <p id="ai-status" role="status" className="sr-only">{generationStatus[status]}</p>
++        <p role="status" className="sr-only">
++          {applyFeedback?.status === "applied" && applyFeedback.message}
++        </p>
++        <p role="alert" className="sr-only">{generationError}</p>
++        <p role="alert" className="sr-only">
++          {applyFeedback?.status === "error" && applyFeedback.message}
++        </p>
+         <div
+-          id="ai-conversation"
+           ref={markdownRef}
+           className="flex-1 p-4 text-gray-300 whitespace-pre-wrap overflow-x-auto"
+           style={{ minHeight: 0, height: "100%", overflowY: "auto" }}
+         >
++          <div id="ai-conversation" role="log" aria-label="Conversation" aria-busy={isLoading}>
+           {history.map((msg, i) => (
+             <div key={i} className={`mb-6 ${msg.role === 'user' ? 'opacity-80' : ''}`}>
+               <div className="text-xs font-bold mb-1 uppercase tracking-wider text-gray-500">
+@@ -125,6 +152,7 @@ const AiPanel: React.FC = () => {
+               </div>
+               <ReactMarkdown
+                 components={{
++                  pre: ({ children }) => <>{children}</>,
+                   code({ node, className, children, ...props }) {
+                     if (!className) return <code {...props}>{children}</code>;
+                     const isLatest = !isLoading && i === history.length - 1 && msg.role === 'assistant';
+@@ -136,6 +164,7 @@ const AiPanel: React.FC = () => {
+                           className="absolute top-2 left-2 z-10 opacity-70 hover:opacity-100 bg-[#232323] rounded p-1 transition"
+                           onClick={() => handleCopy(String(children).trim())}
+                           title="Copy to clipboard"
++                          aria-label="Copy to clipboard"
+                         >
+                           <Copy className="w-4 h-4" />
+                         </button>
+@@ -151,6 +180,7 @@ const AiPanel: React.FC = () => {
+               </ReactMarkdown>
+             </div>
+           ))}
++          </div>
+ 
+           {isLoading && (
+             <div className="mb-6">
+@@ -159,9 +189,9 @@ const AiPanel: React.FC = () => {
+               </div>
+               <ReactMarkdown
+                 components={{
++                  pre: ({ children }) => <>{children}</>,
+                   code({ node, className, children, ...props }) {
+                     if (!className) return <code {...props}>{children}</code>;
+-                    collectCode(className, String(children).trim(), true);
+                     return (
+                       <div className="relative group">
+                         <pre className="overflow-x-auto rounded bg-[#18181b] p-3 my-2 border border-blue-900/30">
+@@ -184,11 +214,13 @@ const AiPanel: React.FC = () => {
+           )}
+         </div>
+       </ResizablePanel>
+-      <ResizableHandle />
++      <ResizableHandle aria-label="Resize conversation and prompt" />
+       <ResizablePanel defaultSize={12} minSize={12}>
+-        <div className="flex h-full">
++        <form aria-label="Generate application" className="flex h-full" onSubmit={handleRequestAi}>
++          <label htmlFor="ai-prompt" className="sr-only">Application prompt</label>
+           <textarea
+             id="ai-prompt"
++            name="prompt"
+             ref={textareaRef}
+             className="w-full h-full p-2 bg-gray-900 text-white"
+             value={text}
+@@ -208,13 +240,18 @@ const AiPanel: React.FC = () => {
+           <div className="grid grid-cols-2 gap-2 m-1">
+           <Button
+             id="ai-generate"
+-            onClick={handleRequestAi}
++            type="submit"
++            aria-label="Generate application"
++            aria-controls="ai-conversation"
+             disabled={isLoading}
+           >
+             <SparklesIcon className="w-6 h-6" />
+           </Button>
+           <Button
+             id="ai-apply-code"
++            type="button"
++            aria-label="Apply generated code"
++            aria-controls="source-editor"
+             onClick={copyCodeToProject}
+             disabled={isLoading}
+             title="Patch generated code to project"
+@@ -223,15 +260,21 @@ const AiPanel: React.FC = () => {
+           </Button>
+           <Button
+             id="ai-clear-history"
++            type="button"
++            aria-label="Clear history"
++            aria-controls="ai-conversation"
+             className="bg-red-900/20 hover:bg-red-900/40 text-red-500 border border-red-900/50"
+-            onClick={clearHistory}
++            onClick={() => {
++              clearHistory();
++              setApplyFeedback(null);
++            }}
+             disabled={isLoading}
+             title="Clear history and start new session"
+           >
+             <SparklesIcon className="w-6 h-6 rotate-180" />
+           </Button>
+           </div>
+-        </div>
++        </form>
+       </ResizablePanel>
+     </ResizablePanelGroup>
+   );
+diff --git a/src/app/project/[id]/EditorPanel.tsx b/src/app/project/[id]/EditorPanel.tsx
+index 0483ac8..9eda9f4 100644
+--- a/src/app/project/[id]/EditorPanel.tsx
++++ b/src/app/project/[id]/EditorPanel.tsx
+@@ -47,16 +47,17 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ width }) => {
+   }, [selectedFile]);
+ 
+   return (
+-    <div id="source-editor" className="flex-grow p-1 h-full" style={{ width: `${width}px` }}>
++    <section id="source-editor" aria-label="Source editor" className="flex-grow p-1 h-full" style={{ width: `${width}px` }}>
+       <Editor
+         height="100%"
+         defaultLanguage={language}
+         value={fileContent}
+         onChange={(value) => setFileContent(selectedFile, value || "")}
++        options={{ ariaLabel: `Source code for ${selectedFile}` }}
+         theme="vs-dark"
+         onMount={(editor) => (editorRef.current = editor)}
+       />
+-    </div>
++    </section>
+   );
+ };
+ 
+diff --git a/src/app/project/[id]/LeftPanel.tsx b/src/app/project/[id]/LeftPanel.tsx
+index 979e972..dabcca3 100644
+--- a/src/app/project/[id]/LeftPanel.tsx
++++ b/src/app/project/[id]/LeftPanel.tsx
+@@ -34,8 +34,8 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
+ 
+   if (isCollapsed) {
+     return (
+-      <div className="flex flex-col items-center space-y-4 p-2 bg-gray-900 h-full">
+-        <Button onClick={toggleCollapse} variant="ghost">
++      <section aria-label="Project files" className="flex flex-col items-center space-y-4 p-2 bg-gray-900 h-full">
++        <Button type="button" onClick={toggleCollapse} variant="ghost" aria-expanded={false} aria-label="Expand files">
+           <ChevronRight className="w-6 h-6 text-white" />
+         </Button>
+         {contentFiles.map((file) => (
+@@ -43,6 +43,9 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
+             key={file}
+             variant="ghost"
+             onClick={() => setSelectedFile(file)}
++            aria-pressed={file === selectedFile}
++            aria-label={file}
++            aria-controls="source-editor"
+             className={`flex flex-col items-center p-0 ${
+               file === selectedFile ? "bg-gray-700" : ""
+             }`}
+@@ -51,32 +54,36 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
+             <span className="text-xs text-white">{file.split(".")[0]}</span>
+           </Button>
+         ))}
+-      </div>
++      </section>
+     );
+   }
+ 
+   return (
+-    <div className="flex flex-col h-full">
++    <section aria-labelledby="project-files-title" className="flex flex-col h-full">
+       <div className="flex justify-between bg-gray-800">
+-        <span className="p-2 text-white">Files</span>
+-        <Button onClick={toggleCollapse} variant="ghost">
++        <span id="project-files-title" className="p-2 text-white">Files</span>
++        <Button type="button" onClick={toggleCollapse} variant="ghost" aria-expanded={true} aria-label="Collapse files">
+           <ChevronLeft className="w-6 h-6 text-white" />
+         </Button>
+       </div>
+       <ul className="text-white">
+         {contentFiles.map((file) => (
+-          <li
+-            key={file}
+-            className={`cursor-pointer text-sm p-2 ${
+-              file === selectedFile ? "bg-gray-700" : ""
+-            }`}
+-            onClick={() => setSelectedFile(file)}
+-          >
+-            {file}
++          <li key={file}>
++            <button
++              type="button"
++              className={`block w-full cursor-pointer p-2 text-left text-sm ${
++                file === selectedFile ? "bg-gray-700" : ""
++              }`}
++              onClick={() => setSelectedFile(file)}
++              aria-controls="source-editor"
++              aria-pressed={file === selectedFile}
++            >
++              {file}
++            </button>
+           </li>
+         ))}
+       </ul>
+-    </div>
++    </section>
+   );
+ };
+ 
+diff --git a/src/app/project/[id]/Main.tsx b/src/app/project/[id]/Main.tsx
+index 5191689..68d5c56 100644
+--- a/src/app/project/[id]/Main.tsx
++++ b/src/app/project/[id]/Main.tsx
+@@ -30,6 +30,7 @@ export default function Main({ project }: { project: ProjectDto }) {
+   });
+   const [uiState, setUIState] = useState(UI_STATE.PREVIEW);
+   const { selectedFile } = useProjectStore((state) => state);
++  const panelName = project.hasAi ? "preview and AI panel" : "preview panel";
+ 
+   useEffect(() => {
+     setWindowSize({
+@@ -53,7 +54,7 @@ export default function Main({ project }: { project: ProjectDto }) {
+   );
+ 
+   return (
+-    <ResizablePanelGroup direction="horizontal">
++    <ResizablePanelGroup tagName="main" aria-label="Project workspace" direction="horizontal">
+       <ResizablePanel
+         onResize={(width) => setLeftPanelWidth(width)}
+         defaultSize={16}
+@@ -65,11 +66,11 @@ export default function Main({ project }: { project: ProjectDto }) {
+           toggleCollapse={() => setIsLeftPanelCollapsed(!isLeftPanelCollapsed)}
+         />
+       </ResizablePanel>
+-      <ResizableHandle />
++      <ResizableHandle aria-label="Resize files panel" />
+       <ResizablePanel>
+         <EditorPanel key={selectedFile} width={editorPanelWidth} />
+       </ResizablePanel>
+-      <ResizableHandle />
++      <ResizableHandle aria-label="Resize source editor" />
+       <ResizablePanel
+         onResize={(width) => setPreviewPanelWidth(width)}
+         defaultSize={36}
+@@ -79,6 +80,9 @@ export default function Main({ project }: { project: ProjectDto }) {
+         {isPreviewCollapsed ? (
+           <div className="bg-gray-900 border-l border-gray-700 flex flex-col">
+             <Button
++              type="button"
++              aria-expanded={false}
++              aria-label={`Expand ${panelName}`}
+               variant="ghost"
+               onClick={() => setIsPreviewCollapsed(false)}
+             >
+@@ -90,6 +94,9 @@ export default function Main({ project }: { project: ProjectDto }) {
+             {/* Preview and AI Tabs */}
+             <div className="flex items-center bg-gray-800 px-2 py-1">
+               <Button
++                type="button"
++                aria-expanded={true}
++                aria-label={`Collapse ${panelName}`}
+                 onClick={() => setIsPreviewCollapsed(!isPreviewCollapsed)}
+                 variant="ghost"
+               >
+@@ -97,6 +104,8 @@ export default function Main({ project }: { project: ProjectDto }) {
+               </Button>
+               <Button
+                 id="preview-tab"
++                type="button"
++                aria-pressed={uiState === UI_STATE.PREVIEW}
+                 onClick={() => setUIState(UI_STATE.PREVIEW)}
+                 variant={uiState === UI_STATE.PREVIEW ? "default" : "outline"}
+               >
+@@ -106,6 +115,8 @@ export default function Main({ project }: { project: ProjectDto }) {
+               {project.hasAi && (
+                 <Button
+                   id="ai-tab"
++                  type="button"
++                  aria-pressed={uiState === UI_STATE.AI}
+                   onClick={() => setUIState(UI_STATE.AI)}
+                   variant={uiState === UI_STATE.AI ? "default" : "outline"}
+                   className="ml-2"
+diff --git a/src/app/project/[id]/PreviewPanel.tsx b/src/app/project/[id]/PreviewPanel.tsx
+index 5115522..b731ad7 100644
+--- a/src/app/project/[id]/PreviewPanel.tsx
++++ b/src/app/project/[id]/PreviewPanel.tsx
+@@ -23,7 +23,7 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
+   const iframeRef = useRef<HTMLIFrameElement>(null);
+ 
+   const handleConsoleMessage = (event: MessageEvent) => {
+-    if (event.data.type === "console") {
++    if (event.source === iframeRef.current?.contentWindow && event.data?.type === "console") {
+       setConsoleOutput((prevOutput) => [...prevOutput, event.data.message]);
+     }
+   };
+@@ -38,13 +38,14 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
+   }, []);
+ 
+   return (
+-    <ResizablePanelGroup direction="vertical">
++    <ResizablePanelGroup tagName="section" aria-label="Application preview" direction="vertical">
+       <ResizablePanel>
+         <div className="flex justify-between items-center bg-gray-800 px-2 py-1">
+           <Button asChild variant="outline">
+             <a
+               href={`/view/${project?.projectId}`}
+               target="_blank"
++              aria-label="Open published project in a new tab"
+             >
+               <ViewIcon className="w-6 h-6" />
+             </a>
+@@ -60,6 +61,8 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
+             )}
+             <Button
+               id="preview-run"
++              type="button"
++              aria-controls="application-preview"
+               onClick={() => {
+                 setPreview(composePreview(fileContents, project.projectId));
+               }}
+@@ -73,18 +76,27 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
+           id="application-preview"
+           ref={iframeRef}
+           srcDoc={preview}
+-          title="Preview"
++          title="Application preview"
+           className="w-full h-full flex-1"
+         />
+       </ResizablePanel>
+-      <ResizableHandle />
++      <ResizableHandle aria-label="Resize preview and console" />
+       <ResizablePanel defaultSize={4}>
+         <div className="w-full h-full overflow-y-auto">
+           <div className="flex justify-between">
+-            <h3 className="mx-2">Console Output</h3>
+-            <Button variant="outline" className="size-xs" onClick={() => setConsoleOutput([])}>x</Button>
++            <h3 id="preview-console-title" className="mx-2">Console Output</h3>
++            <Button
++              type="button"
++              aria-label="Clear console output"
++              aria-controls="preview-console"
++              variant="outline"
++              className="size-xs"
++              onClick={() => setConsoleOutput([])}
++            >
++              <span aria-hidden="true">x</span>
++            </Button>
+           </div>
+-          <div id="preview-console" className="mx-2 ">
++          <div id="preview-console" role="log" aria-labelledby="preview-console-title" className="mx-2">
+             {consoleOutput.map((message, index) => (
+               <div key={index} className="text-sm">
+                 {message}
+diff --git a/src/app/project/[id]/Project.tsx b/src/app/project/[id]/Project.tsx
+index b358381..b34bbc1 100644
+--- a/src/app/project/[id]/Project.tsx
++++ b/src/app/project/[id]/Project.tsx
+@@ -6,13 +6,15 @@ import HomeButton from "@/components/HomeButton";
+ import AuthButtons from "@/components/AuthButtons";
+ import { Button } from "@/components/ui/button";
+ import { Input } from "@/components/ui/input";
+-import { Label } from "@/components/ui/label";
+ import Main from "./Main";
+ import Footer from "@/components/Footer";
+ import Header from "@/components/Header";
+ import { CheckIcon } from "lucide-react";
+ import { ProjectDto } from "@/dto/project.dto";
+ 
++const projectNameClass =
++  "flex items-center border border-gray-700 p-2 h-[36px] rounded-lg text-sm leading-none font-medium select-none";
++
+ export default function Project({ project }: { project: ProjectDto }) {
+   const { setContent, setName, setTags } = useProjectStore((state) => state);
+   useEffect(() => {
+@@ -44,12 +46,6 @@ export default function Project({ project }: { project: ProjectDto }) {
+   };
+   console.log("---:", project );
+ 
+-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+-    if (e.key === "Enter") {
+-      handleSave();
+-    }
+-  };
+-
+   return (
+     <div className="flex flex-col h-screen">
+       <Header
+@@ -57,31 +53,44 @@ export default function Project({ project }: { project: ProjectDto }) {
+           <div className="flex items-center space-x-4">
+             <HomeButton />
+             {isEditing ? (
+-              <div className="flex items-center space-x-2">
++              <form
++                className="flex items-center space-x-2"
++                aria-label="Rename project"
++                onSubmit={(event) => {
++                  event.preventDefault();
++                  handleSave();
++                }}
++              >
++                <label htmlFor="project-name" className="sr-only">Project name</label>
+                 <Input
++                  id="project-name"
++                  name="projectName"
+                   type="text"
+                   value={newProjectName}
+                   onChange={(e) => setNewProjectName(e.target.value)}
+-                  onKeyDown={handleKeyDown}
+                   disabled={!project.isMy}
+                 />
+-                <Button variant="ghost" onClick={handleSave}>
++                <Button type="submit" variant="ghost" aria-label="Save project name">
+                   <CheckIcon className="w-6 h-6" />
+                 </Button>
+-              </div>
+-            ) : (
+-              <Label
+-                className="border border-gray-700 p-2 h-[36px] rounded-lg"
+-                onClick={() => project.isMy && setIsEditing(true)}
++              </form>
++            ) : project.isMy ? (
++              <button
++                type="button"
++                aria-label={newProjectName ? `${newProjectName}, rename project` : "Rename project"}
++                className={projectNameClass}
++                onClick={() => setIsEditing(true)}
+               >
+                 {newProjectName}
+-              </Label>
++              </button>
++            ) : (
++              <span className={projectNameClass}>{newProjectName}</span>
+             )}
+           </div>
+         }
+         right={
+           <div className="flex space-x-4">
+-            <LinkButton id="new-project" href="/project/new">New</LinkButton>
++            <LinkButton id="new-project" href="/project/new" aria-label="New project">New</LinkButton>
+             <AuthButtons />
+           </div>
+         }
+diff --git a/src/app/top/ProjectList.tsx b/src/app/top/ProjectList.tsx
+index e4d76ef..0029ecc 100644
+--- a/src/app/top/ProjectList.tsx
++++ b/src/app/top/ProjectList.tsx
+@@ -4,20 +4,23 @@ import { TopProject } from "@/services/projectsService";
+ 
+ interface Props {
+   projects: TopProject[];
++  label: string;
+ }
+ 
+-const ProjectList: React.FC<Props> = ({ projects }: Props) => {
++const ProjectList: React.FC<Props> = ({ projects, label }: Props) => {
+   return (
+-    <div
++    <ul
+       id="project-list"
+-            className="grid grid-cols-3 gap-4 overflow-y-auto overflow-x-hidden flex-1  w-full max-w-[1500px] p-4 custom-scrollbar"
++      aria-label={label}
++      className="grid grid-cols-3 gap-4 overflow-y-auto overflow-x-hidden flex-1 w-full max-w-[1500px] p-4 custom-scrollbar"
+       style={{
+         gridTemplateRows: "repeat(auto-fill, minmax(200px, 1fr))",
+-      }}    >
+-      {projects.map((project, index) => (
+-        <ProjectTile project={project} key={index} />
++      }}
++    >
++      {projects.map((project) => (
++        <ProjectTile project={project} key={project.id} />
+       ))}
+-    </div>
++    </ul>
+   );
+ };
+ 
+diff --git a/src/app/top/ProjectTile.tsx b/src/app/top/ProjectTile.tsx
+index 4adb3cc..9a6ce99 100644
+--- a/src/app/top/ProjectTile.tsx
++++ b/src/app/top/ProjectTile.tsx
+@@ -8,18 +8,23 @@ interface ProjectTileProps {
+ }
+ 
+ const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
++  const nameId = `project-${project.id}-name`;
++  const hasName = Boolean(project.name.trim());
++
+   return (
+-    <div className="bg-gray-800 shadow rounded overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col min-h-[180px]">
++    <li className="bg-gray-800 shadow rounded overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col min-h-[180px]">
+       <div className="flex-1 flex items-center justify-center w-full">
+         <Link
+           id={`project-${project.id}`}
++          aria-labelledby={hasName ? nameId : undefined}
++          aria-label={hasName ? undefined : `Project ${project.id}`}
+           href={`project/${project?.projectId}`}
+           className="w-full h-full flex items-center justify-center relative"
+         >
+           {project?.image ? (
+             <Image
+               src={project.image}
+-              alt={project.name}
++              alt=""
+               fill
+               className="object-contain w-full h-full cursor-pointer"
+               unoptimized={project.image.startsWith('data:')}
+@@ -32,11 +37,11 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
+         </Link>
+       </div>
+       <div className="px-2 py-1 bg-gray-900 w-full flex-shrink-0">
+-        <h3 className="text-xs font-bold truncate text-gray-100 text-center">
+-          {project ? project.name : "Placeholder"}
++        <h3 id={nameId} className="text-xs font-bold truncate text-gray-100 text-center">
++          {project.name}
+         </h3>
+       </div>
+-    </div>
++    </li>
+   );
+ };
+ 
+diff --git a/src/app/top/page.tsx b/src/app/top/page.tsx
+index 34585a6..f230254 100644
+--- a/src/app/top/page.tsx
++++ b/src/app/top/page.tsx
+@@ -26,15 +26,15 @@ const Top = async () => {
+       <Header
+         right={
+           <div className="flex items-center space-x-4">
+-            <LinkButton id="new-project" href="/project/new">New</LinkButton>
++            <LinkButton id="new-project" href="/project/new" aria-label="New project">New</LinkButton>
+             <AuthButtons />
+           </div>
+         }
+         center={<ProjectTabs active="top" />}
+       />
+-      <div className="flex flex-col items-center flex-1 overflow-hidden">
+-        <ProjectList projects={topProjects} />
+-      </div>
++      <main aria-label="Trends" className="flex flex-col items-center flex-1 overflow-hidden">
++        <ProjectList projects={topProjects} label="Trending projects" />
++      </main>
+       <Footer />
+     </div>
+   );
+diff --git a/src/components/LinkButton.tsx b/src/components/LinkButton.tsx
+index c43767e..7c6db74 100644
+--- a/src/components/LinkButton.tsx
++++ b/src/components/LinkButton.tsx
+@@ -4,14 +4,16 @@ import Link from "next/link";
+ interface Props {
+   href: string;
+   id?: string;
++  "aria-label"?: string;
+   children: ReactNode;
+ }
+ 
+-const LinkButton: React.FC<Props> = ({ href, id, children }) => {
++const LinkButton: React.FC<Props> = ({ href, id, "aria-label": label, children }) => {
+   return (
+     <Link
+       href={href}
+       id={id}
++      aria-label={label}
+       passHref
+       className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+     >
+diff --git a/src/components/ProjectTabs.tsx b/src/components/ProjectTabs.tsx
+index 38e13af..591f0b2 100644
+--- a/src/components/ProjectTabs.tsx
++++ b/src/components/ProjectTabs.tsx
+@@ -4,9 +4,10 @@ import React from "react";
+ 
+ export default function ProjectTabs({ active }: { active: string }) {
+   return (
+-    <div className="flex space-x-2 p-1 px-2 bg-gray-800  rounded-md ">
++    <nav aria-label="Project collections" className="flex space-x-2 p-1 px-2 bg-gray-800 rounded-md">
+       <Link
+         href="/top"
++        aria-current={active === "top" ? "page" : undefined}
+         className={cn("px-2 rounded-md text-gray-400", {
+           "border-1 border-gray-500 bg-black text-white": active === "top",
+         })}
+@@ -16,6 +17,7 @@ export default function ProjectTabs({ active }: { active: string }) {
+       </Link>
+       <Link
+         href="/my"
++        aria-current={active === "my" ? "page" : undefined}
+         className={cn("px-2 rounded-md text-gray-400", {
+           "border-1 border-gray-500 bg-black text-white": active === "my",
+         })}
+@@ -23,6 +25,6 @@ export default function ProjectTabs({ active }: { active: string }) {
+       >
+         My Projects
+       </Link>
+-    </div>
++    </nav>
+   );
+ }
+diff --git a/src/components/stores/projectStore.ts b/src/components/stores/projectStore.ts
+index 34e65aa..baaf7bc 100644
+--- a/src/components/stores/projectStore.ts
++++ b/src/components/stores/projectStore.ts
+@@ -11,7 +11,7 @@ export type ProjectActions = {
+   setError: (error: string) => void;
+   setSelectedFile: (file: keyof Content) => void;
+   setFileContent: (file: string, content: string) => void;
+-  setContent: (data: Content) => void;
++  setContent: (data: Partial<Content>) => void;
+   getPreview: () => string;
+   triggerPreview: () => void;
+   uploadFiles: (
+@@ -150,7 +150,7 @@ export const createProjectStore = (
+         return newState;
+       });
+     },
+-    setContent: (data: Content) => {
++    setContent: (data) => {
+       set((state) => {
+         const newFileContents = { ...state.fileContents, ...data };
+         const newState = { ...state, fileContents: newFileContents };
+diff --git a/src/components/stores/useAi.ts b/src/components/stores/useAi.ts
+index d6f6d04..73c1f56 100644
+--- a/src/components/stores/useAi.ts
++++ b/src/components/stores/useAi.ts
+@@ -1,5 +1,5 @@
+ import { create } from "zustand";
+-import { toast } from "sonner"; // Import the toast function
++import { toast } from "sonner";
+ 
+ interface ChatMessage {
+   role: "user" | "assistant";
+@@ -9,76 +9,85 @@ interface ChatMessage {
+ interface AiState {
+   requestAi: (text: string, files?: any) => Promise<void>;
+   clearHistory: () => void;
+-  isLoading: boolean;
++  status: "idle" | "generating" | "completed" | "error";
++  error: string;
+   response: string;
+   history: ChatMessage[];
+ }
+ 
+ export const useAiStore = create<AiState>((set, get) => ({
+   response: "",
+-  isLoading: false,
++  status: "idle",
++  error: "",
+   history: [],
+-  clearHistory: () => set({ history: [], response: "" }),
++  clearHistory: () => set({ history: [], response: "", status: "idle", error: "" }),
+   requestAi: async (text: string, files?: any) => {
+-    const currentHistory = get().history;
+-    set((state) => ({
+-      isLoading: true,
++    const { history, status } = get();
++    if (status === "generating") return;
++    set({
++      status: "generating",
++      error: "",
+       response: "✨ AI magic is processing...",
+-    }));
++    });
+ 
+     try {
+       const response = await fetch("/api/ai", {
+         method: "POST",
+         body: JSON.stringify({ 
+             prompt: text,
+-            history: currentHistory,
++            history,
+             files
+         }),
+       });
+ 
+       if (!response.ok || !response.body) {
+-        console.error("Failed to ai request:", response.statusText);
+-        toast.error(`Failed to ai request: ${response.statusText}`);
+-        set({ isLoading: false });
+-        return;
++        throw new Error(`Generation failed (HTTP ${response.status}).`);
+       }
+ 
+       const reader = response.body.getReader();
+       const decoder = new TextDecoder();
+       let result = "";
++      let pending = "";
++      let completed = false;
+ 
+-      while (true) {
+-        const { done, value } = await reader.read();
+-        if (done) break;
+-        const chunk = decoder.decode(value, { stream: true });
+-        for (const line of chunk.replaceAll("data:", "").split("\n")) {
+-          if (!line.trim()) continue;
+-          try {
+-            const json = JSON.parse(line);
+-            if (json?.content) {
+-              if (json.content === "[DONE]") continue;
+-              if (result === "✨ AI magic is processing...") result = "";
+-              result += json.content;
+-              set({ response: result });
++      try {
++        while (true) {
++          const { done, value } = await reader.read();
++          if (done) break;
++          pending += decoder.decode(value, { stream: true });
++          const lines = pending.split("\n");
++          pending = lines.pop() ?? "";
++          for (const line of lines) {
++            if (!line.startsWith("data:")) continue;
++            const { content } = JSON.parse(line.slice(5));
++            if (content === "[DONE]") {
++              completed = true;
++            } else if (typeof content === "string" && !completed) {
++              result += content;
+             }
+-          } catch (e) {
+-            // Ignore parse errors for incomplete lines
+           }
++          if (result) set({ response: result });
+         }
++      } finally {
++        reader.releaseLock();
+       }
+-      
+-      set((state) => ({ 
+-        isLoading: false,
++
++      if (!completed) throw new Error("Generation ended before the response was complete.");
++      if (!result.trim()) throw new Error("Generation returned no response.");
++
++      set((state) => ({
++        status: "completed",
+         history: [
+             ...state.history,
+             { role: "user", content: text },
+             { role: "assistant", content: result }
+         ]
+       }));
+-    } catch (err) {
+-      console.error("Error ai request:", err);
+-      toast.error("Error ai request");
+-      set({ isLoading: false });
++    } catch (error) {
++      console.error("AI request failed:", error);
++      const message = error instanceof Error ? error.message : "Generation failed.";
++      set({ status: "error", error: message });
++      toast.error(message);
+     }
+   },
+ }));
+diff --git a/src/services/aiService.ts b/src/services/aiService.ts
+index f38ed47..6619c17 100644
+--- a/src/services/aiService.ts
++++ b/src/services/aiService.ts
+@@ -115,6 +115,8 @@ Use ONLY these file blocks:
+ 
+ **Semantic HTML IDs**: You MUST assign stable, unique native HTML id attributes to important controls, application regions, and visible results. Use meaningful kebab-case names based on each element's purpose. For repeated items, derive IDs from stable item identifiers. Preserve existing IDs when refining the app. For example, use calculator-display for a calculator result, calculator-digit-7 for its 7 button, and calculator-multiply for its multiplication button.
+ 
++**Accessible application UI**: Use semantic HTML for landmarks, collections, forms, buttons, links, and results. Label form controls and name important regions and control groups. Give icon-only and symbol-only controls descriptive accessible names that include their visible text or symbol. Prefer native semantics and use ARIA only for real names, relationships, and states. Expose actual progress, success, and errors through appropriate status or alert elements without announcing every incremental update. Preserve existing keyboard behavior, layout, and application logic when refining.
++
+ Make sure the designs are "premium" and "wow" the user. Use modern CSS (gradients, glassmorphism, animations).
+ Inform the user about your logic and decisions before the code blocks.`;
+ console.log(request.history);
+@@ -136,6 +138,7 @@ console.log(request.history);
+     });
+ 
+     let currentChunkContent = "";
++    let needsContinuation = false;
+ 
+     for await (const chunk of stream) {
+       const content = chunk.choices[0]?.delta?.content || "";
+@@ -147,21 +150,28 @@ console.log(request.history);
+ 
+       const finishReason = chunk.choices[0]?.finish_reason;
+       if (finishReason === "length") {
++        if (!currentChunkContent.trim()) {
++          throw new Error("The provider returned an empty continuation.");
++        }
+         // Auto-continue logic
+         messages.push({ role: "assistant", content: currentChunkContent });
+         messages.push({ role: "user", content: "Your output was cut off. Please continue exactly where you left off. Do NOT repeat or wrap in new code blocks if you were in the middle of one." });
++        needsContinuation = true;
+         break; // Break the inner loop to restart with the new messages
+-      } else if (finishReason === "stop" || finishReason === "content_filter") {
++      } else if (finishReason === "stop") {
+         finished = true;
++      } else if (finishReason === "content_filter") {
++        throw new Error("The provider stopped generation.");
+       }
+     }
+     
+-    // If we finished the loop without a length trigger, we are done
+-    if (!finished && currentChunkContent === "") {
+-        finished = true; // Safety break
++    if (!finished && !needsContinuation) {
++      throw new Error("The provider ended generation without a completion signal.");
+     }
+   }
+ 
++  if (!fullContent.trim()) throw new Error("The provider returned no response.");
++
+   // Final validation step
+   const isRefinement = !!request.history && request.history.length > 0;
+   const issues = validateCode(fullContent, isRefinement);

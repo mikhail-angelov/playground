@@ -1,0 +1,69 @@
+--- a/index.html
++++ b/index.html
+@@ -13,36 +13,36 @@
+     <div class="orb orb--3"></div>
+   </div>
+ 
+-  <main class="calculator" aria-label="Calculator">
++  <main id="calculator" class="calculator" aria-label="Calculator">
+     <div class="display">
+       <div class="display__history" id="history">&nbsp;</div>
+-      <div class="display__result" id="result">0</div>
++      <div class="display__result" id="calculator-display">0</div>
+     </div>
+ 
+     <div class="keypad">
+-      <button class="btn btn--fn" data-action="clear">AC</button>
+-      <button class="btn btn--fn" data-action="sign">±</button>
+-      <button class="btn btn--fn" data-action="percent">%</button>
+-      <button class="btn btn--op" data-action="operator" data-op="÷">÷</button>
++      <button id="calculator-clear" class="btn btn--fn" data-action="clear">AC</button>
++      <button id="calculator-toggle-sign" class="btn btn--fn" data-action="sign">±</button>
++      <button id="calculator-percent" class="btn btn--fn" data-action="percent">%</button>
++      <button id="calculator-divide" class="btn btn--op" data-action="operator" data-op="÷">÷</button>
+ 
+-      <button class="btn btn--num" data-action="digit" data-digit="7">7</button>
+-      <button class="btn btn--num" data-action="digit" data-digit="8">8</button>
+-      <button class="btn btn--num" data-action="digit" data-digit="9">9</button>
+-      <button class="btn btn--op" data-action="operator" data-op="×">×</button>
++      <button id="calculator-digit-7" class="btn btn--num" data-action="digit" data-digit="7">7</button>
++      <button id="calculator-digit-8" class="btn btn--num" data-action="digit" data-digit="8">8</button>
++      <button id="calculator-digit-9" class="btn btn--num" data-action="digit" data-digit="9">9</button>
++      <button id="calculator-multiply" class="btn btn--op" data-action="operator" data-op="×">×</button>
+ 
+-      <button class="btn btn--num" data-action="digit" data-digit="4">4</button>
+-      <button class="btn btn--num" data-action="digit" data-digit="5">5</button>
+-      <button class="btn btn--num" data-action="digit" data-digit="6">6</button>
+-      <button class="btn btn--op" data-action="operator" data-op="−">−</button>
++      <button id="calculator-digit-4" class="btn btn--num" data-action="digit" data-digit="4">4</button>
++      <button id="calculator-digit-5" class="btn btn--num" data-action="digit" data-digit="5">5</button>
++      <button id="calculator-digit-6" class="btn btn--num" data-action="digit" data-digit="6">6</button>
++      <button id="calculator-subtract" class="btn btn--op" data-action="operator" data-op="−">−</button>
+ 
+-      <button class="btn btn--num" data-action="digit" data-digit="1">1</button>
+-      <button class="btn btn--num" data-action="digit" data-digit="2">2</button>
+-      <button class="btn btn--num" data-action="digit" data-digit="3">3</button>
+-      <button class="btn btn--op" data-action="operator" data-op="+">+</button>
++      <button id="calculator-digit-1" class="btn btn--num" data-action="digit" data-digit="1">1</button>
++      <button id="calculator-digit-2" class="btn btn--num" data-action="digit" data-digit="2">2</button>
++      <button id="calculator-digit-3" class="btn btn--num" data-action="digit" data-digit="3">3</button>
++      <button id="calculator-add" class="btn btn--op" data-action="operator" data-op="+">+</button>
+ 
+-      <button class="btn btn--num btn--zero" data-action="digit" data-digit="0">0</button>
+-      <button class="btn btn--num" data-action="decimal">.</button>
+-      <button class="btn btn--equals" data-action="equals">=</button>
++      <button id="calculator-digit-0" class="btn btn--num btn--zero" data-action="digit" data-digit="0">0</button>
++      <button id="calculator-decimal" class="btn btn--num" data-action="decimal">.</button>
++      <button id="calculator-equals" class="btn btn--equals" data-action="equals">=</button>
+     </div>
+   </main>
+ 
+--- a/script.js
++++ b/script.js
+@@ -1,5 +1,5 @@
+ (() => {
+-  const resultEl = document.getElementById('result');
++  const resultEl = document.getElementById('calculator-display');
+   const historyEl = document.getElementById('history');
+ 
+   // Calculator state

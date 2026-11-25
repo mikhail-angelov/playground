@@ -1,0 +1,7 @@
+4c7325b675eb734ec998873751b991f943c638b535fd2cedaa2e63db31e48be8  briefs/calc-01.md
+fdda66e5c523a755fb856e79ae8567256dc8063639392943ab5816daefd6ce0d  configs/R2.json
+f95b27b82ccbb2d3345be1d117135b6d2edc5aa66bbbffada8951ba60ae9fe19  fixtures/R2.json.gz
+5784ed97dbaa0baa418b0faa84ae641f78ef20ba11e9a9e65f6ccdee64f5e385  fixtures/R1-to-R2.patch
+009a8bc9e7e129a8b6f26642582765ff52345c6c93083908d627cd47ad0fd8a7  fixtures/product-R1-to-R2.patch
+e998bd69a2052de08cc839219df608bc4ddefecfac5ef1da803a5e8a32941082  reference-r2/calc-01.spec.ts
+fc1eac8960a79345ad10db946c22831559f7f6cfa31a4e5689b7581d98b2e8a1  reference-r2/playwright.config.ts

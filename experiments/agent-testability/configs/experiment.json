@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "model": "gpt-6.2-sol",
+  "effort": "high",
+  "codexVersion": "codex-cli 0.171.0",
+  "nodeVersion": "v22.23.5",
+  "npmVersion": "10.9.9",
+  "playwrightVersion": "1.61.1",
+  "chromiumRevision": "1228",
+  "wallMs": 600000,
+  "testLaunchLimit": 4,
+  "testTimeoutMs": 120000,
+  "expectTimeoutMs": 15000,
+  "actionTimeoutMs": 10000,
+  "viewport": { "width": 1440, "height": 1000 },
+  "locale": "en-US",
+  "timezoneId": "UTC"
+}

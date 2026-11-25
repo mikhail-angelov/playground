@@ -12,6 +12,12 @@
     "next:start": "next start",
     "lint": "next lint",
     "test": "jest",
+    "agent:reference": "node experiments/agent-testability/harness/reference.mjs",
+    "agent:smoke": "node experiments/agent-testability/harness/run.mjs smoke",
+    "agent:benchmark": "node experiments/agent-testability/harness/run.mjs benchmark",
+    "agent:grade": "node experiments/agent-testability/harness/grade.mjs",
+    "agent:report": "node experiments/agent-testability/harness/report.mjs && node experiments/agent-testability/report-actions.mjs",
+    "agent:report:interface": "node experiments/agent-testability/interface-b/report.mjs",
     "migration:gen": "drizzle-kit generate",
     "migration:run": "drizzle-kit migrate",
     "seed": "ts-node --project tsconfig.server.json ./src/db/seed.ts"
@@ -58,6 +64,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/better-sqlite3": "^7.6.13",
     "@types/ejs": "^3.1.5",
