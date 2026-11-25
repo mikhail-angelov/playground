@@ -59,6 +59,7 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
               <PublishButton projectId={project.projectId} />
             )}
             <Button
+              id="preview-run"
               onClick={() => {
                 setPreview(composePreview(fileContents, project.projectId));
               }}
@@ -69,7 +70,7 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
           </div>
         </div>
         <iframe
-          id="iframe"
+          id="application-preview"
           ref={iframeRef}
           srcDoc={preview}
           title="Preview"
@@ -83,7 +84,7 @@ const PreviewPanel = ({ project }: { project: ProjectDto }) => {
             <h3 className="mx-2">Console Output</h3>
             <Button variant="outline" className="size-xs" onClick={() => setConsoleOutput([])}>x</Button>
           </div>
-          <div className="mx-2 ">
+          <div id="preview-console" className="mx-2 ">
             {consoleOutput.map((message, index) => (
               <div key={index} className="text-sm">
                 {message}

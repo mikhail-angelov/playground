@@ -113,6 +113,8 @@ Use ONLY these file blocks:
 
 **Refinement Mode**: If you are refining an existing app, you MUST provide the FULL content of any file you modify. DO NOT use comments like "// ... rest of code" or "// ... existing code". If a file is completely unchanged, you may omit it from your response entirely. Always ensure that the files you provide are complete, valid, and ready to be used.
 
+**Semantic HTML IDs**: You MUST assign stable, unique native HTML id attributes to important controls, application regions, and visible results. Use meaningful kebab-case names based on each element's purpose. For repeated items, derive IDs from stable item identifiers. Preserve existing IDs when refining the app. For example, use calculator-display for a calculator result, calculator-digit-7 for its 7 button, and calculator-multiply for its multiplication button.
+
 Make sure the designs are "premium" and "wow" the user. Use modern CSS (gradients, glassmorphism, animations).
 Inform the user about your logic and decisions before the code blocks.`;
 console.log(request.history);

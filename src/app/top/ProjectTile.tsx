@@ -11,7 +11,11 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ project }) => {
   return (
     <div className="bg-gray-800 shadow rounded overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 flex flex-col min-h-[180px]">
       <div className="flex-1 flex items-center justify-center w-full">
-        <Link href={`project/${project?.projectId}`} className="w-full h-full flex items-center justify-center relative">
+        <Link
+          id={`project-${project.id}`}
+          href={`project/${project?.projectId}`}
+          className="w-full h-full flex items-center justify-center relative"
+        >
           {project?.image ? (
             <Image
               src={project.image}

@@ -19,7 +19,7 @@ export default async function Page() {
         <Header
           right={
             <div className="flex items-center space-x-4">
-              <LinkButton href="/project/new">New</LinkButton>
+              <LinkButton id="new-project" href="/project/new">New</LinkButton>
               <AuthButtons />
             </div>
           }
@@ -41,7 +41,7 @@ export default async function Page() {
       <Header
         right={
           <div className="flex items-center space-x-4">
-            <LinkButton href="/project/new">New</LinkButton>
+            <LinkButton id="new-project" href="/project/new">New</LinkButton>
             <AuthButtons />
           </div>
         }

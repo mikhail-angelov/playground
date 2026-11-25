@@ -47,7 +47,7 @@ const EditorPanel: React.FC<EditorPanelProps> = ({ width }) => {
   }, [selectedFile]);
 
   return (
-    <div className="flex-grow p-1 h-full" style={{ width: `${width}px` }}>
+    <div id="source-editor" className="flex-grow p-1 h-full" style={{ width: `${width}px` }}>
       <Editor
         height="100%"
         defaultLanguage={language}

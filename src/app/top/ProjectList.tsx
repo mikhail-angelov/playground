@@ -9,6 +9,7 @@ interface Props {
 const ProjectList: React.FC<Props> = ({ projects }: Props) => {
   return (
     <div
+      id="project-list"
             className="grid grid-cols-3 gap-4 overflow-y-auto overflow-x-hidden flex-1  w-full max-w-[1500px] p-4 custom-scrollbar"
       style={{
         gridTemplateRows: "repeat(auto-fill, minmax(200px, 1fr))",

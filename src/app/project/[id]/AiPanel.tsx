@@ -113,6 +113,7 @@ const AiPanel: React.FC = () => {
     <ResizablePanelGroup direction="vertical">
       <ResizablePanel className="flex flex-col !overflow-y-auto">
         <div
+          id="ai-conversation"
           ref={markdownRef}
           className="flex-1 p-4 text-gray-300 whitespace-pre-wrap overflow-x-auto"
           style={{ minHeight: 0, height: "100%", overflowY: "auto" }}
@@ -187,6 +188,7 @@ const AiPanel: React.FC = () => {
       <ResizablePanel defaultSize={12} minSize={12}>
         <div className="flex h-full">
           <textarea
+            id="ai-prompt"
             ref={textareaRef}
             className="w-full h-full p-2 bg-gray-900 text-white"
             value={text}
@@ -205,12 +207,14 @@ const AiPanel: React.FC = () => {
           />
           <div className="grid grid-cols-2 gap-2 m-1">
           <Button
+            id="ai-generate"
             onClick={handleRequestAi}
             disabled={isLoading}
           >
             <SparklesIcon className="w-6 h-6" />
           </Button>
           <Button
+            id="ai-apply-code"
             onClick={copyCodeToProject}
             disabled={isLoading}
             title="Patch generated code to project"
@@ -218,6 +222,7 @@ const AiPanel: React.FC = () => {
             <Copy className="w-6 h-6" />
           </Button>
           <Button
+            id="ai-clear-history"
             className="bg-red-900/20 hover:bg-red-900/40 text-red-500 border border-red-900/50"
             onClick={clearHistory}
             disabled={isLoading}

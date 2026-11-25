@@ -96,6 +96,7 @@ export default function Main({ project }: { project: ProjectDto }) {
                 <ChevronRight className="w-6 h-6 text-white" />
               </Button>
               <Button
+                id="preview-tab"
                 onClick={() => setUIState(UI_STATE.PREVIEW)}
                 variant={uiState === UI_STATE.PREVIEW ? "default" : "outline"}
               >
@@ -104,6 +105,7 @@ export default function Main({ project }: { project: ProjectDto }) {
 
               {project.hasAi && (
                 <Button
+                  id="ai-tab"
                   onClick={() => setUIState(UI_STATE.AI)}
                   variant={uiState === UI_STATE.AI ? "default" : "outline"}
                   className="ml-2"

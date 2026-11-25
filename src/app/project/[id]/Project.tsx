@@ -81,7 +81,7 @@ export default function Project({ project }: { project: ProjectDto }) {
         }
         right={
           <div className="flex space-x-4">
-            <LinkButton href="/project/new">New</LinkButton>
+            <LinkButton id="new-project" href="/project/new">New</LinkButton>
             <AuthButtons />
           </div>
         }
